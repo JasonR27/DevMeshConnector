@@ -1,5 +1,12 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
+console.log("process.env.REACT_APP_BACKEND_URL: ", process.env.REACT_APP_BACKEND_URL)
+console.log("process.env: ", process.env)
+console.log("process.env.REACT_APP_SUPABASE_URL: ", process.env.REACT_APP_SUPABASE_URL)
+console.log("TESTFRONTEND: ", process.env.TESTFRONTEND)
+console.log("TESTBACKEND: ", process.env.TESTBACKEND)
+console.log("REACT_APP_TESTFRONTEND: ", process.env.REACT_APP_TESTFRONTEND)
+console.log("REACT_APP_TESTBACKEND: ", process.env.REACT_APP_TESTBACKEND)
 const baseUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/posts`;
 const profileUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/profile`;
 const pictureUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/picture`;
@@ -12,6 +19,7 @@ export async function getProfiles() {
 
 export async function fetchPosts() {
   const { data } = await axios.get(baseUrl);
+  // const { data } = await axios.get("/api/v1/posts");
   return data;
 }
 

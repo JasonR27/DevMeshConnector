@@ -74,3 +74,4 @@ model Picture {
   profileId Int      @unique
   profile   Profile  @relation(fields: [profileId], references: [id])
 }
+

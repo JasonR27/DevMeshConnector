@@ -11,7 +11,7 @@ jobs:
 
   deploy:
     name: Deploy App
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -29,7 +29,7 @@ jobs:
   backend:
     needs: deploy
     if: ${{ needs.deploy.outputs.backend == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
@@ -39,7 +39,7 @@ jobs:
   frontend:
     needs: deploy
     if: ${{ needs.deploy.outputs.frontend == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: superfly/flyctl-actions/setup-flyctl@master
