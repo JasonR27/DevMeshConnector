@@ -1,9 +1,10 @@
-import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-const userData: Prisma.ProfileCreateInput[] = [
+const userData: Prisma.ProfilesCreateInput[] = [
   {
+    
     username: 'John Doe',
     authorEmail: 'johndoe@gmail.com',
     website: 'johndoe.io',
@@ -11,11 +12,13 @@ const userData: Prisma.ProfileCreateInput[] = [
     posts: {
       create: [
         {
+          user_Id: 1,   
           title: 'Join the Prisma Slack',
           content: 'https://slack.prisma.io',
           published: true,
         },
         {
+          user_Id: 1,
           title: 'Join the other community',
           content: 'https://slack.prisma.io',
           published: true,
@@ -31,6 +34,7 @@ const userData: Prisma.ProfileCreateInput[] = [
     posts: {
       create: [
         {
+          user_Id: 3,
           title: 'Join the Prisma Slack',
           content: 'https://slack.prisma.io',
           published: true,
@@ -46,6 +50,7 @@ const userData: Prisma.ProfileCreateInput[] = [
     posts: {
       create: [
         {
+          user_Id: 2,
           title: 'Ask a question about Prisma on GitHub',
           content: 'https://www.github.com/prisma/prisma/discussions',
           published: true,
@@ -54,25 +59,25 @@ const userData: Prisma.ProfileCreateInput[] = [
       ],
     },
   },
-]
+];
 
 async function main() {
-  console.log(`Start seeding ...`)
+  console.log('Start seeding ...');
   for (const u of userData) {
-    const user = await prisma.profile.create({
+    const user = await prisma.profiles.create({
       data: u,
-    })
-    console.log(`Created user with id: ${user.id}`)
+    });
+    console.log(`Created user with id: ${user.id}`);
   }
-  console.log(`Seeding finished.`)
+  console.log('Seeding finished.');
 }
 
 main()
   .then(async () => {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   })
   .catch(async (e) => {
-    console.error(e)
-    await prisma.$disconnect()
-    process.exit(1)
-  })
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

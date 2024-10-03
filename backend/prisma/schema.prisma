@@ -10,7 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Profile {
+model Users {
+  id       Int        @id @default(autoincrement())
+  name     String
+  email    String     @unique
+  password String
+  posts    Posts[]
+  comments Comments[]
+  friends  Friends[]
+  likes    Likes[]
+}
+
+model Profiles {
   id                   Int                    @id @default(autoincrement())
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
@@ -21,8 +32,8 @@ model Profile {
   isPublic             Boolean                @default(false)
   programmingLanguages ProgrammingLanguages[]
   picture              Picture?
-  posts                Post[]
-  likes                Like[]
+  posts                Posts[]
+  likes                Likes[]
 }
 
 model ProgrammingLanguages {
@@ -31,39 +42,9 @@ model ProgrammingLanguages {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profileId Int
-  Profile   Profile  @relation(fields: [profileId], references: [id])
+  profile   Profiles @relation(fields: [profileId], references: [id])
 
   @@unique([language, id])
-}
-
-model Post {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  title     String
-  content   String?
-  published Boolean   @default(false)
-  viewCount Int       @default(0)
-  profileId Int?
-  profile   Profile?  @relation(fields: [profileId], references: [id])
-  likes     Like[]
-  comments  Comment[]
-}
-
-model Like {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  postId    Int
-  Post      Post     @relation(fields: [postId], references: [id])
-  profileId Int
-  Profile   Profile  @relation(fields: [profileId], references: [id])
-}
-
-model Comment {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  postId    Int
-  Post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Picture {
@@ -72,6 +53,49 @@ model Picture {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   profileId Int      @unique
-  profile   Profile  @relation(fields: [profileId], references: [id])
+  profile   Profiles @relation(fields: [profileId], references: [id])
 }
 
+model Posts {
+  id        Int       @id @default(autoincrement())
+  user      Users     @relation(fields: [user_Id], references: [id])
+  user_Id   Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  title     String
+  content   String?
+  published Boolean   @default(false)
+  viewCount Int       @default(0)
+  profileId Int?
+  profile   Profiles?  @relation(fields: [profileId], references: [id])
+  likes     Likes[]
+  comments  Comments[]
+}
+
+model Comments {
+  id      Int    @id @default(autoincrement())
+  post    Posts  @relation(fields: [post_Id], references: [id])
+  post_Id Int
+  user    Users  @relation(fields: [user_Id], references: [id])
+  user_Id Int
+  content String
+  img     String
+  audio   String
+  file    String
+}
+
+model Friends {
+  id      Int   @id @default(autoincrement())
+  user    Users @relation(fields: [user_Id], references: [id])
+  user_Id Int
+}
+
+model Likes {
+  id         Int      @id @default(autoincrement())
+  post       Posts    @relation(fields: [post_Id], references: [id])
+  post_Id    Int
+  user       Users    @relation(fields: [user_Id], references: [id])
+  user_Id    Int
+  profile    Profiles @relation(fields: [profile_Id], references: [id])
+  profile_Id Int
+}

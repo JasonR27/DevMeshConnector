@@ -4,7 +4,7 @@ import prisma from '../lib/prisma';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const profiles = await prisma.profile.findMany({
+  const profiles = await prisma.profiles.findMany({
     include: {
       programmingLanguages: {
         select: {
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 router.post('/create', async (req, res) => {
   const { username, website, authorEmail, programmingLanguages, company } = req.body;
 
-  const result = await prisma.profile.create({
+  const result = await prisma.profiles.create({
     data: {
       username,
       website,
@@ -49,7 +49,7 @@ router.put('/updateById/:profileId', async (req, res) => {
   await prisma.$transaction([prisma.programmingLanguages.deleteMany({ where: { profileId: Number(profileId) } })]);
 
   // then we repopulate programmingLanguages
-  const profileUpdated = await prisma.profile.update({
+  const profileUpdated = await prisma.profiles.update({
     where: { id: Number(profileId) },
     data: {
       username: username,
@@ -72,7 +72,7 @@ router.get('/findProfileByEmail/:authorEmail', async (req, res) => {
   const { authorEmail } = req.params;
 
   try {
-    const profile = await prisma.profile.findFirst({
+    const profile = await prisma.profiles.findFirst({
       where: { authorEmail },
       include: {
         programmingLanguages: {
@@ -91,7 +91,7 @@ router.get('/findProfileByEmail/:authorEmail', async (req, res) => {
 
 router.put('/publishProfile/:profileId', async (req, res) => {
   const { profileId } = req.params;
-  const profileUpdated = await prisma.profile.update({
+  const profileUpdated = await prisma.profiles.update({
     where: { id: Number(profileId) },
     data: { isPublic: true },
   });
@@ -101,7 +101,7 @@ router.put('/publishProfile/:profileId', async (req, res) => {
 router.get('/:profileId', async (req, res) => {
   const { profileId } = req.params;
 
-  const profile = await prisma.profile.findFirst({
+  const profile = await prisma.profiles.findFirst({
     where: { id: Number(profileId) },
   });
   res.json(profile);

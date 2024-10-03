@@ -14,7 +14,7 @@ const WelcomePage = () => {
       w={'full'}
       h={'100vh'}
       backgroundImage={
-        'url(https://images.unsplash.com/photo-1600267175161-cfaa711b4a81?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)'
+        'url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmhic3B6MGwxaDlud2Rsa3NkNmhmNHo2b2xsc2NmMm1vNHl3ZXBheCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jMbfmwkrcm82PRlYa9/giphy.webp)'
       }
       backgroundSize={'cover'}
       backgroundPosition={'center center'}>
@@ -29,7 +29,8 @@ const WelcomePage = () => {
             fontWeight={700}
             lineHeight={1.2}
             fontSize={useBreakpointValue({ base: '3xl', md: '4xl' })}>
-            DevConnector V4 🚀
+            DevConnector V4 from github daniellaera (another version by JasonR27
+            ) 🚀
           </Text>
           <Stack direction={'row'}>
             <Button

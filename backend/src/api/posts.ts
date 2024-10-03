@@ -5,7 +5,7 @@ import { auth } from '../middleware/auth';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const posts = await prisma.post.findMany({
+  const posts = await prisma.posts.findMany({
     include: {
       profile: {
         select: {
@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 router.post('/create', auth, async (req, res) => {
   const { title, content, profileId } = req.body;
   try {
-    const result = await prisma.post.create({
+    const result = await prisma.posts.create({
       data: {
         title,
         content,
@@ -38,7 +38,7 @@ router.post('/create', auth, async (req, res) => {
 router.get('/post/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const post = await prisma.post.findFirst({
+    const post = await prisma.posts.findFirst({
       where: {
         id: Number(id),
       },
