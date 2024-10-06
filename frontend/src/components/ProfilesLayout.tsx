@@ -4,7 +4,7 @@ import ProfilesActions from './ProfilesActions';
 const ProfilesLayout = () => {
   return (
     <>
-      <ProfilesActions />
+      <ProfilesActions />  
       <Outlet />
     </>
   );

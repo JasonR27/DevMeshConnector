@@ -4,9 +4,9 @@ import MessageResponse from '../interfaces/MessageResponse';
 import emojis from './emojis';
 import posts from './posts';
 import users from './users';
-import profile from './profile';
-import picture from './picture';
-import like from './like';
+import profile from './profiles';
+import picture from './pictures';
+import like from './likes';
 
 const router = express.Router();
 
@@ -19,8 +19,8 @@ router.get<{}, MessageResponse>('/', (req, res) => {
 router.use('/emojis', emojis);
 router.use('/users', users);
 router.use('/posts', posts);
-router.use('/profile', profile);
-router.use('/picture', picture);
-router.use('/like', like);
+router.use('/profiles', profile);
+router.use('/pictures', picture);
+router.use('/likes', like);
 
 export default router;

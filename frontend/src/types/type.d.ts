@@ -12,6 +12,7 @@ interface IPost {
 }
 
 interface IProgrammingLanguage {
+  name: ReactNode;
   createdAt?: string;
   id: number;
   language: string;
@@ -37,7 +38,8 @@ interface ILike {
 }
 
 interface IProfile {
-  id: number;
+  id: uuid;
+  userId: uuid;
   authorEmail: string;
   website: string;
   username: string;
@@ -80,3 +82,18 @@ interface ProfilePageProps {
 interface ReadMoreButtonProps {
   postId: number;
 }
+
+interface Profile {
+  username: string;
+  company: string;
+  authorEmail: string;
+  website: string;
+  programmingLanguages: { language: string }[];
+  picture: { avatarUrl: string };
+}
+
+interface ProfilesProps {
+  profiles: IProfile[];
+}
+
+

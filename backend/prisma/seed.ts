@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 
 const userData: Prisma.ProfilesCreateInput[] = [
   {
-    
     username: 'John Doe',
     authorEmail: 'johndoe@gmail.com',
     website: 'johndoe.io',
@@ -12,18 +11,23 @@ const userData: Prisma.ProfilesCreateInput[] = [
     posts: {
       create: [
         {
-          user_Id: 1,   
+          userId: '1',
           title: 'Join the Prisma Slack',
           content: 'https://slack.prisma.io',
           published: true,
         },
         {
-          user_Id: 1,
+          userId: '1',
           title: 'Join the other community',
           content: 'https://slack.prisma.io',
           published: true,
         },
       ],
+    },
+    user: {
+      create: undefined,
+      connectOrCreate: undefined,
+      connect: undefined,
     },
   },
   {
@@ -34,12 +38,17 @@ const userData: Prisma.ProfilesCreateInput[] = [
     posts: {
       create: [
         {
-          user_Id: 3,
+          userId: '3',
           title: 'Join the Prisma Slack',
           content: 'https://slack.prisma.io',
           published: true,
         },
       ],
+    },
+    user: {
+      create: undefined,
+      connectOrCreate: undefined,
+      connect: undefined,
     },
   },
   {
@@ -50,13 +59,18 @@ const userData: Prisma.ProfilesCreateInput[] = [
     posts: {
       create: [
         {
-          user_Id: 2,
+          userId: '2',
           title: 'Ask a question about Prisma on GitHub',
           content: 'https://www.github.com/prisma/prisma/discussions',
           published: true,
           viewCount: 128,
         },
       ],
+    },
+    user: {
+      create: undefined,
+      connectOrCreate: undefined,
+      connect: undefined,
     },
   },
 ];

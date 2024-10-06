@@ -9,7 +9,7 @@ router.get('/pictureByProfileId/:profileId', async (req, res) => {
 
   try {
     const post = await prisma.picture.findFirst({
-      where: { profileId: Number(profileId) },
+      where: { profileId: profileId },
     });
 
     res.json(post);
@@ -38,7 +38,7 @@ router.put('/update', auth, async (req, res) => {
 
   const updateUser = await prisma.picture.update({
     where: {
-      profileId: Number(profileId),
+      profileId: profileId,
     },
     data: {
       avatarUrl,

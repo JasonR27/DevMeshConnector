@@ -1,27 +1,29 @@
-import { EditIcon } from '@chakra-ui/icons';
-import {
-  Box, Progress, useToast,
-  Heading,
-  Text,
-  Stack,
-  Button,
-  Badge,
-  useColorModeValue,
-  Flex,
-  Input,
-  FormControl,
-  FormLabel,
-  Tag,
-  TagLabel,
-  useDisclosure,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
-  HStack
-} from '@chakra-ui/react';
+// import { EditIcon } from '@chakra-ui/icons';
+// import {
+//   Box, Progress, useToast,
+//   Heading,
+//   Text,
+//   Stack,
+//   Button,
+//   Badge,
+//   useColorModeValue,
+//   Flex,
+//   Input,
+//   FormControl,
+//   FormLabel,
+//   Tag,
+//   TagLabel,
+//   useDisclosure,
+//   AlertDialog,
+//   AlertDialogOverlay,
+//   AlertDialogContent,
+//   AlertDialogHeader,
+//   AlertDialogBody,
+//   AlertDialogFooter,
+//   HStack
+// } from '@chakra-ui/react';
+import { Container, Row, Col, Button, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import classnames from 'classnames';
 import { Session, User } from '@supabase/supabase-js';
 import { AxiosResponse } from 'axios';
 import { useEffect, useRef, useState } from 'react';
@@ -29,7 +31,7 @@ import { useMutation, useQuery } from 'react-query';
 import { supabaseClient } from '../config/supabase-client';
 import { getRandomColor } from '../utils/functions';
 import PersonalAvatar from './PersonalAvatar';
-import { AsyncSelect, MultiValue } from 'chakra-react-select';
+// import { AsyncSelect, MultiValue } from 'chakra-react-select';
 import { pickListOptions } from '../config/pickListOptions';
 import { FaAddressBook, FaCheck } from 'react-icons/fa';
 import eventBus from '../eventBus';
@@ -42,6 +44,7 @@ const mappedColourOptions = pickListOptions.map(option => ({
 
 const Profile = () => {
   const [session, setSession] = useState<Session | null>();
+  const [user, setUser] = useState<User>()
   const [profile, setProfile] = useState<IProfile>()
   const [picture, setPicture] = useState<IPicture>()
   const [avatarUrl, setAvatarUrl] = useState<string>();
@@ -50,18 +53,18 @@ const Profile = () => {
   const [company, setCompany] = useState<string>();
   const [profileId, setProfileId] = useState<number>()
   const [authorEmail, setAuthorEmail] = useState<string>();
-  const [user, setUser] = useState<User>()
+
   const [isEditingLanguage, setIsEditingLanguage] = useState<boolean>();
   const [isUrlUploaded, setIsUrlUploaded] = useState<boolean>();
   const [isPublic, setIsPublic] = useState<boolean>();
   const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
   const [newParams, setNewParams] = useState<any[]>([]);
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  // const toast = useToast();
+  // const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  const color3 = useColorModeValue('gray.50', 'gray.800')
-  const color4 = useColorModeValue('white', 'gray.700')
+  // const color3 = useColorModeValue('gray.50', 'gray.800')
+  // const color4 = useColorModeValue('white', 'gray.700')
 
   useEffect(() => {
     const setData = async () => {
@@ -87,15 +90,15 @@ const Profile = () => {
       setPicture(res)
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error',
-        position: 'top',
-        variant: 'subtle',
-        description: error,
-        status: 'error',
-        duration: 3000,
-        isClosable: true
-      });
+      // toast({
+      //   title: 'Error',
+      //   position: 'top',
+      //   variant: 'subtle',
+      //   description: error,
+      //   status: 'error',
+      //   duration: 3000,
+      //   isClosable: true
+      // });
     }
   })
 
@@ -126,20 +129,23 @@ const Profile = () => {
       }
     },
     onError: (error: any) => {
-      toast({
-        title: 'Error',
-        position: 'top',
-        variant: 'subtle',
-        description: error,
-        status: 'error',
-        duration: 3000,
-        isClosable: true
-      });
+      // toast({
+      //   title: 'Error',
+      //   position: 'top',
+      //   variant: 'subtle',
+      //   description: error,
+      //   status: 'error',
+      //   duration: 3000,
+      //   isClosable: true
+      // });
     }
   });
 
   const postCreateProfile = async (): Promise<AxiosResponse> => {
+    // const profile: Omit<IProfile, 'id'> = {
     const profile: Omit<IProfile, 'id'> = {
+      // userId:
+      userId: user?.id!,
       website: website!,
       username: username!,
       company: company!,
@@ -151,15 +157,15 @@ const Profile = () => {
 
   const { isLoading: isCreatingProfile, mutate: postProfile } = useMutation(postCreateProfile, {
     onSuccess(res) {
-      toast({
-        title: 'Profile created.',
-        position: 'top',
-        variant: 'subtle',
-        description: '',
-        status: 'success',
-        duration: 3000,
-        isClosable: true
-      });
+      // toast({
+      //   title: 'Profile created.',
+      //   position: 'top',
+      //   variant: 'subtle',
+      //   description: '',
+      //   status: 'success',
+      //   duration: 3000,
+      //   isClosable: true
+      // });
       refetchProfile()
     }
   });
@@ -171,6 +177,7 @@ const Profile = () => {
       company: company!,
       authorEmail: user?.email!,
       id: profileId!,
+      userId: user?.id!,
       programmingLanguages: languages!
     };
     return await saveProfile(profile);
@@ -180,15 +187,15 @@ const Profile = () => {
     postUpdateProfile,
     {
       onSuccess: (res) => {
-        toast({
-          title: 'Profile updated.',
-          position: 'top',
-          variant: 'subtle',
-          description: '',
-          status: 'success',
-          duration: 3000,
-          isClosable: true
-        });
+        // toast({
+        //   title: 'Profile updated.',
+        //   position: 'top',
+        //   variant: 'subtle',
+        //   description: '',
+        //   status: 'success',
+        //   duration: 3000,
+        //   isClosable: true
+        // });
         refetchProfile()
       },
       onError: (err) => {
@@ -206,15 +213,15 @@ const Profile = () => {
     postPublishProfile,
     {
       onSuccess: (res) => {
-        toast({
-          title: 'Profile published.',
-          position: 'top',
-          variant: 'subtle',
-          description: '',
-          status: 'success',
-          duration: 3000,
-          isClosable: true
-        });
+        // toast({
+        //   title: 'Profile published.',
+        //   position: 'top',
+        //   variant: 'subtle',
+        //   description: '',
+        //   status: 'success',
+        //   duration: 3000,
+        //   isClosable: true
+        // });
         refetchProfile()
       },
       onError: (err) => {
@@ -236,27 +243,27 @@ const Profile = () => {
     postCreateProfilePicture,
     {
       onSuccess: (res) => {
-        toast({
-          title: 'Picture created.',
-          position: 'top',
-          variant: 'subtle',
-          description: '',
-          status: 'success',
-          duration: 3000,
-          isClosable: true
-        });
+        // toast({
+        //   title: 'Picture created.',
+        //   position: 'top',
+        //   variant: 'subtle',
+        //   description: '',
+        //   status: 'success',
+        //   duration: 3000,
+        //   isClosable: true
+        // });
         eventBus.dispatch('profileUpdated', true);
       },
       onError: (err: any) => {
-        toast({
-          title: 'Error uploading picture',
-          position: 'top',
-          variant: 'subtle',
-          description: err.response.data.error,
-          status: 'error',
-          duration: 3000,
-          isClosable: true
-        });
+        // toast({
+        //   title: 'Error uploading picture',
+        //   position: 'top',
+        //   variant: 'subtle',
+        //   description: err.response.data.error,
+        //   status: 'error',
+        //   duration: 3000,
+        //   isClosable: true
+        // });
       },
     }
   );
@@ -273,15 +280,15 @@ const Profile = () => {
     postUpdateProfilePicture,
     {
       onSuccess: (res) => {
-        toast({
-          title: 'Picture updated.',
-          position: 'top',
-          variant: 'subtle',
-          description: '',
-          status: 'success',
-          duration: 3000,
-          isClosable: true
-        });
+        // toast({
+        //   title: 'Picture updated.',
+        //   position: 'top',
+        //   variant: 'subtle',
+        //   description: '',
+        //   status: 'success',
+        //   duration: 3000,
+        //   isClosable: true
+        // });
         eventBus.dispatch('profileUpdated', true);
       },
       onError: (err) => {
@@ -302,7 +309,7 @@ const Profile = () => {
     if (picture) {
       //console.log('pic pic', picture)
     }
-    
+
   }, [user, refetchProfile, profile, refetchPicture])
 
   useEffect(() => {
@@ -321,7 +328,7 @@ const Profile = () => {
   }
 
   function publishMe() {
-    onClose()
+    // onClose()
     publish();
   }
 
@@ -342,173 +349,80 @@ const Profile = () => {
     setIsEditingLanguage(true)
   }
 
-  function handleLanguages(e: MultiValue<{ colorScheme: string; value: string; label: string; color: string; }>) {
-    let newParams: any[] = []
-    for (let i = 0; i < e.length; i += 1) {
-      const obje = e[i].value
-      newParams.push(obje)
-    }
+  // function handleLanguages(e: MultiValue<{ colorScheme: string; value: string; label: string; color: string; }>) {
+  //   let newParams: any[] = []
+  //   for (let i = 0; i < e.length; i += 1) {
+  //     const obje = e[i].value
+  //     newParams.push(obje)
+  //   }
 
-    setLanguages(newParams)
-  }
+  //   setLanguages(newParams)
+  // }
 
-  if (isFetchingProfile) return <Progress size={'xs'} isIndeterminate />
+  // if (isFetchingProfile) return <Progress size={'xs'} isIndeterminate />
 
   return (
-    <Flex
-      justify={'center'}
-      bg={color3}>
-      <Stack
-        spacing={4}
-        w={'full'}
-        maxW='xl'
-        bg={color4}
-        rounded={'xl'}
-        boxShadow={'lg'}
-        p={6}
-        my={12}>
-        <Heading lineHeight={1.1} fontSize='2xl' alignSelf='center'>
-          User Profile Edit
-        </Heading>
-        <FormControl id="userName">
-          <PersonalAvatar
-            url={picture?.avatarUrl}
-            disabled={!profileId}
-            onUpload={(url: any) => {
-              setAvatarUrl(url);
-              setIsUrlUploaded(true)
-            }}
-          />
-          <Box textAlign={'center'}>
-            <Text fontSize={'sm'} fontWeight={500} color={'gray.500'} mb={4}>
-              {session?.user.email}
-            </Text>
-            <Badge ml='1' colorScheme={isPublic ? `green` : `gray`}>
-              {isPublic ? `Public` : `Private`}
-            </Badge>
-          </Box>
-        </FormControl>
-        <FormControl id="userName">
-          <FormLabel>username</FormLabel>
-          <Input
-            placeholder={username || 'username'}
-            type="text"
-            value={username || ''}
-            onChange={(e: any) => setUsername(e.target.value)}
-          />
-        </FormControl>
-        <FormControl id="website">
-          <FormLabel>website</FormLabel>
-          <Input
-            placeholder={website || 'website'}
-            type="text"
-            value={website || ''}
-            onChange={(e: any) => setWebsite(e.target.value)}
-          />
-        </FormControl>
-        <FormControl id="company">
-          <FormLabel>company</FormLabel>
-          <Input
-            placeholder={company || 'company'}
-            type="text"
-            value={company || ''}
-            onChange={(e: any) => setCompany(e.target.value)}
-          />
-        </FormControl>
-        {isEditingLanguage ? (<FormControl pb={10}>
-          <FormLabel>Select programming languages that you like most</FormLabel>
-          <AsyncSelect
-            onChange={(e) => handleLanguages(e)}
-            isMulti
-            name="colors"
-            options={mappedColourOptions}
-            placeholder="ex: Java, GoLang"
-            closeMenuOnSelect={false}
-            size="md"
-            loadOptions={(inputValue, callback) => {
-              setTimeout(() => {
-                const values = mappedColourOptions.filter((i) =>
-                  i.label.toLowerCase().includes(inputValue.toLowerCase()),
-                );
-                callback(values);
-              }, 3000);
-            }}
-          />
-        </FormControl>) : (
-          <>
-            <FormLabel>Programming languages</FormLabel>
-            <HStack spacing={4}>
-              {Object.entries(newParams)
-                .map(
-                  ([key, value]) => (<Tag colorScheme={getRandomColor()} key={key}><TagLabel>{value}</TagLabel></Tag>)
-                )
-              }
-              <Button onClick={() => editLanguage()} leftIcon={<EditIcon />} colorScheme='pink' variant='ghost'>
-                Edit
-              </Button>
-            </HStack>
-          </>)}
-          <Stack spacing={8} mx={'auto'} maxW={'xl'} py={12} px={6} direction={['column', 'row']}>
-              {!isPublic && profileId && <Button
-                onClick={onOpen}
-                leftIcon={<FaAddressBook />}
-                fontFamily={'heading'}
-                w={'full'}
-                bgGradient="linear(to-r, red.400,pink.400)"
-                color={'white'}
-                _hover={{
-                  bgGradient: 'linear(to-r, red.400,pink.400)',
-                  boxShadow: 'xl',
-                }}>
-                Publish profile
-              </Button>}
-              <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
-              >
-                <AlertDialogOverlay>
-                  <AlertDialogContent>
-                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                    Publish Profile
-                    </AlertDialogHeader>
+    <>
+    <div className="container mt-5">
+  <div className="row justify-content-center">
+    <div className="col-md-8">
+      <div className="card shadow-lg">
+        <div className="card-body">
+          <h2 className="card-title text-center">User Profile Edit</h2>
+          <form>
+            <div className="form-group">
+              <label htmlFor="userName">Username</label>
+              <input type="text" className="form-control" id="userName" placeholder="username" value="" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="website">Website</label>
+              <input type="text" className="form-control" id="website" placeholder="website" value="" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="company">Company</label>
+              <input type="text" className="form-control" id="company" placeholder="company" value="" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="languages">Programming languages</label>
+              <select multiple className="form-control" id="languages">
+                <option>Java</option>
+                <option>GoLang</option>
+                {/* <!-- Add more options as needed --> */}
+              </select>
+            </div>
+            <button type="button" className="btn btn-primary w-100 mt-3" data-toggle="modal" data-target="#publishModal">
+              Publish Profile
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-                    <AlertDialogBody>
-                      Are you sure? You can't undo this action afterwards.
-                    </AlertDialogBody>
+{/* <!-- Alert Dialog --> */}
+{/* <div className="modal fade" id="publishModal" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true"> */}
+<div className="modal fade" id="publishModal" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
+  <div className="modal-dialog" role="document">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h5 className="modal-title" id="publishModalLabel">Publish Profile</h5>
+        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div className="modal-body">
+        Are you sure? You can't undo this action afterwards.
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" className="btn btn-primary">Publish</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-                    <AlertDialogFooter>
-                      <Button ref={cancelRef} onClick={onClose}>
-                        Cancel
-                      </Button>
-                      <Button
-                        spinnerPlacement="start"
-                        isLoading={isPublishingProfile}
-                        colorScheme='blue'
-                        onClick={() => publishMe()} ml={3}>
-                        {isPublishingProfile || 'Publish'}
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialogOverlay>
-              </AlertDialog>
-              <Button
-                leftIcon={<FaCheck />}
-                isLoading={isCreatingProfile || isUpdatingProfile}
-                loadingText={profileId ? `Updating` : `Creating`}
-                onClick={postData}
-                disabled={!username || !website || !languages}
-                bg={'blue.400'}
-                color={'white'}
-                w="full"
-                _hover={{
-                  bg: 'blue.500',
-                }}>
-                {profileId ? `Update` : `Save`}
-              </Button>
-            </Stack>
-      </Stack>
-    </Flex>
+    </>
   );
 }
 

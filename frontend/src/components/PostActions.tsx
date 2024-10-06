@@ -1,24 +1,23 @@
-import { AddIcon } from '@chakra-ui/icons';
-import { Box, Button, Flex, useColorModeValue } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Container, Button, Row, Col } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { FaPlus } from "react-icons/fa";
 
-const PostActions = () => {
+const PostActions: React.FC = () => {
   return (
-    <Box px={4} bg={useColorModeValue('gray.100', 'gray.700')}>
-      <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-        <Link to="/post/new">
-          <Button
-            variant={'solid'}
-            colorScheme={'teal'}
-            size={'sm'}
-            mr={4}
-            leftIcon={<AddIcon />}>
-            Add Post
-          </Button>
-        </Link>
-      </Flex>
-    </Box>
+    <Container fluid className="bg-light py-2">
+      <Row className="align-items-center justify-content-between">
+        <Col>
+          <Link to="/post/new">
+            <Button variant="primary" size="sm" className="d-flex align-items-center">
+              <FaPlus className="mr-2" />
+              Add Post
+            </Button>
+          </Link>
+        </Col>
+      </Row>
+    </Container>
   );
-}
+};
 
 export default PostActions;

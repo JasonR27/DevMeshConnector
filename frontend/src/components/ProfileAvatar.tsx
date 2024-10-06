@@ -1,5 +1,5 @@
-import { Avatar } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Image } from 'react-bootstrap';
 import { supabaseClient } from '../config/supabase-client';
 
 interface ProfileAvatarProps {
@@ -8,7 +8,7 @@ interface ProfileAvatarProps {
   avatarSize?: string;
 }
 
-const ProfileAvatar = ({ url, avatarName, avatarSize }: ProfileAvatarProps) => {
+const ProfileAvatar: React.FC<ProfileAvatarProps> = ({ url, avatarName, avatarSize }) => {
   const [avatarUrl, setAvatarUrl] = useState<string>();
 
   useEffect(() => {
@@ -28,7 +28,14 @@ const ProfileAvatar = ({ url, avatarName, avatarSize }: ProfileAvatarProps) => {
     }
   }
 
-  return <Avatar src={avatarUrl} name={avatarName} size={avatarSize}/>;
+  return (
+    <Image
+      src={avatarUrl}
+      alt={avatarName}
+      roundedCircle
+      style={{ width: avatarSize, height: avatarSize }}
+    />
+  );
 };
 
 export default ProfileAvatar;

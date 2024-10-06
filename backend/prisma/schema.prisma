@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Users {
-  id       Int        @id @default(autoincrement())
+  id       String        @id @default(uuid())
   name     String
   email    String     @unique
   password String
@@ -19,12 +19,15 @@ model Users {
   comments Comments[]
   friends  Friends[]
   likes    Likes[]
+  Profiles Profiles[]
 }
 
 model Profiles {
-  id                   Int                    @id @default(autoincrement())
+  id                   String                    @id @default(uuid())
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
+  user                 Users                  @relation(fields: [userId], references: [id])
+  userId               String
   username             String
   website              String
   company              String
@@ -37,47 +40,47 @@ model Profiles {
 }
 
 model ProgrammingLanguages {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   language  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  profileId Int
+  profileId String
   profile   Profiles @relation(fields: [profileId], references: [id])
 
   @@unique([language, id])
 }
 
 model Picture {
-  id        Int      @id @default(autoincrement())
+  id        String      @id @default(uuid())
   avatarUrl String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  profileId Int      @unique
+  profileId String      @unique
   profile   Profiles @relation(fields: [profileId], references: [id])
 }
 
 model Posts {
-  id        Int       @id @default(autoincrement())
-  user      Users     @relation(fields: [user_Id], references: [id])
-  user_Id   Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String        @id @default(uuid())
+  user      Users      @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   title     String
   content   String?
-  published Boolean   @default(false)
-  viewCount Int       @default(0)
-  profileId Int?
+  published Boolean    @default(false)
+  viewCount Int        @default(0)
+  profileId String?
   profile   Profiles?  @relation(fields: [profileId], references: [id])
   likes     Likes[]
   comments  Comments[]
 }
 
 model Comments {
-  id      Int    @id @default(autoincrement())
-  post    Posts  @relation(fields: [post_Id], references: [id])
-  post_Id Int
-  user    Users  @relation(fields: [user_Id], references: [id])
-  user_Id Int
+  id      String    @id @default(uuid())
+  post    Posts  @relation(fields: [postId], references: [id])
+  postId  String
+  user    Users  @relation(fields: [userId], references: [id])
+  userId  String
   content String
   img     String
   audio   String
@@ -85,17 +88,17 @@ model Comments {
 }
 
 model Friends {
-  id      Int   @id @default(autoincrement())
-  user    Users @relation(fields: [user_Id], references: [id])
-  user_Id Int
+  id     String   @id @default(uuid())
+  user   Users @relation(fields: [userId], references: [id])
+  userId String
 }
 
 model Likes {
-  id         Int      @id @default(autoincrement())
-  post       Posts    @relation(fields: [post_Id], references: [id])
-  post_Id    Int
-  user       Users    @relation(fields: [user_Id], references: [id])
-  user_Id    Int
-  profile    Profiles @relation(fields: [profile_Id], references: [id])
-  profile_Id Int
+  id        String      @id @default(uuid())
+  post      Posts    @relation(fields: [postId], references: [id])
+  postId    String
+  user      Users    @relation(fields: [userId], references: [id])
+  userId    String
+  profile   Profiles @relation(fields: [profileId], references: [id])
+  profileId String
 }

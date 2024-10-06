@@ -5,17 +5,26 @@ import { auth } from '../middleware/auth';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const likes = await prisma.like.findMany({});
+  const likes = await prisma.likes.findMany({});
   res.status(200).json(likes);
 });
 
 router.post('/create', auth, async (req, res) => {
-  const { profileId, postId } = req.body;
+  const { profileId, postId, userId } = req.body;
   try {
-    const result = await prisma.like.create({
+    const result = await prisma.likes.create({
       data: {
         postId: postId,
         profileId: profileId,
+        profile: {
+          connect: { id: profileId },
+        },
+        user: {
+          connect: { id: userId }, // Connect the user to the user
+        },
+        post: {
+          connect: { id: userId }, // Connect the post to the user
+        },
       },
     });
     res.status(200).json(result);

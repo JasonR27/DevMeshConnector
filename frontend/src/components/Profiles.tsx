@@ -1,88 +1,48 @@
-import {
-  Heading,
-  Avatar,
-  Box,
-  Text,
-  Stack,
-  Button,
-  useColorModeValue,
-  Card,
-  CardHeader,
-  Flex,
-  IconButton,
-  CardBody,
-  CardFooter,
-  Container,
-  SimpleGrid,
-  Tag
-} from '@chakra-ui/react';
+import React from 'react';
+import { Container, Row, Col, Card, Button, Badge, Dropdown } from 'react-bootstrap';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { truncate } from '../utils/functions';
 import ProfileAvatar from './ProfileAvatar';
 
-const Profiles = ({ profiles }: any) => {
-
-  const followColor = useColorModeValue('gray.400', 'gray.900');
-
+const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
   return (
-    <Container maxW={'7xl'} py={16} as={Stack} spacing={12}>
-      <SimpleGrid minChildWidth="120px" spacing="40px" templateColumns="repeat(auto-fill, minmax(400px, 1fr))">
-        {profiles.map(({ username, company, authorEmail, website, programmingLanguages, picture }: IProfile, i: number) => (
-          <Box key={i}>
-            <Card>
-              <CardHeader>
-                <Flex>
-                  <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-                    <ProfileAvatar url={picture?.avatarUrl} avatarName={truncate(authorEmail)} />
-                    <Box>
-                      <Heading size="sm">
-                        {username} - {authorEmail}
-                      </Heading>
-                      <Text>
-                        {company} - {website}
-                      </Text>
-                    </Box>
-                  </Flex>
-                  <IconButton variant="ghost" colorScheme="gray" aria-label="See menu" icon={<BsThreeDotsVertical />} />
-                </Flex>
-              </CardHeader>
-              <CardBody>
-                <Text>
-                  With Chakra UI, I wanted to sync the speed of development with the speed of design. I wanted the
-                  developer to be just as excited as the designer to create a screen.
-                </Text>
+    <Container className="py-5">
+      <Row>
+        {profiles.map(({ username, company, authorEmail, website, programmingLanguages, picture }, i) => (
+          <Col key={i} md={6} lg={4} className="mb-4">
+            <Card className="shadow-sm">
+              <Card.Header className="d-flex justify-content-between align-items-center">
+                <div className="d-flex align-items-center">
+                  <ProfileAvatar url={picture?.avatarUrl} avatarName={truncate(authorEmail)} />
+                  <div className="ms-3">
+                    <Card.Title as="h5">{username} - {authorEmail}</Card.Title>
+                    <Card.Text>{company} - {website}</Card.Text>
+                  </div>
+                </div>
+                <Dropdown>
+                  <Dropdown.Toggle as={Button} variant="link" className="text-muted p-0">
+                    <BsThreeDotsVertical />
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item href="#">Action</Dropdown.Item>
+                    <Dropdown.Item href="#">Another action</Dropdown.Item>
+                    <Dropdown.Item href="#">Something else here</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Card.Header>
+              <Card.Body>
+                <Card.Text>Profile description goes here</Card.Text>
                 {programmingLanguages.map((value, index) => (
-                  <Tag margin={2} key={index}>
-                    {value.language}
-                  </Tag>
+                  <Badge key={index} className="me-2">{value.language}</Badge>
                 ))}
-              </CardBody>
-
-              <CardFooter
-                justify="space-between"
-                flexWrap="wrap"
-                sx={{
-                  '& > button': {
-                    minW: '136px'
-                  }
-                }}>
-                <Button
-                  w={'xl'}
-                  mt={8}
-                  bg={followColor}
-                  color={'white'}
-                  rounded={'md'}
-                  _hover={{
-                    transform: 'translateY(-2px)',
-                    boxShadow: 'lg'
-                  }}>
-                  Follow
-                </Button>
-              </CardFooter>
+              </Card.Body>
+              <Card.Footer className="d-flex justify-content-between">
+                <Button variant="primary" className="w-100">Follow</Button>
+              </Card.Footer>
             </Card>
-          </Box>
+          </Col>
         ))}
-      </SimpleGrid>
+      </Row>
     </Container>
   );
 };

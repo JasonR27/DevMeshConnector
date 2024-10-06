@@ -1,4 +1,5 @@
-import { Avatar, Box, Button, Flex, keyframes, Tooltip } from '@chakra-ui/react';
+// import { Avatar, Box, Button, Flex, keyframes, Tooltip } from '@chakra-ui/react';
+import { Container, Button, Tooltip, OverlayTrigger, Image, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from 'react';
 import { supabaseClient } from '../config/supabase-client';
 import { UPLOAD_PICTURE_DISABLED_TEXT } from '../utils/constants';
@@ -9,19 +10,6 @@ const PersonalAvatar = ({ url, onUpload, disabled }: any) => {
 
   const size = '96px';
   const color = 'teal';
-
-  const pulseRing = keyframes`
-	0% {
-    transform: scale(0.33);
-  }
-  40%,
-  50% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-  `;
 
   useEffect(() => {
     if (url) downloadImage(url);
@@ -69,58 +57,64 @@ const PersonalAvatar = ({ url, onUpload, disabled }: any) => {
 
   return (
     <>
-      <Flex justifyContent="center" alignItems="center" h="120px" w="full" overflow="hidden">
-        <Box
-          as="div"
-          position="relative"
-          w={size}
-          h={size}
-          _before={{
-            content: "''",
-            position: 'relative',
-            display: 'block',
-            width: '300%',
-            height: '300%',
-            boxSizing: 'border-box',
-            marginLeft: '-100%',
-            marginTop: '-100%',
-            borderRadius: '50%',
-            bgColor: color,
-            animation: `2.25s ${pulseRing} cubic-bezier(0.455, 0.03, 0.515, 0.955) -0.4s infinite`
-          }}>
-          <Avatar src={avatarUrl} size="full" position="absolute" top={0} />
-        </Box>
-      </Flex>
-      <Box textAlign={'center'} overflow="hidden">
-        <Tooltip isDisabled={!disabled} placement="left" hasArrow label={UPLOAD_PICTURE_DISABLED_TEXT} bg={'green.600'}>
-          <Button
-            disabled={disabled}
-            size="sm"
-            flex={1}
-            mb={4}
-            fontSize={'sm'}
-            rounded={'full'}
-            _focus={{
-              bg: 'gray.200'
-            }}>
-            <label className="button primary block" htmlFor="single">
-              {uploading ? 'Uploading ...' : 'Upload'}
-            </label>
-          </Button>
-        </Tooltip>
-        <input
+      <Container fluid className="d-flex flex-column align-items-center justify-content-center" style={{ height: '120px', width: '100%', overflow: 'hidden' }}>
+        <div
           style={{
-            visibility: 'hidden',
-            position: 'absolute',
-            cursor: 'pointer'
+            position: 'relative',
+            width: size,
+            height: size,
+            overflow: 'hidden'
           }}
-          type="file"
-          id="single"
-          accept="image/*"
-          onChange={uploadAvatar}
-          disabled={uploading || disabled}
-        />
-      </Box>
+        >
+          <div
+            style={{
+              content: "''",
+              position: 'relative',
+              display: 'block',
+              width: '300%',
+              height: '300%',
+              boxSizing: 'border-box',
+              marginLeft: '-100%',
+              marginTop: '-100%',
+              borderRadius: '50%',
+              backgroundColor: color,
+              // animation: `2.25s ${pulseRing} cubic-bezier(0.455, 0.03, 0.515, 0.955) -0.4s infinite`
+            }}
+          />
+          {/* <Avatar src={avatarUrl} size={size} position="absolute" top={0} /> */}
+        </div>
+
+        <div className="text-center" style={{ overflow: 'hidden' }}>
+          <OverlayTrigger
+            placement="left"
+            overlay={<Tooltip id="button-tooltip">{UPLOAD_PICTURE_DISABLED_TEXT}</Tooltip>}
+            // disabled={!disabled}
+          >
+            <Button
+              disabled={disabled}
+              size="sm"
+              className="mb-4"
+              style={{ fontSize: 'sm', borderRadius: '50%' }}
+            >
+              <label className="button primary block" htmlFor="single">
+                {uploading ? 'Uploading ...' : 'Upload'}
+              </label>
+            </Button>
+          </OverlayTrigger>
+          <input
+            style={{
+              visibility: 'hidden',
+              position: 'absolute',
+              cursor: 'pointer'
+            }}
+            type="file"
+            id="single"
+            accept="image/*"
+            onChange={uploadAvatar}
+            disabled={uploading || disabled}
+          />
+        </div>
+      </Container>
     </>
   );
 };

@@ -1,30 +1,24 @@
-import * as React from "react"
-import {
-  useColorMode,
-  useColorModeValue,
-  IconButton,
-  IconButtonProps,
-} from "@chakra-ui/react"
-import { FaMoon, FaSun } from "react-icons/fa"
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { FaMoon, FaSun } from "react-icons/fa";
 
-type ColorModeSwitcherProps = Omit<IconButtonProps, "aria-label">
+const ColorModeSwitcher = () => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-export const ColorModeSwitcher: React.FC<ColorModeSwitcherProps> = (props) => {
-  const { toggleColorMode } = useColorMode()
-  const text = useColorModeValue("dark", "light")
-  const SwitchIcon = useColorModeValue(FaMoon, FaSun)
+  const toggleColorMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.body.classList.toggle("bg-dark", !isDarkMode);
+    document.body.classList.toggle("text-white", !isDarkMode);
+  };
 
   return (
-    <IconButton
-      size="md"
-      fontSize="lg"
-      variant="ghost"
-      color="current"
-      marginLeft="2"
+    <button
+      className="btn btn-outline-secondary"
       onClick={toggleColorMode}
-      icon={<SwitchIcon />}
-      aria-label={`Switch to ${text} mode`}
-      {...props}
-    />
-  )
-}
+    >
+      {isDarkMode ? <FaSun /> : <FaMoon />} Switch to {isDarkMode ? "light" : "dark"} mode
+    </button>
+  );
+};
+
+export default ColorModeSwitcher;

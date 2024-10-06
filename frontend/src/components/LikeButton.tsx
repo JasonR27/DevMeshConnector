@@ -1,4 +1,5 @@
-import { IconButton, Stack, Tooltip } from '@chakra-ui/react';
+import React from 'react';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { HiOutlineThumbUp } from 'react-icons/hi';
 import { LIKE_BUTTON_TEXT } from '../utils/constants';
 import './LikeButton.css';
@@ -9,16 +10,25 @@ interface LikeButtonProps {
   likesCount?: number;
 }
 
-const LikeButton = ({ isDisabled, onClick, likesCount }: LikeButtonProps) => {
+const LikeButton: React.FC<LikeButtonProps> = ({ isDisabled, onClick, likesCount }) => {
   return (
-    <Tooltip placement="left" hasArrow label={LIKE_BUTTON_TEXT} bg={'green.600'}>
-      <Stack direction={'row'} justify="end" spacing={6}>
-        <div>
-          <span className="button__badge">{likesCount ? likesCount : 0}</span>
-          <IconButton disabled={isDisabled} aria-label="'Like Button" icon={<HiOutlineThumbUp />} onClick={onClick}/>
-        </div>
-      </Stack>
-    </Tooltip>
+    <OverlayTrigger
+      placement="left"
+      overlay={<Tooltip id="tooltip-left">{LIKE_BUTTON_TEXT}</Tooltip>}
+    >
+      <div className="d-flex justify-content-end align-items-center">
+        <span className="button__badge">{likesCount ? likesCount : 0}</span>
+        <Button
+          variant="outline-primary"
+          disabled={isDisabled}
+          aria-label="Like Button"
+          onClick={onClick}
+          className="d-flex align-items-center"
+        >
+          <HiOutlineThumbUp />
+        </Button>
+      </div>
+    </OverlayTrigger>
   );
 };
 

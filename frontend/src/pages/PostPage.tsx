@@ -1,17 +1,17 @@
 import { fetchPosts } from '../api';
-import { useQuery } from 'react-query'
+import { useQuery } from 'react-query';
 
 import Posts from '../components/Posts';
-import { Progress } from '@chakra-ui/react';
+import { Spinner, Alert } from 'react-bootstrap';
 
 function BlogPostsPage() {
-  const { data, error, isError, isLoading } = useQuery('posts', fetchPosts)
+  const { data, error, isError, isLoading } = useQuery('posts', fetchPosts);
 
   if (isLoading) {
-    return <Progress size={'xs'} isIndeterminate />
+    return <Spinner animation="border" role="status"><span className="visually-hidden">Loading...</span></Spinner>;
   }
   if (isError) {
-    return <div>Error! {(error as Error).message}</div>
+    return <Alert variant="danger">Error! {(error as Error).message}</Alert>;
   }
 
   return (

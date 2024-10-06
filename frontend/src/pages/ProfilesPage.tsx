@@ -1,50 +1,68 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getProfiles } from "../api";
-import { useQuery } from 'react-query';
-import Profiles from '../components/Profiles';
-import { Progress } from "@chakra-ui/react";
+import { useQuery } from "react-query";
+import Profiles from "../components/Profiles";
+import { Spinner, Alert, Container } from "react-bootstrap";
 
-const ProfilesPage = () => {
-  const [profiles, setProfiles] = useState<IProfile[]>()
+const ProfilesPage: React.FC = () => {
+  const [profiles, setProfiles] = useState<IProfile[]>();
 
-  const fetchProfiles = async () => {
-    const res = await getProfiles()
-    return res
+  const fetchProfiles = async (): Promise<IProfile[]> => {
+    const res: IProfile[] = await getProfiles();
+    return res;
   };
+  
 
-  const { data: profilesData, error, isError, isLoading } = useQuery('profiles', fetchProfiles, {
-    enabled: true, retry: 2, cacheTime: 0, onSuccess(res: any) {
-      //console.log(res)
-    },
-    onError: (error: any) => {
-      console.log(error)
-    },
-    //initialData: () => []
-  })
+  const { data: profilesData, error, isError, isLoading } = useQuery<IProfile[]>(
+    "profiles",
+    fetchProfiles,
+    {
+      enabled: true,
+      retry: 2,
+      cacheTime: 0,
+      onSuccess: (res: any) => {
+        //console.log(res)
+      },
+      onError: (error: any) => {
+        console.log(error);
+      },
+      //initialData: () => []
+    }
+  );
 
   useEffect(() => {
-
     if (profilesData) {
-      setProfiles(profilesData)
+      setProfiles(profilesData);
     }
-
-  }, [profilesData])
+  }, [profilesData]);
 
   if (isLoading) {
-    return <Progress size={'xs'} isIndeterminate />
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </Container>
+    );
   }
+
   if (isError) {
-    return <div>Error! {(error as Error).message}</div>
-  }
+    return (
+      <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+        <Alert variant="danger">
+          Error! {(error as Error).message}
+        </Alert>
+      </Container>
+    );
+  }  
 
   return (
-    <>
-      {isLoading && <p>Loading posts...</p>}
-      {error && <p>{error}</p>}
+    <Container>
+      {isLoading && <p>Loading profiles...</p>}
+      {error && <p>{(error as Error).message}</p>}
       {!error && profiles && <Profiles profiles={profiles} />}
-    </>
-  )
-}
+    </Container>
+  );
+};
 
-export default ProfilesPage
-
+export default ProfilesPage;

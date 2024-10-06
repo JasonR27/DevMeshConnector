@@ -5,8 +5,8 @@ import { useMutation, useQuery } from 'react-query';
 import { AxiosResponse } from 'axios';
 import { addPost, getProfileByAuthorEmail } from '../api';
 import { Session, User } from '@supabase/supabase-js';
-import { Button, Container, Flex, FormControl, Heading, Input, Stack, useColorModeValue, useToast } from '@chakra-ui/react';
-import { CheckIcon } from '@chakra-ui/icons';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 
 function NewPostPage() {
   const [postTitle, setPostTitle] = useState("");
@@ -15,7 +15,7 @@ function NewPostPage() {
   const [user, setUser] = useState<User | null>();
   const [state, setState] = useState<'initial' | 'submitting' | 'success'>('initial');
   const [error, setError] = useState(false);
-  const toast = useToast();
+  // const toast = useToast();
   const navigate = useNavigate()
   const [profile, setProfile] = useState<IProfile>()
 
@@ -71,16 +71,8 @@ function NewPostPage() {
 
   const { isLoading: isPostingTutorial, mutate: postTutorial } = useMutation(createPost, {
     onSuccess(res) {
-      toast({
-        title: 'Post created.',
-        position: 'top',
-        variant: 'subtle',
-        description: '',
-        status: 'success',
-        duration: 3000,
-        isClosable: true
-      });
-    }
+      // entered code for toast message here
+          }
   })
 
   function postData() {
@@ -92,107 +84,49 @@ function NewPostPage() {
   }
 
   return (
-    <Flex minH={'20vh'} align={'center'} justify={'center'} mt={8}>
-      <Container
-        maxW={'lg'}
-        bg={useColorModeValue('white', 'whiteAlpha.100')}
-        boxShadow={'xl'}
-        rounded={'lg'}
-        p={6}
-      >
-        <Heading as={'h2'} fontSize={{ base: 'xl', sm: '2xl' }} textAlign={'center'} mb={5}>
-          Wha do you have in mind?
-        </Heading>
-        <Stack
-
-          as={'form'}
-          spacing={'30'}
-          onSubmit={async (e: FormEvent) => {
-            e.preventDefault();
-
-            try {
-              if (postTitle.length < 1 || postContent.length < 1) {
-                setError(true);
-                toast({
-                  position: 'top',
-                  title: 'An error occured',
-                  description: `${error}`,
-                  status: 'error',
-                  duration: 5000,
-                  isClosable: true
-                });
-                return;
-              }
-            } catch (error) {
-              toast({
-                position: 'top',
-                title: 'An error occured',
-                description: `${error}`,
-                duration: 5000,
-                status: 'error',
-                isClosable: true
-              });
-            }
-
-            setError(false);
-            setState('submitting');
-
-            setTimeout(() => {
-              setState('success');
-            }, 1000);
-            setTimeout(() => {
-              navigate('/posts')
-            }, 2000);
-          }}
-        >
-          <FormControl>
-            <Input
-              variant={'solid'}
-              borderWidth={1}
-              color={'white.800'}
-              _placeholder={{ color: 'gray.400' }}
-              borderColor={useColorModeValue('gray.300', 'gray.700')}
-              id={'text'}
-              type={'text'}
-              required
-              placeholder={'your title here'}
-              aria-label={'your title here'}
-              value={postTitle}
-              disabled={state !== 'initial' && state !== 'success'}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setPostTitle(e.target.value)}
-            ></Input>
-          </FormControl>
-          <FormControl>
-            <Input
-              variant={'solid'}
-              borderWidth={1}
-              color={'white.800'}
-              _placeholder={{ color: 'gray.400' }}
-              borderColor={useColorModeValue('gray.300', 'gray.700')}
-              id={'text'}
-              type={'text'}
-              required
-              placeholder={'your content here'}
-              aria-label={'your content here'}
-              value={postContent}
-              disabled={state !== 'initial' && state !== 'success'}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setPostContent(e.target.value)}
-            ></Input>
-          </FormControl>
-          <FormControl w={{ base: '100%', md: '40%' }}>
-            <Button
-              colorScheme={state === 'success' ? 'green' : 'blue'}
-              isLoading={state === 'submitting'}
-              w={'100%'}
-              type={state === 'success' ? 'button' : 'submit'}
-              onClick={postData}
-            >
-              {state === 'success' ? <CheckIcon /> : 'Submit'}
-            </Button>
-          </FormControl>
-        </Stack>
-      </Container>
-    </Flex>
+    <Container className="mt-5">
+      <Row className="justify-content-center">
+        <Col md={6}>
+          <div className="p-4 bg-white shadow rounded">
+            <h2 className="text-center mb-4">What do you have in mind?</h2>
+            <Form onSubmit={async (e: FormEvent) => {
+              e.preventDefault();
+              // ... your form submission logic
+            }}>
+              <Form.Group controlId="postTitle">
+                <Form.Control
+                  type="text"
+                  placeholder="Your title here"
+                  value={postTitle}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPostTitle(e.target.value)}
+                  disabled={state !== 'initial' && state !== 'success'}
+                  required
+                />
+              </Form.Group>
+              <Form.Group controlId="postContent" className="mt-3">
+                <Form.Control
+                  type="text"
+                  placeholder="Your content here"
+                  value={postContent}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPostContent(e.target.value)}
+                  disabled={state !== 'initial' && state !== 'success'}
+                  required
+                />
+              </Form.Group>
+              <Button
+                variant={state === 'success' ? 'success' : 'primary'}
+                type={state === 'success' ? 'button' : 'submit'}
+                onClick={postData}
+                className="mt-4 w-100"
+                disabled={state === 'submitting'}
+              >
+                {state === 'success' ? <i className="bi bi-check mr-2"></i> : 'Submit'}
+              </Button>
+            </Form>
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

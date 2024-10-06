@@ -1,24 +1,22 @@
-import { AddIcon } from '@chakra-ui/icons';
-import { Box, Button, Flex, useColorModeValue } from '@chakra-ui/react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Container, Button, Row, Col } from 'react-bootstrap';
 
-const ProfilesActions = () => {
+const ProfilesActions: React.FC = () => {
   return (
-    <Box px={4} bg={useColorModeValue('gray.100', 'gray.700')}>
-      <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
-        <Link to="/post/new">
-          <Button
-            variant={'solid'}
-            colorScheme={'teal'}
-            size={'sm'}
-            mr={4}
-            leftIcon={<AddIcon />}>
-            Add Profile
-          </Button>
-        </Link>
-      </Flex>
-    </Box>
+    <Container fluid className="bg-light py-3">
+      <Row className="align-items-center justify-content-between">
+        <Col>
+          <Link to="/profiles/new">
+            <Button variant="primary" size="sm" className="d-flex align-items-center">
+              <i className="bi bi-plus mr-2"></i>
+              Add Profile
+            </Button>
+          </Link>
+        </Col>
+      </Row>
+    </Container>
   );
-}
+};
 
 export default ProfilesActions;

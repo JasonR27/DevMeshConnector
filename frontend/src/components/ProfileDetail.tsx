@@ -1,15 +1,21 @@
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Container, FormControl, FormLabel, HStack, Input, Progress, Stack, Tag, TagLabel, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react';
+// import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Box, Button, Container, FormControl, FormLabel, HStack, Input, Progress, Stack, Tag, TagLabel, Text, useColorModeValue, useDisclosure, useToast } from '@chakra-ui/react';
 import { User } from '@supabase/supabase-js';
 import { AxiosResponse } from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { createProfile, getProfileByAuthorEmail, publishProfile, saveProfile } from '../api';
 import { supabaseClient } from '../config/supabase-client';
-import { EditIcon } from '@chakra-ui/icons'
+// import { EditIcon } from '@chakra-ui/icons'
 import { FaAddressBook, FaCheck } from 'react-icons/fa';
-import { AsyncSelect, MultiValue } from 'chakra-react-select';
+// import { AsyncSelect, MultiValue } from 'chakra-react-select';
 import { pickListOptions } from '../config/pickListOptions';
 import { getRandomColor } from '../utils/functions';
+import React from "react";
+import { Container, Accordion, Card, Button, Form, Modal, Badge } from "react-bootstrap";
+import { Toast, ToastContainer } from "react-bootstrap";
+import axios from "axios";
+
+import Select, { ActionMeta, MultiValue } from "react-select";
 
 const mappedColourOptions = pickListOptions.map(option => ({
   ...option,
@@ -31,9 +37,15 @@ const ProfileDetail = ({ childToParent }: Props) => {
   const [profileId, setProfileId] = useState<number>()
   const [user, setUser] = useState<User | null>();
   const [newParams, setNewParams] = useState<any[]>([]);
+  const [showToast, setShowToast] = React.useState(false);
 
-  const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  // const toast = useToast();
+  // const { isOpen, onOpen, onClose } = useDisclosure()
   const cancelRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -84,6 +96,7 @@ const ProfileDetail = ({ childToParent }: Props) => {
 
   const postCreateProfile = async (): Promise<AxiosResponse> => {
     const profile: Omit<IProfile, 'id'> = {
+      userId: user?.id!,
       website: website,
       username: username,
       company: company,
@@ -95,21 +108,15 @@ const ProfileDetail = ({ childToParent }: Props) => {
 
   const { isLoading: isCreatingProfile, mutate: postProfile } = useMutation(postCreateProfile, {
     onSuccess(res) {
-      toast({
-        title: 'Profile created.',
-        position: 'top',
-        variant: 'subtle',
-        description: '',
-        status: 'success',
-        duration: 3000,
-        isClosable: true
-      });
+      setShowToast(true);
+
       refetch()
     }
   });
 
   const postUpdateProfile = async (): Promise<AxiosResponse> => {
     const profile: IProfile = {
+      userId: user?.id!,
       website: website,
       username: username,
       company: company,
@@ -120,260 +127,209 @@ const ProfileDetail = ({ childToParent }: Props) => {
     return await saveProfile(profile);
   }
 
-  const { isLoading: isUpdatingProfile, mutate: updateProfile } = useMutation(
-    postUpdateProfile,
-    {
-      onSuccess: (res) => {
-        toast({
-          title: 'Profile updated.',
-          position: 'top',
-          variant: 'subtle',
-          description: '',
-          status: 'success',
-          duration: 3000,
-          isClosable: true
-        });
-        refetch()
-      },
-      onError: (err) => {
-        console.log(err)
-      },
-      //onMutate: () => console.log('mutating')
-    }
-  );
+  const ProfileUpdate: React.FC = () => {
+    const [showToast, setShowToast] = React.useState(false);
 
-  const postPublishProfile = async (): Promise<AxiosResponse> => {
-    return await publishProfile(profileId!);
-  }
-
-  const { isLoading: isPublishingProfile, mutate: publish } = useMutation(
-    postPublishProfile,
-    {
-      onSuccess: (res) => {
-        toast({
-          title: 'Profile published.',
-          position: 'top',
-          variant: 'subtle',
-          description: '',
-          status: 'success',
-          duration: 3000,
-          isClosable: true
-        });
-        refetch()
-      },
-      onError: (err) => {
-        console.log(err)
-      },
-      //onMutate: () => console.log('mutating')
-    }
-  );
-
-  function publishMe() {
-    onClose()
-    publish();
-  }
-
-  function postData() {
-    try {
-      if (profileId) {
-        updateProfile()
-      } else {
-        postProfile()
+    const { isLoading: isUpdatingProfile, mutate: updateProfile } = useMutation(
+      postUpdateProfile,
+      {
+        onSuccess: (res) => {
+          setShowToast(true);
+          refetch();
+        },
+        onError: (err) => {
+          console.log(err);
+        },
       }
-    } catch (err) {
-      //setPostResult(fortmatResponse(err));
-    }
-  }
+    );
 
-  function handleLanguages(e: MultiValue<{ colorScheme: string; value: string; label: string; color: string; }>) {
-    let newParams: any[] = []
-    for (let i = 0; i < e.length; i += 1) {
-      const obje = e[i].value
-      newParams.push(obje)
+    const postPublishProfile = async (): Promise<AxiosResponse> => {
+      return await publishProfile(profileId!);
     }
 
-    setLanguages(newParams)
-  }
+    const { isLoading: isPublishingProfile, mutate: publish } = useMutation(
+      postPublishProfile,
+      {
+        onSuccess: (res) => {
+          setShowToast(true);
+          refetch()
+        },
+        onError: (err) => {
+          console.log(err)
+        },
+        //onMutate: () => console.log('mutating')
+      }
+    );
 
-  const editLanguage = () => {
-    setNewParams([])
-    setIsEditingLanguage(true)
-  }
+    function publishMe() {
+      // onClose()
+      publish();
+    }
 
-  function handleUserNameChange(e: any) {
-    setUsername(e.target.value);
-  }
+    function postData() {
+      try {
+        if (profileId) {
+          updateProfile()
+        } else {
+          postProfile()
+        }
+      } catch (err) {
+        //setPostResult(fortmatResponse(err));
+      }
+    }
 
-  const color = useColorModeValue('gray.800', 'gray.200')
-  const bgColor = useColorModeValue('gray.100', 'gray.600')
-  const bgColorFocus = useColorModeValue('gray.200', 'gray.800')
+    // function handleLanguages(e: MultiValue<{ colorScheme: string; value: string; label: string; color: string; }>) {
+    //   let newParams: any[] = []
+    //   for (let i = 0; i < e.length; i += 1) {
+    //     const obje = e[i].value
+    //     newParams.push(obje)
+    //   }
 
-  return (
-    <Container maxW={'7xl'} py={16} as={Stack} spacing={12}>
-      <Accordion allowToggle={true}>
-        <AccordionItem>
-          <AccordionButton _expanded={{ bgGradient: 'linear(to-r, teal.500, green.500)', color: 'white' }} onClick={() => refetch()}>
-            <Box flex='1' textAlign='left'>
-              Show profile
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel>
-            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={6} px={6}>
-              <FormControl>
-                <FormLabel>Username</FormLabel>
-                <Input
-                  type={'text'}
-                  value={username || ''}
-                  onChange={(e: any) => setUsername(e.target.value)}
-                  placeholder={username || 'username'}
-                  color={color}
-                  bg={bgColor}
-                  rounded={'full'}
-                  border={0}
-                  _focus={{
-                    bg: bgColorFocus,
-                    outline: 'none'
-                  }}
-                />
-              </FormControl>
-            </Stack>
-            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={6} px={6}>
-              <FormControl>
-                <FormLabel>Website</FormLabel>
-                <Input
-                  type={'text'}
-                  value={website || ''}
-                  onChange={(e: any) => setWebsite(e.target.value)}
-                  placeholder={website || 'website'}
-                  color={color}
-                  bg={bgColor}
-                  rounded={'full'}
-                  border={0}
-                  _focus={{
-                    bg: bgColorFocus,
-                    outline: 'none'
-                  }}
-                />
-              </FormControl>
-            </Stack>
-            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={6} px={6}>
-              <FormControl>
-                <FormLabel>Company</FormLabel>
-                <Input
-                  type={'text'}
-                  value={company || ''}
-                  onChange={(e: any) => setCompany(e.target.value)}
-                  placeholder={company || 'company'}
-                  color={color}
-                  bg={bgColor}
-                  rounded={'full'}
-                  border={0}
-                  _focus={{
-                    bg: bgColorFocus,
-                    outline: 'none'
-                  }}
-                />
-              </FormControl>
-            </Stack>
-            <Stack spacing={1} mx={'auto'} maxW={'lg'} py={6} px={6}>
-              {isEditingLanguage ? (<FormControl pb={10}>
-                <FormLabel>Select programming languages that you like most</FormLabel>
-                <AsyncSelect
-                  onChange={(e) => handleLanguages(e)}
-                  isMulti
-                  name="colors"
-                  options={mappedColourOptions}
-                  placeholder="ex: Java, GoLang"
-                  closeMenuOnSelect={false}
-                  size="md"
-                  loadOptions={(inputValue, callback) => {
-                    setTimeout(() => {
-                      const values = mappedColourOptions.filter((i) =>
-                        i.label.toLowerCase().includes(inputValue.toLowerCase()),
-                      );
-                      callback(values);
-                    }, 3000);
-                  }}
-                />
-              </FormControl>) : (
-                <>
-                <FormLabel>Programming languages</FormLabel>
-                <HStack spacing={4}>
-                  {Object.entries(newParams)
-                    .map(
-                      ([key, value]) => (<Tag colorScheme={getRandomColor()} key={key}><TagLabel>{value}</TagLabel></Tag>)
-                    )
-                  }
-                  <Button onClick={() => editLanguage()} leftIcon={<EditIcon />} colorScheme='pink' variant='ghost'>
-                    Edit
+    //   setLanguages(newParams)
+    // }
+
+    // const handleLanguages = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
+    //   setLanguages(newValue.map(option => ({ name: option.label })));
+    // };
+
+    const handleLanguages = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
+      setLanguages(newValue.map((option, index) => ({
+        id: index, // Placeholder value
+        name: option.label,
+        language: option.value,
+        profileId: 1 // Placeholder value
+      })));
+    };
+
+    const editLanguage = () => {
+      setNewParams([])
+      setIsEditingLanguage(true)
+    }
+
+    function handleUserNameChange(e: any) {
+      setUsername(e.target.value);
+    }
+
+    // const color = useColorModeValue('gray.800', 'gray.200')
+    // const bgColor = useColorModeValue('gray.100', 'gray.600')
+    // const bgColorFocus = useColorModeValue('gray.200', 'gray.800')
+
+    const options = [
+      { value: 'java', label: 'Java' },
+      { value: 'golang', label: 'GoLang' },
+      { value: 'python', label: 'Python' },
+      // Add more options as needed
+    ];
+
+    return (
+      <Container className="py-5">
+
+
+        <Accordion defaultActiveKey="0">
+          <Card>
+            <Accordion.Item eventKey="0">
+              <Accordion.Header onClick={() => refetch()}>Show profile</Accordion.Header>
+              <Accordion.Body>
+                <Form>
+                  <Form.Group controlId="username">
+                    <Form.Label>Username</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="username"
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="website">
+                    <Form.Label>Website</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="website"
+                    />
+                  </Form.Group>
+                  <Form.Group controlId="company">
+                    <Form.Label>Company</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                      placeholder="company"
+                    />
+                  </Form.Group>
+                  {isEditingLanguage ? (
+                    <Form.Group controlId="languages">
+                      <Form.Label>Select programming languages that you like most</Form.Label>
+                      <Select
+                        isMulti
+                        name="languages"
+                        options={options}
+                        placeholder="ex: Java, GoLang"
+                        closeMenuOnSelect={false}
+                        onChange={handleLanguages}
+                      />
+                    </Form.Group>
+                  ) : (
+                    <>
+                      <Form.Label>Programming languages</Form.Label>
+                      <div className="d-flex flex-wrap">
+                        {languages?.map((lang, index) => (
+                          <Badge key={index} bg="primary" className="mr-2">
+                            {lang.name}
+                          </Badge>
+                        ))}
+
+                        <Button variant="outline-primary" onClick={() => setIsEditingLanguage(true)}>
+                          Edit
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </Form>
+                <div className="d-flex justify-content-between mt-4">
+                  {!isPublic && profileId && (
+                    <Button variant="primary" onClick={handleOpen}>
+                      <FaAddressBook className="mr-2" />
+                      Publish Profile
+                    </Button>
+                    // <Button variant="danger"  onClick={() => open()}>
+                    //   <FaAddressBook className="mr-2" />
+                    //   Publish profile
+                    // </Button>
+                  )}
+                  <Button
+                    variant="primary"
+                    onClick={postData}
+                    disabled={!username || !website || !languages?.length}
+                  >
+                    <FaCheck className="mr-2" />
+                    {profileId ? "Update" : "Save"}
                   </Button>
-                </HStack></>)}
-            </Stack>
-            <Stack spacing={8} mx={'auto'} maxW={'xl'} py={12} px={6} direction={['column', 'row']}>
-              {!isPublic && profileId && <Button
-                onClick={onOpen}
-                leftIcon={<FaAddressBook />}
-                fontFamily={'heading'}
-                w={'full'}
-                bgGradient="linear(to-r, red.400,pink.400)"
-                color={'white'}
-                _hover={{
-                  bgGradient: 'linear(to-r, red.400,pink.400)',
-                  boxShadow: 'xl',
-                }}>
-                Publish profile
-              </Button>}
-              <AlertDialog
-                isOpen={isOpen}
-                leastDestructiveRef={cancelRef}
-                onClose={onClose}
-              >
-                <AlertDialogOverlay>
-                  <AlertDialogContent>
-                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                    Publish Profile
-                    </AlertDialogHeader>
+                </div>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Card>
 
-                    <AlertDialogBody>
-                      Are you sure? You can't undo this action afterwards.
-                    </AlertDialogBody>
-
-                    <AlertDialogFooter>
-                      <Button ref={cancelRef} onClick={onClose}>
-                        Cancel
-                      </Button>
-                      <Button
-                        spinnerPlacement="start"
-                        isLoading={isPublishingProfile}
-                        colorScheme='blue'
-                        onClick={() => publishMe()} ml={3}>
-                        {isPublishingProfile || 'Publish'}
-                      </Button>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialogOverlay>
-              </AlertDialog>
-              <Button
-                leftIcon={<FaCheck />}
-                isLoading={isCreatingProfile || isUpdatingProfile}
-                loadingText={profileId ? `Updating` : `Creating`}
-                onClick={postData}
-                disabled={!username || !website || !languages}
-                bg={'blue.400'}
-                color={'white'}
-                w="full"
-                _hover={{
-                  bg: 'blue.500',
-                }}>
-                {profileId ? `Update` : `Save`}
+          <Modal show={isOpen} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Publish Profile</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>Are you sure? You can't undo this action afterwards.</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Cancel
               </Button>
-            </Stack>
-          </AccordionPanel>
-        </AccordionItem>
-      </Accordion>
-    </Container>
-  )
+              <Button variant="primary" onClick={handleClose}>
+                Publish
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+        </Accordion>
+      </Container>
+    )
+  }
 };
 
 export default ProfileDetail;
