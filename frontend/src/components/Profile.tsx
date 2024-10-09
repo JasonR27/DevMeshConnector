@@ -1,40 +1,14 @@
-// import { EditIcon } from '@chakra-ui/icons';
-// import {
-//   Box, Progress, useToast,
-//   Heading,
-//   Text,
-//   Stack,
-//   Button,
-//   Badge,
-//   useColorModeValue,
-//   Flex,
-//   Input,
-//   FormControl,
-//   FormLabel,
-//   Tag,
-//   TagLabel,
-//   useDisclosure,
-//   AlertDialog,
-//   AlertDialogOverlay,
-//   AlertDialogContent,
-//   AlertDialogHeader,
-//   AlertDialogBody,
-//   AlertDialogFooter,
-//   HStack
-// } from '@chakra-ui/react';
-import { Container, Row, Col, Button, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
-import classnames from 'classnames';
+import React, { useEffect, useRef, useState } from 'react';
+import { Form, Button, Stack, Container, Row, Col, Badge, Modal } from 'react-bootstrap';
+import { FaAddressBook, FaCheck, FaEdit } from 'react-icons/fa';
+import { pickListOptions } from '../config/pickListOptions';
 import { Session, User } from '@supabase/supabase-js';
 import { AxiosResponse } from 'axios';
-import { useEffect, useRef, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { supabaseClient } from '../config/supabase-client';
 import { getRandomColor } from '../utils/functions';
-import PersonalAvatar from './PersonalAvatar';
-// import { AsyncSelect, MultiValue } from 'chakra-react-select';
-import { pickListOptions } from '../config/pickListOptions';
-import { FaAddressBook, FaCheck } from 'react-icons/fa';
-import eventBus from '../eventBus';
+import AsyncSelect from 'react-select/async';
+import { MultiValue, ActionMeta } from 'react-select';
 import { createPicture, getPictureByProfileId, getProfileByAuthorEmail, updatePicture, createProfile, saveProfile, publishProfile } from '../api';
 
 const mappedColourOptions = pickListOptions.map(option => ({
@@ -43,28 +17,36 @@ const mappedColourOptions = pickListOptions.map(option => ({
 }));
 
 const Profile = () => {
+  const [username, setUsername] = useState<string>('');
+  const [website, setWebsite] = useState<string>('');
+  const [company, setCompany] = useState<string>('');
+  // const [languages, setLanguages] = useState<string[]>();
+  // const [isPublic, setIsPublic] = useState<boolean>(false);
+  const [isPublic, setIsPublic] = useState<boolean>();
+  const [isEditingLanguage, setIsEditingLanguage] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isPublishingProfile, setIsPublishingProfile] = useState<boolean>(false);
+  // const [isCreatingProfile, setIsCreatingProfile] = useState<boolean>(false);
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
+  const [profileId, setProfileId] = useState<String>()
+  const [authorEmail, setAuthorEmail] = useState<string>();
+  const [profile, setProfile] = useState<IProfile>()
+  // const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
   const [session, setSession] = useState<Session | null>();
   const [user, setUser] = useState<User>()
-  const [profile, setProfile] = useState<IProfile>()
-  const [picture, setPicture] = useState<IPicture>()
-  const [avatarUrl, setAvatarUrl] = useState<string>();
-  const [username, setUsername] = useState<string>();
-  const [website, setWebsite] = useState<string>();
-  const [company, setCompany] = useState<string>();
-  const [profileId, setProfileId] = useState<number>()
-  const [authorEmail, setAuthorEmail] = useState<string>();
-
-  const [isEditingLanguage, setIsEditingLanguage] = useState<boolean>();
-  const [isUrlUploaded, setIsUrlUploaded] = useState<boolean>();
-  const [isPublic, setIsPublic] = useState<boolean>();
-  const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
   const [newParams, setNewParams] = useState<any[]>([]);
-  // const toast = useToast();
-  // const { isOpen, onOpen, onClose } = useDisclosure()
-  const cancelRef = useRef<HTMLButtonElement>(null);
 
-  // const color3 = useColorModeValue('gray.50', 'gray.800')
-  // const color4 = useColorModeValue('white', 'gray.700')
+  // const [programmingLanguages, setProgrammingLanguages] = useState([]);
+  const [languages, setLanguages] = useState<string[]>([]);
+
+  // const handleLanguagesChange = (selectedOptions: { map: (arg0: (option: any) => any) => React.SetStateAction<never[]>; }) => {
+  //   setProgrammingLanguages(selectedOptions.map((option: { value: any; }) => option.value));
+  // };
+
+  const handleLanguagesChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
+    setLanguages(newValue.map(option => option.value));
+  };
+
 
   useEffect(() => {
     const setData = async () => {
@@ -80,27 +62,9 @@ const Profile = () => {
     setData();
   }, []);
 
-  const fetchProfilePicture = async () => {
-    const res: AxiosResponse<ApiDataType> = await getPictureByProfileId(profile?.id!)
-    return res.data
-  }
-
-  const { data: pictureData, isLoading, isError, refetch: refetchPicture } = useQuery(['profilePicture'], fetchProfilePicture, {
-    enabled: false, retry: 2, cacheTime: 0, onSuccess(res: IPicture) {
-      setPicture(res)
-    },
-    onError: (error: any) => {
-      // toast({
-      //   title: 'Error',
-      //   position: 'top',
-      //   variant: 'subtle',
-      //   description: error,
-      //   status: 'error',
-      //   duration: 3000,
-      //   isClosable: true
-      // });
-    }
-  })
+  const handleLanguages = (e: any) => {
+    // Handle language selection
+  };
 
   const fetchProfile = async () => {
     const res: AxiosResponse<ApiDataType> = await getProfileByAuthorEmail(user?.email!)
@@ -119,7 +83,7 @@ const Profile = () => {
         setAuthorEmail(res.authorEmail)
         if (res.programmingLanguages.length !== newParams.length) {
           res.programmingLanguages.forEach(obj => {
-            newParams.push(obj.language)
+            newParams.push(obj)
           })
         }
         setLanguages(newParams)
@@ -143,6 +107,12 @@ const Profile = () => {
 
   const postCreateProfile = async (): Promise<AxiosResponse> => {
     // const profile: Omit<IProfile, 'id'> = {
+    console.log('inside postCreateProfile')
+    console.log('website: ', website)
+    console.log('username: ', username)
+    console.log('website: ', website)
+    console.log('company: ', company)
+    console.log('languages: ', languages)
     const profile: Omit<IProfile, 'id'> = {
       // userId:
       userId: user?.id!,
@@ -157,6 +127,7 @@ const Profile = () => {
 
   const { isLoading: isCreatingProfile, mutate: postProfile } = useMutation(postCreateProfile, {
     onSuccess(res) {
+      console.log('Profile Created Succesfully!')
       // toast({
       //   title: 'Profile created.',
       //   position: 'top',
@@ -170,260 +141,155 @@ const Profile = () => {
     }
   });
 
-  const postUpdateProfile = async (): Promise<AxiosResponse> => {
-    const profile: IProfile = {
-      website: website!,
-      username: username!,
-      company: company!,
-      authorEmail: user?.email!,
-      id: profileId!,
-      userId: user?.id!,
-      programmingLanguages: languages!
-    };
-    return await saveProfile(profile);
-  }
+  const editLanguage = () => {
+    setIsEditingLanguage(!isEditingLanguage);
+  };
 
-  const { isLoading: isUpdatingProfile, mutate: updateProfile } = useMutation(
-    postUpdateProfile,
-    {
-      onSuccess: (res) => {
-        // toast({
-        //   title: 'Profile updated.',
-        //   position: 'top',
-        //   variant: 'subtle',
-        //   description: '',
-        //   status: 'success',
-        //   duration: 3000,
-        //   isClosable: true
-        // });
-        refetchProfile()
-      },
-      onError: (err) => {
-        console.log(err)
-      },
-      //onMutate: () => console.log('mutating')
-    }
-  );
+  const onOpen = () => setIsOpen(true);
+  const onClose = () => setIsOpen(false);
 
-  const postPublishProfile = async (): Promise<AxiosResponse> => {
-    return await publishProfile(profileId!);
-  }
-
-  const { isLoading: isPublishingProfile, mutate: publish } = useMutation(
-    postPublishProfile,
-    {
-      onSuccess: (res) => {
-        // toast({
-        //   title: 'Profile published.',
-        //   position: 'top',
-        //   variant: 'subtle',
-        //   description: '',
-        //   status: 'success',
-        //   duration: 3000,
-        //   isClosable: true
-        // });
-        refetchProfile()
-      },
-      onError: (err) => {
-        console.log(err)
-      },
-      //onMutate: () => console.log('mutating')
-    }
-  );
-
-  const postCreateProfilePicture = async (): Promise<AxiosResponse> => {
-    const picture: Omit<IPicture, 'id'> = {
-      profileId: profileId!,
-      avatarUrl: avatarUrl!
-    };
-    return await createPicture(picture, session?.access_token!);
-  }
-
-  const { isLoading: isCreatingProfileUrl, mutate: createProfilePicture } = useMutation(
-    postCreateProfilePicture,
-    {
-      onSuccess: (res) => {
-        // toast({
-        //   title: 'Picture created.',
-        //   position: 'top',
-        //   variant: 'subtle',
-        //   description: '',
-        //   status: 'success',
-        //   duration: 3000,
-        //   isClosable: true
-        // });
-        eventBus.dispatch('profileUpdated', true);
-      },
-      onError: (err: any) => {
-        // toast({
-        //   title: 'Error uploading picture',
-        //   position: 'top',
-        //   variant: 'subtle',
-        //   description: err.response.data.error,
-        //   status: 'error',
-        //   duration: 3000,
-        //   isClosable: true
-        // });
-      },
-    }
-  );
-
-  const postUpdateProfilePicture = async (): Promise<AxiosResponse> => {
-    const picture: Omit<IPicture, 'id'> = {
-      profileId: profileId!,
-      avatarUrl: avatarUrl!
-    };
-    return await updatePicture(picture, session?.access_token!);
-  }
-
-  const { isLoading: isUpdatingProfileUrl, mutate: updateProfilePicture } = useMutation(
-    postUpdateProfilePicture,
-    {
-      onSuccess: (res) => {
-        // toast({
-        //   title: 'Picture updated.',
-        //   position: 'top',
-        //   variant: 'subtle',
-        //   description: '',
-        //   status: 'success',
-        //   duration: 3000,
-        //   isClosable: true
-        // });
-        eventBus.dispatch('profileUpdated', true);
-      },
-      onError: (err) => {
-        console.log(err)
-      },
-    }
-  );
-
-  useEffect(() => {
-    if (user) {
-      //console.log('user->', user)
-      refetchProfile()
-    }
-    if (profile) {
-      //console.log('prof', profile)
-      refetchPicture()
-    }
-    if (picture) {
-      //console.log('pic pic', picture)
-    }
-
-  }, [user, refetchProfile, profile, refetchPicture])
-
-  useEffect(() => {
-
-    if (isUrlUploaded) {
-      handleProfilePicture()
-    }
-  }, [isUrlUploaded])
-
-  async function handleProfilePicture() {
-    try {
-      picture?.id ? updateProfilePicture() : createProfilePicture();
-    } catch (error: any) {
-      alert(error.message);
-    }
-  }
-
-  function publishMe() {
-    // onClose()
-    publish();
-  }
+  const publishMe = () => {
+    setIsPublishingProfile(true);
+    // Publish profile logic
+    setIsPublishingProfile(false);
+    onClose();
+  };
 
   function postData() {
     try {
       if (profileId) {
-        updateProfile()
+        console.log('profileId already exists')
+        // updateProfile()
       } else {
         postProfile()
       }
     } catch (err) {
-      //setPostResult(fortmatResponse(err));
+      console.log('Error creating profile')
+      // setPostResult(fortmatResponse(err));
     }
   }
 
-  const editLanguage = () => {
-    setNewParams([])
-    setIsEditingLanguage(true)
-  }
-
-  // function handleLanguages(e: MultiValue<{ colorScheme: string; value: string; label: string; color: string; }>) {
-  //   let newParams: any[] = []
-  //   for (let i = 0; i < e.length; i += 1) {
-  //     const obje = e[i].value
-  //     newParams.push(obje)
-  //   }
-
-  //   setLanguages(newParams)
-  // }
-
-  // if (isFetchingProfile) return <Progress size={'xs'} isIndeterminate />
+  // const handleLanguagesChange = (selectedOptions: any[]) => {
+  //   setLanguages(selectedOptions.map((option: { value: any; }) => option.value));
+  // };
 
   return (
-    <>
-    <div className="container mt-5">
-  <div className="row justify-content-center">
-    <div className="col-md-8">
-      <div className="card shadow-lg">
-        <div className="card-body">
-          <h2 className="card-title text-center">User Profile Edit</h2>
-          <form>
-            <div className="form-group">
-              <label htmlFor="userName">Username</label>
-              <input type="text" className="form-control" id="userName" placeholder="username" value="" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="website">Website</label>
-              <input type="text" className="form-control" id="website" placeholder="website" value="" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="company">Company</label>
-              <input type="text" className="form-control" id="company" placeholder="company" value="" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="languages">Programming languages</label>
-              <select multiple className="form-control" id="languages">
-                <option>Java</option>
-                <option>GoLang</option>
-                {/* <!-- Add more options as needed --> */}
-              </select>
-            </div>
-            <button type="button" className="btn btn-primary w-100 mt-3" data-toggle="modal" data-target="#publishModal">
-              Publish Profile
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+    <Container className="my-5">
+      <Row className="justify-content-center">
+        <Col md={8}>
+          <Stack gap={4} className="bg-light p-4 rounded shadow">
+            <h2 className="text-center">User Profile Edit</h2>
+            <Form.Group controlId="userName">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group controlId="website">
+              <Form.Label>Website</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group controlId="company">
+              <Form.Label>Company</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="company"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+              />
+            </Form.Group>
+            {isEditingLanguage ? (
+              <Form.Group controlId="languages">
+                <Form.Label>Select programming languages that you like most</Form.Label>
+                {/* Replace with your AsyncSelect component */}
+                <AsyncSelect
+                  onChange={handleLanguagesChange}
+                  isMulti
+                  name="programmingLanguages"
+                  options={mappedColourOptions}
+                  placeholder="ex: JavaScript, C, Assembly"
+                  closeMenuOnSelect={false}
+                  loadOptions={(inputValue, callback) => {
+                    setTimeout(() => {
+                      const values = mappedColourOptions.filter((i) =>
+                        i.label.toLowerCase().includes(inputValue.toLowerCase()),
+                      );
+                      callback(values);
+                    }, 3000);
+                  }}
+                />
 
-{/* <!-- Alert Dialog --> */}
-{/* <div className="modal fade" id="publishModal" tabindex="-1" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true"> */}
-<div className="modal fade" id="publishModal" role="dialog" aria-labelledby="publishModalLabel" aria-hidden="true">
-  <div className="modal-dialog" role="document">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h5 className="modal-title" id="publishModalLabel">Publish Profile</h5>
-        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div className="modal-body">
-        Are you sure? You can't undo this action afterwards.
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        <button type="button" className="btn btn-primary">Publish</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-    </>
+                {/* <AsyncSelect
+                  onChange={(e) => setLanguages(e.target.value)}
+                  isMulti
+                  name="colors"
+                  options={mappedColourOptions}
+                  placeholder="ex: JavaScript, C, Assembly"
+                  closeMenuOnSelect={false}
+                  loadOptions={(inputValue, callback) => {
+                    setTimeout(() => {
+                      const values = mappedColourOptions.filter((i) =>
+                        i.label.toLowerCase().includes(inputValue.toLowerCase()),
+                      );
+                      callback(values);
+                    }, 3000);
+                  }}
+                /> */}
+              </Form.Group>
+            ) : (
+              <>
+                <Form.Label>Programming languages</Form.Label>
+                <Stack direction="horizontal" gap={2}>
+                  {/* Replace with your tags */}
+                  <Button variant="outline-primary" onClick={editLanguage}>
+                    <FaEdit /> Edit
+                  </Button>
+                </Stack>
+              </>
+            )}
+            {!isPublic && (
+              <Button variant="danger" onClick={onOpen}>
+                <FaAddressBook /> Publish profile
+              </Button>
+            )}
+            <Modal show={isOpen} onHide={onClose}>
+              <Modal.Header closeButton>
+                <Modal.Title>Publish Profile</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>Are you sure? The Profile will be online until deletion.</Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={postData}
+                  disabled={isPublishingProfile}
+                >
+                  {isPublishingProfile ? 'Publishing...' : 'Publish'}
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            <Button
+              variant="primary"
+              onClick={postData}
+              disabled={!username || !website}
+            >
+              {isCreatingProfile || isUpdatingProfile ? 'Saving...' : 'Save'}
+            </Button>
+          </Stack>
+        </Col>
+      </Row>
+    </Container>
   );
-}
+};
 
-export default Profile
+export default Profile;

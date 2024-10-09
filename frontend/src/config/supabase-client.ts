@@ -1,8 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
-console.log('sb url: ', process.env.REACT_APP_SUPABASE_URL!)
+// require('console-polyfill');
 
-const supabaseUrl: string = process.env.REACT_APP_SUPABASE_URL!;
-const supabaseAnonKey: string = process.env.REACT_APP_SUPABASE_ANON_KEY!;
+// import console-polyfill from 'console-polyfill';
+
+// import 'console-polyfill';
+
+
+
+console.log('sb url: ', process.env.VITE_SUPABASE_URL!)
+
+const supabaseUrl: string = import.meta.env.VITE_SUPABASE_URL!;
+const supabaseAnonKey: string = import.meta.env.VITE_SUPABASE_ANON_KEY!;
 
 export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);

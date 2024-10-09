@@ -13,7 +13,7 @@ const WelcomePage = () => {
         backgroundImage: 'url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmhic3B6MGwxaDlud2Rsa3NkNmhmNHo2b2xsc2NmMm1vNHl3ZXBheCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jMbfmwkrcm82PRlYa9/giphy.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center center'
-      }}
+      }} 
     >
       <div className="container-fluid text-white text-center" style={{ background: 'linear-gradient(to right, rgba(0, 0, 0, 0.6), transparent)' }}>
         <div className="row justify-content-center">

@@ -17,9 +17,6 @@ import { Link } from 'react-router-dom';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
 
-
-
-
 const MainNavigation = () => {
   const [user, setUser] = useState<User>()
   const [session, setSession] = useState<Session | null>();
@@ -34,14 +31,14 @@ const MainNavigation = () => {
     // we listen here if someone cleans the storage in the browser
     // so we push him back and logout
     // check: https://stackoverflow.com/questions/56660153/how-to-listen-to-localstorage-value-changes-in-react
-    const handleLocalStorage = () => {
-      window.addEventListener('storage', (event) => {
-        if (event) supabaseClient.auth.signOut()
-      })
-    }
+    // const handleLocalStorage = () => {
+    //   window.addEventListener('storage', (event) => {
+    //     if (event) supabaseClient.auth.signOut()
+    //   })
+    // }
     //if (session) getAvatarUrl();
     //if (session) refetch()
-    handleLocalStorage()
+    // handleLocalStorage()
   }, []);
 
   useEffect(() => {
@@ -50,9 +47,13 @@ const MainNavigation = () => {
       if (error) throw error;
       if (session) {
         setSession(session)
-        //setUser(session.user)
+        setUser(session.user)
       }
     };
+
+    async function signOut() {
+      const { error } = await supabaseClient.auth.signOut()
+    }
 
     supabaseClient.auth.onAuthStateChange((_event, session) => {
       if (_event === 'SIGNED_OUT') {
@@ -154,51 +155,66 @@ const MainNavigation = () => {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">Home</a>
+                <a className="nav-link active" aria-current="page" href="/">Home</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="profiles">Profiles</a>
+                <a className="nav-link active" href="profiles">Profiles</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="posts">Posts</a>
+                <a className="nav-link active" href="posts">Posts</a>
               </li>
               <li className="nav-item">
                 {/* <a className="nav-link" to="/myprofiles">My Profiles</a> */}
                 {/* <Link className="nav-link" to="/myprofiles">My Profiles</Link> */}
-                <a className="dropdown-item" href="myprofiles">My Profiles</a>
+                <a className="nav-link active" href="myprofiles">My Profiles</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="https://www.geeksforgeeks.org/">Events</a>
+                <a className="nav-link active" href="https://www.geeksforgeeks.org/">Events</a>
               </li>
-              <li className="nav-item dropdown">
-                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <form className="d-flex ps-5" role="search">
+              <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+              <button className="btn btn-outline-success" type="submit">Search</button>
+            </form>
+
+              <li className="nav-item dropdown ps-5" >
+                <a className="nav-link dropdown-toggle ps-5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Dropdown
                 </a>
                 <ul className="dropdown-menu">
-                  <li><a className="dropdown-item" href="linkedin.com">Jobs</a></li>
+                  <li><a className="dropdown-item" href="https://www.linkedin.com">Jobs</a></li>
                   <li><a className="dropdown-item" href="https://stackup.dev/">Hackatons</a></li>
                   <li><a className="dropdown-item" href="https://www.geeksforgeeks.org/">Events</a></li>
+                  <div>
+            {user ? (
+                <button className="btn btn-danger m-1 p-2 pl-5 pr-9" onClick={signOut}>Sign Out Button</button>
+            ) : (
+              <button className="btn btn-primary m-1 p-2 pl-5 pr-9" onClick={handleClick}>Sign In</button>                
+                
+            )}
+        </div>
+                  
+                  {/* <li><a>Sign Out</a></li> */}
                   <li><hr className="dropdown-divider" /></li>
                   <li><a className="dropdown-item" href="https://youtu.be/dQw4w9WgXcQ?t=43">Contact JasonR27</a></li>
                 </ul>
               </li>
             </ul>
-            <form className="d-flex" role="search">
-              <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-              <button className="btn btn-outline-success" type="submit">Search</button>
-            </form>
+            
 
           </div>
         </div>
         <ul className="navbar-nav">
           <li className="nav-item">
             {/* <button className="btn btn-primary m-1 p-2 pl-5 pr-9">Sign In</button> */}
-            <button
-              className="btn btn-primary m-1 p-2 pl-5 pr-9"
-              onClick={handleClick}
-            >
-              Sign In
-            </button>
+            <div>
+              
+            {
+            user ? (
+                <div className='text-success'>Welcome, {user.email}</div>
+            ) : (
+                <button className="btn btn-primary m-1 p-2 pl-5 pr-9" onClick={handleClick}>Sign In</button>
+            )}
+        </div>
           </li>
         </ul>
       </nav>

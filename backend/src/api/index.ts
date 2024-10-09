@@ -7,6 +7,9 @@ import users from './users';
 import profile from './profiles';
 import picture from './pictures';
 import like from './likes';
+import signup from './signup';
+import login from './login';
+// import like from './likes';
 
 const router = express.Router();
 
@@ -22,5 +25,6 @@ router.use('/posts', posts);
 router.use('/profiles', profile);
 router.use('/pictures', picture);
 router.use('/likes', like);
+router.use('/auth', signup, login);
 
 export default router;

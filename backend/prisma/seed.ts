@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 
+
 const prisma = new PrismaClient();
 
 const userData: Prisma.ProfilesCreateInput[] = [
@@ -15,12 +16,14 @@ const userData: Prisma.ProfilesCreateInput[] = [
           title: 'Join the Prisma Slack',
           content: 'https://slack.prisma.io',
           published: true,
+          viewCount: 0,
         },
         {
           userId: '1',
           title: 'Join the other community',
           content: 'https://slack.prisma.io',
           published: true,
+          viewCount: 0,
         },
       ],
     },
@@ -42,6 +45,7 @@ const userData: Prisma.ProfilesCreateInput[] = [
           title: 'Join the Prisma Slack',
           content: 'https://slack.prisma.io',
           published: true,
+          viewCount: 0,
         },
       ],
     },

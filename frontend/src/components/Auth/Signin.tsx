@@ -10,17 +10,41 @@ import { regex } from '../../utils/constants';
 import Logo from './Logo';
 import { OAuthButtonGroup } from './OAuthButtonGroup';
 import CustomToast from '../CustomToast';
+import { createUser, logInUser } from '../../api';
+import { useMutation } from 'react-query';
+// import { error } from 'console';
+import { AxiosResponse } from 'axios';
+import 'console-polyfill';
+
+
+// const history = useHistory();
 
 
 export const Signin = () => {
+
+  // const navigate = useNavigate();
+
+  const token = localStorage.getItem('token')
+
+  if (!token) {
+    // window.location.href = '/login';
+    // navigate('/login');
+    redirect('/myprofiles')
+  }
   // const formBackground = useColorModeValue('gray.100', 'gray.700');
-  const [showToast, setShowToast] = useState(false);
+  // Hook for signup state management
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
+  const [name, setName] = useState<string>('');
+
+  const [showToast, setShowToast] = useState(true);
+  const [toastMessage, setToastMessage] = useState({ title: '', message: '', variant: '' });
   const [authButtonState, setAuthButtonState] = useState(true);
-  // const toast = useToast();
-  const navigate = useNavigate();
+  
   const [magicEmail, setMagicEmail] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // const [email, setEmail] = useState('');
+
   const [loadingGithub, setLoadingGithub] = useState(false);
   const [loading, setLoading] = useState(false);
   const [magicEmailDisabled, setMagicEmailDisabled] = useState(true);
@@ -29,6 +53,7 @@ export const Signin = () => {
   const [Lmsg, setLMsg] = useState(''); // Login message
   const [user, setUser] = useState<User | null>(); // User object after registration / login
   const [session, setSession] = useState<Session | null>();
+  // const [posiuser, setPosiuser] = useState<IPossibleUser>;
 
   // New hooks for bootstrap
 
@@ -96,6 +121,14 @@ export const Signin = () => {
     setPassword(e.target.value)
   }
 
+  const handleUsername = (e: any) => {
+    setUsername(e.target.value)
+  }
+
+  const handleName = (e: any) => {
+    setName(e.target.value)
+  }
+
   const handleLoginWithMagic = async (email: string) => {
     try {
       setLoading(true);
@@ -150,72 +183,110 @@ export const Signin = () => {
     []
   );
 
+
+  const postLogInUser = async (): Promise<AxiosResponse> => {
+    // const profile: Omit<IProfile, 'id'
+    const user: Omit<IPossibleUser, 'id'> = {
+      email: email,
+      password: password,
+    };
+    return await logInUser(user);
+  }
+
   const handleLogin = async () => {
     try {
-      console.log('entered log in try')
+      console.log('entered log in try');
       setLoading(true);
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password,
-      })
-      if (error) {
-        <CustomToast
-        show={showToast}
-        onClose={() => setShowToast(false)}
-        title="Error"
-        message="An error occurred"
-        variant="warning"
-      />
+      
+      // setPosiuser({email, password});
+      postLogInUser();
+
+      if (Error) {
+        console.log('error', Error)
+        setToastMessage({
+          title: 'Error',
+          message: 'An error occurred',
+          variant: 'warning',
+        });
+        setShowToast(true);
       } else {
-        <CustomToast
-        show={showToast}
-        onClose={() => setShowToast(false)}
-        title="Logged In"
-        message="An error occurred"
-        variant='success'
-      />
-        setUser(data.user)
-        setSession(data.session)
-        console.log('data.session: ', data.session)
+        setToastMessage({
+          title: 'Logged In',
+          message: 'Successfully Logged In',
+          variant: 'success',
+        });
+        setShowToast(true);
+        // setUser(data.user);
+        // setSession(data.session);
+        // console.log('data.session: ', data.session);
         console.log('signed in');
-        navigate("/myprofiles");
+        // history.push('/myprofiles');
+        // window.location.href = '/myprofiles';
+        // navigate('/myprofiles');
+        redirect('/myprofiles')
       }
     } catch (err) {
-      throw err;
+      console.error(err);
     } finally {
-      console.log('entered log in finally')
-      setEmail('')
-      setPassword('')
+      console.log('entered log in finally');
+      setEmail('');
+      setPassword('');
       setLoading(false);
     }
-  }
+  };
+
+  // const fetchUser = async () => {
+  //   const res: AxiosResponse<ApiDataType> = await getUserByEmail(user?.email!)
+  //   return res.data;
+  // };
+
+  // const { data: profileData, error: profileError, isLoading: isFetchingProfile, refetch: refetchUser } = useQuery(['profile'], fetchUser, {
+  //   enabled: false, retry: 2, cacheTime: 0, onSuccess(res: IUser) {
+  //     setUser(res)
+  //     if (res != null) {
+  //       setUsername(res.username)
+  //       setEmail(res.email)
+  //       setUserId(res.id)
+  //       if (res.programmingLanguages.length !== newParams.length) {
+  //         res.programmingLanguages.forEach(obj => {
+  //           newParams.push(obj)
+  //         })
+  //       }
+
+  //     } else {
+  //       setIsEditingLanguage(true)
+  //     }
+  //   },
+  //   onError: (error: any) => {
+  //     // toast({
+  //     //   title: 'Error',
+  //     //   position: 'top',
+  //     //   variant: 'subtle',
+  //     //   description: error,
+  //     //   status: 'error',
+  //     //   duration: 3000,
+  //     //   isClosable: true
+  //     // });
+  //   }
+  // });
 
   const handleRegister = async () => {
     try {
+
       setLoading(true);
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password
-      })
-      if (error) {
-        // toast({
-        //   title: 'Error',
-        //   position: 'top',
-        //   description: error.message,
-        //   status: 'warning',
-        //   duration: 5000,
-        //   isClosable: true
-        // });
+
+      postUser()
+
+      if (Error) {
+        // toast
+        console.log('error: ', Error, Error.name)
       } else {
-        // toast({
-        //   title: 'Success',
-        //   position: 'top',
-        //   description: 'Account created',
-        //   status: 'success',
-        //   duration: 5000,
-        //   isClosable: true
-        // })
-        navigate("/myprofiles");
+        // toast
+        postUser()
+        console.log('Registered Succesfully')
+        // navigate("/myprofiles");
+        // window.location.href = '/myprofiles';
+        redirect('/myprofiles')
       }
     } catch (err) {
       // console.log(err)
@@ -226,6 +297,33 @@ export const Signin = () => {
       setLoading(false);
     }
   }
+
+  const postCreateUser = async (): Promise<AxiosResponse> => {
+    // const profile: Omit<IProfile, 'id'
+    const user: Omit<IUser, 'id'> = {
+      username: username,
+      email: email,
+      password: password,
+      name: name,
+    };
+    return await createUser(user);
+  }
+
+  const { isLoading: isCreatingUser, mutate: postUser } = useMutation(postCreateUser, {
+    onSuccess(res) {
+      console.log('Profile Created Succesfully!')
+      // toast({
+      //   title: 'Profile created.',
+      //   position: 'top',
+      //   variant: 'subtle',
+      //   description: '',
+      //   status: 'success',
+      //   duration: 3000,
+      //   isClosable: true
+      // });
+      // refetchUser()
+    }
+  });
 
   useEffect(() => {
     if (session) {
@@ -241,6 +339,8 @@ export const Signin = () => {
 
   const handleEmailChange = (e: { target: { value: SetStateAction<string>; }; }) => setEmail(e.target.value);
   const handlePasswordChange = (e: { target: { value: SetStateAction<string>; }; }) => setPassword(e.target.value);
+  const handleNameChange = (e: { target: { value: SetStateAction<string>; }; }) => setName(e.target.value);
+  const handleUsernameChange = (e: { target: { value: SetStateAction<string>; }; }) => setUsername(e.target.value);
   const handleMagicEmailChange = (e: { target: { value: SetStateAction<string>; }; }) => setMagicEmail(e.target.value);
 
   // const handleRegister = () => {
@@ -260,17 +360,14 @@ export const Signin = () => {
 
   return (
     <Container className="py-5"
-     >
+    >
       <Row className="justify-content-center"
-      style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-        width: '70%',
-        left: '15%',
-        position: 'relative',
-        
-      }}
+
       >
-        <Col lg="6">
+        <Col lg="6" className='border border-primary' style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.5)',
+          position: 'relative',
+        }}>
           <div className="text-center mb-4">
             <h1>{!authButtonState ? 'Register a new account' : 'Sign in to your account'}</h1>
             <p>
@@ -310,6 +407,14 @@ export const Signin = () => {
                     <Label for="password">Password</Label>
                     <Input type="password" id="password" value={password} onChange={handlePasswordChange} />
                   </FormGroup>
+                  {!authButtonState ? <><FormGroup>
+                    <Label for="name">Name</Label>
+                    <Input type="text" id="name" value={name} onChange={handleNameChange} />
+                  </FormGroup><FormGroup>
+                      <Label for="username">Username</Label>
+                      <Input type="text" id="username" value={username} onChange={handleUsernameChange} />
+                    </FormGroup></> : <></>}
+                  
                   <Button color="link" onClick={!authButtonState ? handleRegister : handleLogin} disabled={emailDisabled || !password}>
                     {loading ? 'Loading...' : (!authButtonState ? 'Register' : 'Sign in')}
                   </Button>

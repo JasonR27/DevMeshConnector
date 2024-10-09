@@ -29,7 +29,7 @@ interface Props {
 
 const ProfileDetail = ({ childToParent }: Props) => {
   const [username, setUsername] = useState<string>('');
-  const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
+  // const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
   const [website, setWebsite] = useState<string>('');
   const [company, setCompany] = useState<string>('');
   const [isPublic, setIsPublic] = useState<boolean>();
@@ -38,8 +38,8 @@ const ProfileDetail = ({ childToParent }: Props) => {
   const [user, setUser] = useState<User | null>();
   const [newParams, setNewParams] = useState<any[]>([]);
   const [showToast, setShowToast] = React.useState(false);
-
   const [isOpen, setIsOpen] = useState(false);
+  const [languages, setLanguages] = useState<string[]>([]);
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -80,7 +80,7 @@ const ProfileDetail = ({ childToParent }: Props) => {
 
         if (res.programmingLanguages.length !== newParams.length) {
           res.programmingLanguages.forEach(obj => {
-            newParams.push(obj.language)
+            newParams.push(obj)
           })
         }
         setLanguages(newParams)
@@ -192,13 +192,22 @@ const ProfileDetail = ({ childToParent }: Props) => {
     //   setLanguages(newValue.map(option => ({ name: option.label })));
     // };
 
+    // const handleLanguages = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
+    //   setLanguages(newValue.map((option, index) => ({
+    //     id: index, // Placeholder value
+    //     name: option.label,
+    //     language: option.value,
+    //     profileId: 1 // Placeholder value
+    //   })));
+    // };
+
+    // const handleLanguagesChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
+    //   setLanguages(newValue.map(option => option.value));
+    // };
+
+    
     const handleLanguages = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
-      setLanguages(newValue.map((option, index) => ({
-        id: index, // Placeholder value
-        name: option.label,
-        language: option.value,
-        profileId: 1 // Placeholder value
-      })));
+      setLanguages(newValue.map(option => option.value));
     };
 
     const editLanguage = () => {
@@ -276,7 +285,7 @@ const ProfileDetail = ({ childToParent }: Props) => {
                       <div className="d-flex flex-wrap">
                         {languages?.map((lang, index) => (
                           <Badge key={index} bg="primary" className="mr-2">
-                            {lang.name}
+                            {lang}
                           </Badge>
                         ))}
 

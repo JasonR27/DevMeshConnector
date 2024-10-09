@@ -33,7 +33,7 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
               <Card.Body>
                 <Card.Text>Profile description goes here</Card.Text>
                 {programmingLanguages.map((value, index) => (
-                  <Badge key={index} className="me-2">{value.language}</Badge>
+                  <Badge key={index} className="me-2">{value}</Badge>
                 ))}
               </Card.Body>
               <Card.Footer className="d-flex justify-content-between">

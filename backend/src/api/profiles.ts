@@ -1,17 +1,20 @@
 import express from 'express';
 import prisma from '../lib/prisma';
+// import { PrismaClient } from '@prisma/client';
 // import { User } from '@supabase/supabase-js';
+
+// const authPrisma = new PrismaClient({ datasources: { db: { schema: 'auth' } } });
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
   const profiles = await prisma.profiles.findMany({
     include: {
-      programmingLanguages: {
-        select: {
-          language: true,
-        },
-      },
+      // programmingLanguages: {
+      //   select: {
+      //     language: true,
+      //   },
+      // },
       picture: {
         select: {
           avatarUrl: true,
@@ -52,28 +55,64 @@ router.post('/create', async (req, res) => {
 
   if (!userId) {
     return res.status(400).json({ error: 'User ID is required' });
+  } else {
+    console.log('found userId');
+    console.log('userId: ', userId);
   }
 
   try {
 
-    // Check if the user exists
-    const user = await prisma.users.findUnique({
-      where: { id: userId },
-    });
+    const user = await prisma.$queryRaw`
+    SELECT * FROM auth.users
+    WHERE id::text = ${userId}`;
 
     if (!user) {
+      console.log('didnt found linked user');
       return res.status(404).json({ error: 'User not found' });
+    } else {
+      console.log('found linked user');
     }
-    console.log('userId: ', userId);
+    // console.log('userId: ', userId);
 
     // if (!User) {
     //   return res.status(404).json({ error: 'User not found' });
     // }
 
-    console.log('userId: ', userId);
+    // console.log('userId: ', userId);
+
+
+
+    console.log('username, userId, website, authorEmail, programmingLanguages, company', username, userId, website, authorEmail, programmingLanguages, company);
+
+    console.log('programmingLanguages: ', programmingLanguages);
+
+    if (!programmingLanguages) {
+      return res.status(400).json({ error: 'Programming languages are required' });
+    }
+
+    // console.log(user);
+
+    // const user = await prisma.$queryRaw`
+    // SELECT * FROM auth.users
+    // WHERE id::text = ${userId}`;
+
+
+    const userExists = await prisma.$queryRaw`
+    SELECT * FROM auth.users
+    WHERE id::text = ${userId}`;
+
+    // const userExists = await prisma.users.findUnique({
+    //   where: { id: userId },
+    // });
+
+    if (!userExists) {
+      return res.status(404).json({ error: 'User not found' });
+    } else {
+      console.log('User does exists');
+    }
 
     const result = await prisma.profiles.create({
-      data: {
+      data: { 
         user: {
           connect: {
             id: userId,
@@ -83,17 +122,18 @@ router.post('/create', async (req, res) => {
         website,
         authorEmail,
         company,
-        programmingLanguages: {
-          connectOrCreate: programmingLanguages.map((language: any) => ({
-            create: { language },
-            where: {
-              language,
-              id: userId,
-            },
-          })),
-        },
+        programmingLanguages,
       },
     });
+
+    // const result = await prisma.$executeRaw`
+    //   ALTER TABLE public.profiles
+    //   ADD CONSTRAINT fk_user
+    //   FOREIGN KEY (user_id)
+    //   REFERENCES auth.users(id);
+    //   INSERT INTO public.profiles (username, userId, website, authorEmail, company, programmingLanguages)
+    //   VALUES (${username}, ${userId}, ${website}, ${authorEmail}, ${company}, ${programmingLanguages}::text[])`;
+
     res.status(201).json(result);
   } catch (error: any) {
     console.error('Error creating profile:', error); // Log the error details
@@ -110,7 +150,7 @@ router.put('/updateById/:profileId', async (req, res) => {
   const { username, website, company, programmingLanguages, isPublic } = req.body;
 
   // we delete first all record with profileId
-  await prisma.$transaction([prisma.programmingLanguages.deleteMany({ where: { profileId: profileId } })]);
+  // await prisma.$transaction([prisma.programmingLanguages.deleteMany({ where: { profileId: profileId } })]);
 
   // then we repopulate programmingLanguages
   const profileUpdated = await prisma.profiles.update({
@@ -120,12 +160,13 @@ router.put('/updateById/:profileId', async (req, res) => {
       website: website,
       company: company,
       isPublic: isPublic,
-      programmingLanguages: {
-        connectOrCreate: programmingLanguages.map((lang: string) => ({
-          create: { language: lang },
-          where: { id: Number(profileId) },
-        })),
-      },
+      programmingLanguages,
+      // programmingLanguages: {
+      //   connectOrCreate: programmingLanguages.map((lang: string) => ({
+      //     create: { language: lang },
+      //     where: { id: Number(profileId) },
+      //   })),
+      // },
     },
   });
 
@@ -141,11 +182,11 @@ router.get('/findProfileByEmail/:authorEmail', async (req, res) => {
     const profile = await prisma.profiles.findFirst({
       where: { authorEmail },
       include: {
-        programmingLanguages: {
-          select: {
-            language: true,
-          },
-        },
+        // programmingLanguages: {
+        //   select: {
+        //     language: true,
+        //   },
+        // },
         picture: { select: { avatarUrl: true } },
       },
     });

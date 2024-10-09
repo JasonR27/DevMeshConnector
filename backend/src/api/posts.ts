@@ -25,6 +25,7 @@ router.post('/create', auth, async (req, res) => {
     const result = await prisma.posts.create({
       data: {
         title,
+        viewCount: 0,
         content,
         profile: {
           connect: { id: profileId },

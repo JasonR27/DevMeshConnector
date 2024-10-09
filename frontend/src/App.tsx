@@ -78,7 +78,13 @@ export const App = () => {
     // <ChakraProvider theme={theme}>
     //not really doing anything
     <CustomProvider theme="high-contrast">
-      <div data-bs-theme="dark">
+      <div data-bs-theme="dark" style={{
+        width: '100%',
+        height: '100vh',
+        backgroundImage: 'url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmhic3B6MGwxaDlud2Rsa3NkNmhmNHo2b2xsc2NmMm1vNHl3ZXBheCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jMbfmwkrcm82PRlYa9/giphy.webp)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center'
+      }} >
         <BrowserRouter>
           <AuthProvider>
             <RootLayout>

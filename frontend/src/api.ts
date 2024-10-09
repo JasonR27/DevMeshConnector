@@ -1,30 +1,42 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
-console.log("process.env.REACT_APP_BACKEND_URL: ", process.env.REACT_APP_BACKEND_URL)
-console.log("process.env: ", process.env)
-console.log("process.env.REACT_APP_SUPABASE_URL: ", process.env.REACT_APP_SUPABASE_URL)
-console.log("TESTFRONTEND: ", process.env.TESTFRONTEND)
-console.log("TESTBACKEND: ", process.env.TESTBACKEND)
-console.log("REACT_APP_TESTFRONTEND: ", process.env.REACT_APP_TESTFRONTEND)
-console.log("REACT_APP_TESTBACKEND: ", process.env.REACT_APP_TESTBACKEND)
-const baseUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/posts`;
-const profilesUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/profiles`;
-const pictureUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/pictures`;
-const likeUrl: string = `${process.env.REACT_APP_BACKEND_URL}/api/v1/likes`;
+console.log("REACT_APP_TESTBACKEND: ", import.meta.env.VITE_TESTBACKEND)
+console.log("VITE_BACKEND_URL: ", import.meta.env.VITE_BACKEND_URL)
+ 
+const baseUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/posts`;
+const profilesUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/profiles`;
+const pictureUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/pictures`;
+const likeUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/likes`;
+const usersUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/users`;
+const authUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth`;
 
-// export async function getProfiles() {
-//   const { data } = await axios.get(profilesUrl);
-//   return data;
-// }
+export const logInUser = async (user: IPossibleUser): Promise<AxiosResponse> => {
+  const email = user.email;
+  const password = user.password;
+  try {
+    const response: AxiosResponse<ApiDataType> = await axios.post(`${authUrl}/login/`, {email, password});
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    } else {
+      throw new Error("Token is undefined");
+    }
+    // localStorage.setItem('token', response.data.token)
 
-// export async function getProfiles(): Promise<IProfile[]> {
-//   const { data: IProfile } = await axios.get<IProfile[]>(profilesUrl);
-//   return data;
-// }
+    return response;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
 
 export async function getProfiles(): Promise<IProfile[]> {
   const response = await axios.get<IProfile[]>(profilesUrl);
   const data: IProfile[] = response.data;
+  return data;
+}
+
+export async function getUsers(): Promise<IUser[]> {
+  const response = await axios.get<IUser[]>(usersUrl);
+  const data: IUser[] = response.data;
   return data;
 }
 
@@ -37,6 +49,16 @@ export async function fetchPosts() {
 export const getPost = async (id: number): Promise<AxiosResponse> => {
   const response: AxiosResponse<ApiDataType> = await axios.get(baseUrl + '/post/' + id);
   return response;
+};
+
+export const getUserByEmail = async (userEmail: string): Promise<AxiosResponse> => {
+  try {
+    const response: AxiosResponse<ApiDataType> = await axios.get(`${usersUrl}/findUserByEmail/${userEmail}`);
+    // const response: AxiosResponse<ApiDataType> = await axios.get(`8080/findProfileByEmail/${authorEmail}`);
+    return response;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
 };
 
 export const getProfileByAuthorEmail = async (authorEmail: string): Promise<AxiosResponse> => {
@@ -63,10 +85,22 @@ export const deleteTodo = async (id: number): Promise<AxiosResponse> => {
   }
 };
 
-export async function createProfile(profile: Omit<IProfile, 'id'>) {
-  const response = await axios.post(`${profilesUrl}/create`, profile);
+export async function createUser(user: Omit<IUser, 'id'>) {
+  console.log('axios post to /create, res: User')
+  console.log('authUrl: ', authUrl)
+  const response = await axios.post(`${authUrl}/signup`, user);
+  
   return response;
 }
+
+export async function createProfile(profile: Omit<IProfile, 'id'>) {
+  console.log('axios post to /create, res: profile')
+  const response = await axios.post(`${profilesUrl}/create`, profile);
+  
+  return response;
+}
+
+
 
 export async function saveProfile(profile: IProfile) {
   const response = await axios.put(`${profilesUrl}/updateById/${profile.id}`, profile);

@@ -1,5 +1,24 @@
+interface IUser {
+  id: uuid;
+  email?: string;
+  username?: string;
+  password: string;
+  paswordHash?: string;
+  name: string;
+}
+
+interface IPossibleUser {
+  id?: uuid;
+  email?: string;
+  username?: string;
+  password: string;
+  paswordHash?: string;
+}
+
+
+
 interface IPost {
-  id: number;
+  id: uuid;
   title: string;
   content: string;
   status?: boolean;
@@ -11,17 +30,8 @@ interface IPost {
   likes?: ILike[];
 }
 
-interface IProgrammingLanguage {
-  name: ReactNode;
-  createdAt?: string;
-  id: number;
-  language: string;
-  profileId: number;
-  color?: string;
-}
-
 interface IPicture {
-  id: number;
+  id: uuid;
   profileId: number;
   avatarUrl: string;
   createdAt?: string;
@@ -49,14 +59,16 @@ interface IProfile {
   updatedAt?: string;
   isPublic?: boolean;
   picture?: IPicture;
-  programmingLanguages: IProgrammingLanguage[];
+  programmingLanguages: String[];
 }
+
 
 interface TodoProps {
   todo: IPost;
 }
 
 type ApiDataType = {
+  token?: string;
   message: string;
   status: string;
   posts?: IPost[];
@@ -83,17 +95,19 @@ interface ReadMoreButtonProps {
   postId: number;
 }
 
-interface Profile {
-  username: string;
-  company: string;
-  authorEmail: string;
-  website: string;
-  programmingLanguages: { language: string }[];
-  picture: { avatarUrl: string };
-}
-
 interface ProfilesProps {
   profiles: IProfile[];
 }
 
 
+interface ImportMetaEnv {
+  VITE_TESTBACKEND: any;
+  readonly VITE_BACKEND_URL: string;
+  readonly VITE_SUPABASE_URL: string;
+  readonly VITE_SUPABASE_ANON_KEY: string;
+  // Add other variables here
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
