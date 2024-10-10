@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import bodyParser from 'body-parser';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const router = express();
 const prisma = new PrismaClient();
@@ -11,6 +13,7 @@ router.use(bodyParser.json());
 // const SECRET_KEY = process.env.SUPABASE_JWT_SECRET;
 
 const SECRET_KEY: string = process.env.REACT_APP_SUPABASE_JWT_SECRET || 'default_secret_key';
+// const SECRET_KEY: string = process.env.REACT_APP_SUPABASE_JWT_SECRET || process.env.REACT_APP_SUPABASE_JWT_SECRET;
 
 
 
@@ -34,10 +37,10 @@ router.post('/login', async (req, res) => {
       //   throw new Error('SECRET_KEY is not defined');
     } else {
       console.log('SECRET_KEY: ', SECRET_KEY);
+      console.log('token: ', token);
     }
   } else {
-    res.status(401).json({ error: 'Invalid credentials' });
-    
+    res.status(401).json({ error: 'Invalid credentials' });    
   }
 });
 

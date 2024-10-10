@@ -59,7 +59,7 @@ interface IProfile {
   updatedAt?: string;
   isPublic?: boolean;
   picture?: IPicture;
-  programmingLanguages: String[];
+  programmingLanguages: string[];
 }
 
 
@@ -101,7 +101,7 @@ interface ProfilesProps {
 
 
 interface ImportMetaEnv {
-  VITE_TESTBACKEND: any;
+  VITE_TESTBACKEND: unknown;
   readonly VITE_BACKEND_URL: string;
   readonly VITE_SUPABASE_URL: string;
   readonly VITE_SUPABASE_ANON_KEY: string;
@@ -110,4 +110,12 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+interface ToastProps {
+  show: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  variant: 'success' | 'danger' | 'warning' | 'info';
 }

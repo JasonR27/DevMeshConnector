@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Toast, ToastContainer } from 'react-bootstrap';
 
-interface ToastProps {
-  show: boolean;
-  onClose: () => void;
-  title: string;
-  message: string;
-  variant: 'success' | 'danger' | 'warning' | 'info';
-}
+
 
 const CustomToast: React.FC<ToastProps> = ({ show, onClose, title, message, variant }) => {
   return (

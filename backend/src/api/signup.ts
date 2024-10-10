@@ -8,7 +8,7 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const saltRounds = 10;
 
-router.use(express.json());
+router.use(express.json()); 
 
 router.post('/signup', async (req, res) => {
   console.log('Its entering router.post /signup endpoint');

@@ -1,23 +1,21 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Container, Row, Col, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { Button } from 'react-bootstrap'
 import classnames from 'classnames';
 import { Session, User } from '@supabase/supabase-js';
 import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
-import { HiEye, HiEyeOff } from 'react-icons/hi';
-import { Navigate, redirect, useNavigate } from 'react-router-dom';
+// import { HiEye, HiEyeOff } from 'react-icons/hi';
+import { redirect } from 'react-router-dom';
 import { supabaseClient } from '../../config/supabase-client';
 import { regex } from '../../utils/constants';
 import Logo from './Logo';
-import { OAuthButtonGroup } from './OAuthButtonGroup';
+// import { OAuthButtonGroup } from './OAuthButtonGroup';
 import CustomToast from '../CustomToast';
 import { createUser, logInUser } from '../../api';
 import { useMutation } from 'react-query';
-// import { error } from 'console';
+// import { error } from 'console'; // thows polifyls error
 import { AxiosResponse } from 'axios';
 import 'console-polyfill';
-
-
-// const history = useHistory();
 
 
 export const Signin = () => {
@@ -41,7 +39,9 @@ export const Signin = () => {
   const [showToast, setShowToast] = useState(true);
   const [toastMessage, setToastMessage] = useState({ title: '', message: '', variant: '' });
   const [authButtonState, setAuthButtonState] = useState(true);
+  // const [isCreatingUser, setIsCreatingUser] = useState(true);
   
+
   const [magicEmail, setMagicEmail] = useState('');
   // const [email, setEmail] = useState('');
 
@@ -49,28 +49,15 @@ export const Signin = () => {
   const [loading, setLoading] = useState(false);
   const [magicEmailDisabled, setMagicEmailDisabled] = useState(true);
   const [emailDisabled, setEmailDisabled] = useState(false);
-  const [Rmsg, setRMsg] = useState(''); // Registration message
-  const [Lmsg, setLMsg] = useState(''); // Login message
-  const [user, setUser] = useState<User | null>(); // User object after registration / login
+  
   const [session, setSession] = useState<Session | null>();
-  // const [posiuser, setPosiuser] = useState<IPossibleUser>;
+  
 
   // New hooks for bootstrap
 
   // const [authButtonState, setAuthButtonState] = useState(false);
   const [activeTab, setActiveTab] = useState('1');
-  // const [email, setEmail] = useState('');
-  // const [password, setPassword] = useState('');
-  // const [magicEmail, setMagicEmail] = useState('');
-  // const [loading, setLoading] = useState(false);
-  // const [emailDisabled, setEmailDisabled] = useState(true);
-  // const [magicEmailDisabled, setMagicEmailDisabled] = useState(false);
-
-  // const { isOpen, onToggle } = useDisclosure()
-
-  // const onClickReveal = () => {
-  //   onToggle()
-  // }
+  
 
   function signInWithSocial(socialName: string): void {
     switch (socialName) {
@@ -95,7 +82,7 @@ export const Signin = () => {
         provider: 'github',
       });
       if (error) throw error
-    } catch (error: any) {
+    } catch (error: unknown) {
       // toast({
       //   title: 'Error',
       //   position: 'top',
@@ -104,6 +91,7 @@ export const Signin = () => {
       //   duration: 5000,
       //   isClosable: true
       // });
+      console.log(error)
     }
   };
 
@@ -117,17 +105,17 @@ export const Signin = () => {
     setEmail(e.target.value)
   }
 
-  const handlePassword = (e: any) => {
-    setPassword(e.target.value)
-  }
+  // const handlePassword = (e: string) => {
+  //   setPassword(e.target.value)
+  // }
 
-  const handleUsername = (e: any) => {
-    setUsername(e.target.value)
-  }
+  // const handleUsername = (e: any) => {
+  //   setUsername(e.target.value)
+  // }
 
-  const handleName = (e: any) => {
-    setName(e.target.value)
-  }
+  // const handleName = (e: any) => {
+  //   setName(e.target.value)
+  // }
 
   const handleLoginWithMagic = async (email: string) => {
     try {
@@ -169,19 +157,23 @@ export const Signin = () => {
     console.log('Login with twitter...')
   }
 
-  const handleCallBack = useCallback(
-    (stringFromChild: string) => {
-      signInWithSocial(stringFromChild)
-    },
-    []
-  );
 
-  const handlePasswordCallBack = useCallback(
-    (passwordFromChild: string) => {
-      setPassword(passwordFromChild)
-    },
-    []
-  );
+  // commented bc of it says is not being use
+
+  // const handleCallBack = useCallback(
+  //   (stringFromChild: string) => {
+  //     signInWithSocial(stringFromChild)
+  //   },
+  //   []
+  // );
+
+
+  // const handlePasswordCallBack = useCallback(
+  //   (passwordFromChild: string) => {
+  //     setPassword(passwordFromChild)
+  //   },
+  //   []
+  // );
 
 
   const postLogInUser = async (): Promise<AxiosResponse> => {
@@ -197,18 +189,19 @@ export const Signin = () => {
     try {
       console.log('entered log in try');
       setLoading(true);
-      
+
       // setPosiuser({email, password});
       postLogInUser();
 
       if (Error) {
-        console.log('error', Error)
+        console.log('error unable to login', Error)
         setToastMessage({
           title: 'Error',
           message: 'An error occurred',
           variant: 'warning',
         });
         setShowToast(true);
+        <CustomToast show={showToast} onClose={(): void => {setShowToast(false)} } title={'toast  login error title here'} message={'toast login error message here'} variant={'warning'} />
       } else {
         setToastMessage({
           title: 'Logged In',
@@ -216,6 +209,10 @@ export const Signin = () => {
           variant: 'success',
         });
         setShowToast(true);
+        <CustomToast show={showToast} onClose={(): void => {setShowToast(false)} } title={'toast  login error title here'} message={'toast login error message here'} variant={'warning'} />
+        // <CustomToast show={false} onClose={function (): void {
+        //   throw new Error('Function not implemented.');
+        // } } title={''} message={''} variant={'warning'} />
         // setUser(data.user);
         // setSession(data.session);
         // console.log('data.session: ', data.session);
@@ -311,7 +308,7 @@ export const Signin = () => {
 
   const { isLoading: isCreatingUser, mutate: postUser } = useMutation(postCreateUser, {
     onSuccess(res) {
-      console.log('Profile Created Succesfully!')
+      console.log('Profile Created Succesfully!');
       // toast({
       //   title: 'Profile created.',
       //   position: 'top',
@@ -321,6 +318,13 @@ export const Signin = () => {
       //   duration: 3000,
       //   isClosable: true
       // });
+      if (isCreatingUser) {
+        console.log('loading')
+      }
+      console.log('res', res);
+      <CustomToast show={true} onClose={function (): void {
+        throw new Error('Function not implemented.');
+      } } title={''} message={'User created succesfully'} variant={'warning'} />
       // refetchUser()
     }
   });
@@ -359,8 +363,7 @@ export const Signin = () => {
   // };
 
   return (
-    <Container className="py-5"
-    >
+    <Container className="py-5">
       <Row className="justify-content-center"
 
       >
@@ -414,7 +417,7 @@ export const Signin = () => {
                       <Label for="username">Username</Label>
                       <Input type="text" id="username" value={username} onChange={handleUsernameChange} />
                     </FormGroup></> : <></>}
-                  
+
                   <Button color="link" onClick={!authButtonState ? handleRegister : handleLogin} disabled={emailDisabled || !password}>
                     {loading ? 'Loading...' : (!authButtonState ? 'Register' : 'Sign in')}
                   </Button>
