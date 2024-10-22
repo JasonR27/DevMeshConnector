@@ -5,16 +5,19 @@ import reportWebVitals from './reportWebVitals';
 import * as serviceWorker from './serviceWorker';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Row, Col, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import ParticlesComp from './components/Particles';
+// import { Container, Row, Col, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Failed to find the root element');
 const root = ReactDOM.createRoot(container);
 
 const queryClient = new QueryClient();
+
 root.render(
-  <React.StrictMode>
+  <React.StrictMode >
     <QueryClientProvider client={queryClient} >
+      <ParticlesComp />
 
       <App />
 

@@ -13,8 +13,8 @@ import NewPostPage from './pages/NewPostPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostLayout from './pages/PostLayout';
 import PostPage from './pages/PostPage';
-import ProfileLayout from './pages/ProfileLayout';
-import ProfilePage from './pages/ProfilePage';
+// import ProfileLayout from './pages/ProfileLayout';
+// import ProfilePage from './pages/ProfilePage';
 import WelcomePage from './pages/WelcomePage';
 import ProfilesPage from './pages/ProfilesPage';
 import Signin from './components/Auth/Signin';
@@ -81,7 +81,8 @@ export const App = () => {
       <div data-bs-theme="dark" style={{
         width: '100%',
         height: '100vh',
-        backgroundImage: 'url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmhic3B6MGwxaDlud2Rsa3NkNmhmNHo2b2xsc2NmMm1vNHl3ZXBheCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jMbfmwkrcm82PRlYa9/giphy.webp)',
+        backgroundColor: 'black',
+        // backgroundImage: 'url(https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYmhic3B6MGwxaDlud2Rsa3NkNmhmNHo2b2xsc2NmMm1vNHl3ZXBheCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jMbfmwkrcm82PRlYa9/giphy.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center center'
       }} >
@@ -101,21 +102,21 @@ export const App = () => {
                 <Route
                   path="/post/new"
                   element={
-                    <ProtectedRoute signedIn={signedIn}>
+                    <ProtectedRoute>
                       <NewPostPage />
                     </ProtectedRoute>
                   }
                 />
                 {/* <Route path="/invoices" element={<Invoices />} /> */}
                 <Route path="/myprofiles" element={
-                  <ProtectedRoute signedIn={signedIn}>
-                    <ProfilesLayout />
-                  </ProtectedRoute>
+                  <ProtectedRoute>
+                    <ProfilesLayout style={{ zIndex: -1 }} />
+                   </ProtectedRoute>
                 }>
                   <Route index element={<Profile />} />
                 </Route>
                 <Route path="/profiles/new" element={
-                  <ProtectedRoute signedIn={signedIn}>
+                  <ProtectedRoute >
                     <ProfilesLayout />
                   </ProtectedRoute>
                 }>

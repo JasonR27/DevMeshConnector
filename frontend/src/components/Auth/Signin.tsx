@@ -2,25 +2,28 @@
 import { Container, Row, Col, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { Button } from 'react-bootstrap'
 import classnames from 'classnames';
-import { Session, User } from '@supabase/supabase-js';
-import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { Session } from '@supabase/supabase-js';
+import { SetStateAction, useEffect, useState } from 'react';
 // import { HiEye, HiEyeOff } from 'react-icons/hi';
 import { redirect } from 'react-router-dom';
 import { supabaseClient } from '../../config/supabase-client';
-import { regex } from '../../utils/constants';
-import Logo from './Logo';
+// import { regex } from '../../utils/constants';
+// import Logo from './Logo';
 // import { OAuthButtonGroup } from './OAuthButtonGroup';
 import CustomToast from '../CustomToast';
 import { createUser, logInUser } from '../../api';
 import { useMutation } from 'react-query';
 // import { error } from 'console'; // thows polifyls error
 import { AxiosResponse } from 'axios';
-import 'console-polyfill';
+// import 'console-polyfill';
+import { useAuth } from './Auth'
 
 
 export const Signin = () => {
 
   // const navigate = useNavigate();
+
+  const { setUser } = useAuth();
 
   const token = localStorage.getItem('token')
 
@@ -35,75 +38,79 @@ export const Signin = () => {
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [name, setName] = useState<string>('');
+  // const [user, setUser] = useState<IUser>()
 
-  const [showToast, setShowToast] = useState(true);
-  const [toastMessage, setToastMessage] = useState({ title: '', message: '', variant: '' });
+  const [showToast, setShowToast] = useState(false);
+
   const [authButtonState, setAuthButtonState] = useState(true);
   // const [isCreatingUser, setIsCreatingUser] = useState(true);
-  
 
   const [magicEmail, setMagicEmail] = useState('');
   // const [email, setEmail] = useState('');
 
-  const [loadingGithub, setLoadingGithub] = useState(false);
+  // const [loadingGithub, setLoadingGithub] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [magicEmailDisabled, setMagicEmailDisabled] = useState(true);
+  // const [magicEmailDisabled, setMagicEmailDisabled] = useState(true);
   const [emailDisabled, setEmailDisabled] = useState(false);
-  
+
   const [session, setSession] = useState<Session | null>();
-  
+
 
   // New hooks for bootstrap
 
   // const [authButtonState, setAuthButtonState] = useState(false);
   const [activeTab, setActiveTab] = useState('1');
-  
 
-  function signInWithSocial(socialName: string): void {
-    switch (socialName) {
-      case 'Google':
-        consoleGoogle()
-        break;
-      case 'GitHub':
-        signGithub()
-        break;
-      case 'Twitter':
-        consoleTwitter()
-        break;
-      default:
-        break;
-    }
-  }
+  // type ToastVariant = 'success' | 'warning' | 'danger' | 'info';
 
-  const signInWithGithub = async () => {
-    try {
-      setLoadingGithub(true)
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'github',
-      });
-      if (error) throw error
-    } catch (error: unknown) {
-      // toast({
-      //   title: 'Error',
-      //   position: 'top',
-      //   description: error.error_description || error.message,
-      //   status: 'error',
-      //   duration: 5000,
-      //   isClosable: true
-      // });
-      console.log(error)
-    }
-  };
+  // interface ToastMessage {
+  //   title: string;
+  //   message: string;
+  //   variant: ToastVariant;
+  // }
 
-  const checkMagicEmail = (e: any) => {
-    setMagicEmailDisabled(!regex.test(e.target.value));
-    setMagicEmail(e.target.value)
-  }
+  const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
 
-  const checkEmail = (e: any) => {
-    setEmailDisabled(!regex.test(e.target.value));
-    setEmail(e.target.value)
-  }
+
+  // function signInWithSocial(socialName: string): void {
+  //   switch (socialName) {
+  //     case 'Google':
+  //       consoleGoogle()
+  //       break;
+  //     case 'GitHub':
+  //       signGithub()
+  //       break;
+  //     case 'Twitter':
+  //       consoleTwitter()
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
+
+  // const signInWithGithub = async () => {
+  //   try {
+  //     setLoadingGithub(true)
+  //     const { error } = await supabaseClient.auth.signInWithOAuth({
+  //       provider: 'github',
+  //     });
+  //     if (error) throw error
+  //   } catch (error: unknown) {
+  //     // add toast here
+  //     
+  //     console.log(error)
+  //   }
+  // };
+
+  // const checkMagicEmail = (e: any) => {
+  //   setMagicEmailDisabled(!regex.test(e.target.value));
+  //   setMagicEmail(e.target.value)
+  // }
+
+  // const checkEmail = (e: any) => {
+  //   setEmailDisabled(!regex.test(e.target.value));
+  //   setEmail(e.target.value)
+  // }
 
   // const handlePassword = (e: string) => {
   //   setPassword(e.target.value)
@@ -117,45 +124,45 @@ export const Signin = () => {
   //   setName(e.target.value)
   // }
 
-  const handleLoginWithMagic = async (email: string) => {
-    try {
-      setLoading(true);
-      const { error } = await supabaseClient.auth.signInWithOtp({ email });
-      if (error) throw error;
-      // toast({
-      //   title: 'Account confirmed.',
-      //   position: 'top',
-      //   description: 'Check your email for the login link',
-      //   status: 'success',
-      //   duration: 5000,
-      //   isClosable: true
-      // });
-    } catch (error: any) {
-      // toast({
-      //   title: 'Error',
-      //   position: 'top',
-      //   description: error.error_description || error.message,
-      //   status: 'error',
-      //   duration: 5000,
-      //   isClosable: true
-      // });
-    } finally {
-      setLoading(false);
-      setEmail('')
-    }
-  };
+  // const handleLoginWithMagic = async (email: string) => {
+  //   try {
+  //     setLoading(true);
+  //     const { error } = await supabaseClient.auth.signInWithOtp({ email });
+  //     if (error) throw error;
+  //     // toast({
+  //     //   title: 'Account confirmed.',
+  //     //   position: 'top',
+  //     //   description: 'Check your email for the login link',
+  //     //   status: 'success',
+  //     //   duration: 5000,
+  //     //   isClosable: true
+  //     // });
+  //   } catch (error: any) {
+  //     // toast({
+  //     //   title: 'Error',
+  //     //   position: 'top',
+  //     //   description: error.error_description || error.message,
+  //     //   status: 'error',
+  //     //   duration: 5000,
+  //     //   isClosable: true
+  //     // });
+  //   } finally {
+  //     setLoading(false);
+  //     setEmail('')
+  //   }
+  // };
 
-  const consoleGoogle = () => {
-    console.log('Login with google...')
-  }
+  // const consoleGoogle = () => {
+  //   console.log('Login with google...')
+  // }
 
-  const signGithub = () => {
-    signInWithGithub();
-  }
+  // const signGithub = () => {
+  //   signInWithGithub();
+  // }
 
-  const consoleTwitter = () => {
-    console.log('Login with twitter...')
-  }
+  // const consoleTwitter = () => {
+  //   console.log('Login with twitter...')
+  // }
 
 
   // commented bc of it says is not being use
@@ -182,55 +189,50 @@ export const Signin = () => {
       email: email,
       password: password,
     };
+    // const userfetch = await logInUser(user);
+    // setUser(userfetch.user);
     return await logInUser(user);
   }
 
-  const handleLogin = async () => {
+
+  const handleLogin = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
     try {
       console.log('entered log in try');
       setLoading(true);
+      const response = await postLogInUser();
+      const { token, redirectUrl, user } = response.data;
+      localStorage.setItem('token', token);
+      setUser(user);
+      console.log('localStorage.token: ', localStorage.token)
 
-      // setPosiuser({email, password});
-      postLogInUser();
-
-      if (Error) {
-        console.log('error unable to login', Error)
-        setToastMessage({
-          title: 'Error',
-          message: 'An error occurred',
-          variant: 'warning',
-        });
-        setShowToast(true);
-        <CustomToast show={showToast} onClose={(): void => {setShowToast(false)} } title={'toast  login error title here'} message={'toast login error message here'} variant={'warning'} />
-      } else {
+      if (response.status === 200) {
+        localStorage.setItem('token', token);
+        console.log('localStorage.token: ', localStorage.token)
         setToastMessage({
           title: 'Logged In',
           message: 'Successfully Logged In',
           variant: 'success',
         });
         setShowToast(true);
-        <CustomToast show={showToast} onClose={(): void => {setShowToast(false)} } title={'toast  login error title here'} message={'toast login error message here'} variant={'warning'} />
-        // <CustomToast show={false} onClose={function (): void {
-        //   throw new Error('Function not implemented.');
-        // } } title={''} message={''} variant={'warning'} />
-        // setUser(data.user);
-        // setSession(data.session);
-        // console.log('data.session: ', data.session);
-        console.log('signed in');
-        // history.push('/myprofiles');
-        // window.location.href = '/myprofiles';
-        // navigate('/myprofiles');
-        redirect('/myprofiles')
+        window.location.href = redirectUrl;
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setToastMessage({
+        title: 'Error',
+        message: err.response?.data?.error || 'An error occurred during login',
+        variant: 'danger',
+      });
+      setShowToast(true);
     } finally {
-      console.log('entered log in finally');
+      setLoading(false);
       setEmail('');
       setPassword('');
-      setLoading(false);
     }
   };
+
+
 
   // const fetchUser = async () => {
   //   const res: AxiosResponse<ApiDataType> = await getUserByEmail(user?.email!)
@@ -285,10 +287,12 @@ export const Signin = () => {
         // window.location.href = '/myprofiles';
         redirect('/myprofiles')
       }
-    } catch (err) {
-      // console.log(err)
-      throw err;
-    } finally {
+    }
+    // catch (err) {
+    //   // console.log(err)
+    //   throw err;
+    // }
+    finally {
       // setEmail('')
       // setPassword('')
       setLoading(false);
@@ -309,6 +313,7 @@ export const Signin = () => {
   const { isLoading: isCreatingUser, mutate: postUser } = useMutation(postCreateUser, {
     onSuccess(res) {
       console.log('Profile Created Succesfully!');
+      redirect('/myprofiles')
       // toast({
       //   title: 'Profile created.',
       //   position: 'top',
@@ -324,7 +329,7 @@ export const Signin = () => {
       console.log('res', res);
       <CustomToast show={true} onClose={function (): void {
         throw new Error('Function not implemented.');
-      } } title={''} message={'User created succesfully'} variant={'warning'} />
+      }} title={''} message={'User created succesfully'} variant={'warning'} />
       // refetchUser()
     }
   });
@@ -429,15 +434,24 @@ export const Signin = () => {
                     <Label for="magicEmail">Email address</Label>
                     <Input type="email" id="magicEmail" value={magicEmail} onChange={handleMagicEmailChange} />
                   </FormGroup>
-                  <Button color="primary" onClick={() => handleLoginWithMagic(magicEmail)} disabled={magicEmailDisabled}>
+                  {/* <Button color="primary" onClick={() => handleLoginWithMagic(magicEmail)} disabled={magicEmailDisabled}>
                     {loading ? 'Sending magic link ...' : 'Send magic link'}
-                  </Button>
+                  </Button> */}
                 </Form>
               </TabPane>
             </TabContent>
           </div>
         </Col>
       </Row>
+      {toastMessage ? (
+        <CustomToast
+          show={showToast}
+          onClose={() => setShowToast(false)}
+          title={toastMessage.title}
+          message={toastMessage.message}
+          variant={toastMessage.variant}
+        />) : <></>
+      }
     </Container>
   );
 };

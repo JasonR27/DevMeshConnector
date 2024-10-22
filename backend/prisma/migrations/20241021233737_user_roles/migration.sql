@@ -6,8 +6,10 @@ CREATE TABLE "auth"."Users" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
+    "session" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );
@@ -87,6 +89,9 @@ CREATE TABLE "public"."Likes" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_email_key" ON "auth"."Users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_username_key" ON "auth"."Users"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Profiles_authorEmail_key" ON "public"."Profiles"("authorEmail");

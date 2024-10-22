@@ -1,9 +1,6 @@
 import express from 'express';
 import prisma from '../lib/prisma';
-// import { PrismaClient } from '@prisma/client';
-// import { User } from '@supabase/supabase-js';
-
-// const authPrisma = new PrismaClient({ datasources: { db: { schema: 'auth' } } });
+import { auth } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -11,10 +8,6 @@ router.get('/', async (req, res) => {
   const profiles = await prisma.profiles.findMany({
     include: {
       // programmingLanguages: {
-      //   select: {
-      //     language: true,
-      //   },
-      // },
       picture: {
         select: {
           avatarUrl: true,
@@ -49,7 +42,7 @@ router.get('/', async (req, res) => {
 //   res.json(result);
 // });
 
-router.post('/create', async (req, res) => {
+router.post('/create', auth, async (req, res) => {
   console.log('console.log(req.body)', req.body);
   const { username, userId, website, authorEmail, programmingLanguages, company } = req.body;
 

@@ -15,7 +15,7 @@ interface IProgrammingLanguage {
 
   interface Profile extends IProfile {
     // Profile can extend IProfile if they share common properties
-    authoremail: String,
-    picture: String,
+    authoremail: string,
+    picture: string,
   }
   

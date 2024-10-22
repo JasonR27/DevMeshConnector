@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 // const app = express();
 const router = express.Router();
 const prisma = new PrismaClient();
-const saltRounds = 10;
+const saltRounds = 15;
 
 router.use(express.json()); 
 
@@ -27,10 +27,27 @@ router.post('/signup', async (req, res) => {
         passwordHash: passwordHash,
         username: username,
         name: name,
+        session: '',
+        role: '',
       },
     });
 
-    res.status(201).json({ message: 'User created successfully', user: newUser });
+    // Call the login endpoint with the new user's credentials
+    const loginResponse = await fetch('http://localhost:8080/api/v1/auth/login', { // Replace with your actual backend URL
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }), // Use the same email and password from signup
+    });
+    
+    const loginData = await loginResponse.json();
+    
+    if (loginResponse.ok) {
+      return res.status(201).json({ token: loginData.token, user: newUser, redirectUrl: '/myprofiles' });
+    } else {
+      return res.status(401).json({ error: 'Login failed after signup' });
+    }
+    
+    // return res.status(201).json({ message: 'User created successfully', user: newUser });
   } catch (error: any) {
     console.log('error: ', error);
     if (error.code === 'P2002') {
