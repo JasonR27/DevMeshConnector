@@ -2,9 +2,9 @@
 
 #I'm using bootstrap and react-bootstrap fro the UI, instead of what was used in the original repo, 
 
-# also I added my own auth system using cookies for the jwt's, instead of using the auth system from supabase, 
+#also I added my own auth system using cookies for the jwt's, instead of using the auth system from supabase, 
 
-# the prisma schemas are also different.
+#the prisma schemas are also different.
  
 # still, thanks to daniellaera, for a lot of great and very organized repos to work on and grow as a developer.
 
