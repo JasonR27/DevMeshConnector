@@ -6,5 +6,5 @@
 
 # the prisma schemas are also different.
  
-# still, thanks to daniellaera, for a lot of great repos to work on and grow as a developer.
+# still, thanks to daniellaera, for a lot of great and very organized repos to work on and grow as a developer.
 
