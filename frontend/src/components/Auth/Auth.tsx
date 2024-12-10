@@ -1,53 +1,115 @@
-// import { Session, User } from '@supabase/supabase-js';
-import { useContext, useState, useEffect, createContext } from 'react';
-import { supabaseClient } from '../../config/supabase-client';
+import { useContext, useState, useEffect, createContext, ReactNode, Dispatch, SetStateAction } from 'react';
+// import { supabaseClient } from '../../config/supabase-client';
+import { getUserData, getUserInfo } from '../../api';
+import { AxiosResponse } from 'axios';
+import { useQuery } from 'react-query';
+import CustomToast from '../CustomToast';
+import { logInUser as apiLogin } from '../../api'; // Import the login function
 
-// create a context for authentication
-// const AuthContext = createContext<{ session: Session | null | undefined, user: User | null | undefined, signOut: () => void }>({ session: null, user: null, signOut: () => {} });
-const AuthContext = createContext<{ user: IUser | null | undefined}>({ user: null });
+// Define the IUser interface according to your user structure
+export interface IUser {
+    id: string;
+    name: string;
+    // Add other user properties as needed
+}
 
-export const AuthProvider = ({ children }: any) => {
-    const [user, setUser] = useState<IUser>()
-    // const [session, setSession] = useState<Session | null>();
+
+export interface AuthContextType {
+    user: IUser | null | undefined;
+    setUser: Dispatch<SetStateAction<IUser | null>>;
+    login: (user: IPossibleUser) => Promise<AxiosResponse<IUser>>;
+}
+
+// Create the AuthContext with the appropriate type
+export const AuthContext = createContext<Partial<AuthContextType> | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState(true);
+    const [toastMessage, setToastMessage] = useState<{ title: string; message: string; variant: string } | null>({ title: 'string', message: 'string', variant: 'warning' });
+    const [showToast, setShowToast] = useState(false);
+    const [tokenjwt, setTokenjwt] = useState<string>(''); 
+    const token = localStorage.getItem('token');
+
+    const login = async (user: IPossibleUser): Promise<AxiosResponse> => {
+        try {
+            // const { token, user: userData } = await apiLogin(user); // Call the login API
+            const response: AxiosResponse<{  user: IUser }> = await apiLogin(user);
+            setUser(response.data.user); // Update the context with user data
+            console.log('login on Auth.tsx login response.data.user: ', response.data.user);
+            console.log('login on Auth.tsx login user state: ', user);
+            setToastMessage({
+                title: 'User  Info fetched',
+                message: 'Successfully fetched user information',
+                variant: 'success',
+            });
+            return response;
+        } catch (error) {
+            console.error('Login failed:', error);
+            throw error; // Handle error as needed
+        }
+    };
 
     useEffect(() => {
+        
         const setData = async () => {
-            // const { data: { session }, error } = await supabaseClient.auth.getSession();
-            // if (error) throw error;
-            // setSession(session)
-            // setUser(session?.user)
             setLoading(false);
+            try {
+                console.log('in useffect Auth, setData')
+                // console.log('token: ', token)
+                const response: AxiosResponse<{ user: IUser }> = await getUserInfo();
+                // removes sensitive data from the user info on context here 
+                console.log('response.data.user: ', response.data.user)
+                setUser(response.data.user); // Update the context with user data
+                console.log('user: ', user)
+                
+                // reminder! also change db model to store token and secret on separate table with higher RLS security
+                setToastMessage({
+                    title: 'User Info fetched',
+                    message: 'Successfully fetched user information',
+                    variant: 'success',
+                });
+            } catch (error) {
+                console.error('Couldnt fetch user data:', error);
+                setToastMessage({
+                    title: 'User Info couldnt be fetched',
+                    message: 'Couldnt fetched user info',
+                    variant: 'Warning',
+                });
+                throw error; // Handle error as needed
+            }
         };
-
-        // const { data: listener } = supabaseClient.auth.onAuthStateChange((_event, session) => {
-        //     setSession(session);
-        //     setUser(session?.user)
-        //     setLoading(false)
-        // });
 
         setData();
 
         return () => {
-            // listener?.subscription.unsubscribe();
+            // Cleanup if needed
         };
     }, []);
 
-    // const value = {
-    //     session,
-    //     user,
-    //     // signOut: () => supabaseClient.auth.signOut(),
-    // };
+    // AuthContextType
 
-    // use a provider to pass down the value
     return (
-        <AuthContext.Provider value={{ user, setUser }}>
+        <AuthContext.Provider value={{ user, setUser, login }}>
+            {toastMessage && (
+                <CustomToast
+                    show={showToast}
+                    onClose={() => setShowToast(false)}
+                    title={toastMessage.title}
+                    message={toastMessage.message}
+                    variant={toastMessage.variant}
+                />
+            )}
             {!loading && children}
         </AuthContext.Provider>
     );
 };
 
-// export the useAuth hook
+// Export the useAuth hook
 export const useAuth = () => {
-    return useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };

@@ -26,37 +26,58 @@ router.use(bodyParser.json());
 
 
 // Endpoint to retrieve session data
-router.get('/session', (req, res) => {
-  const token = req.session.token;
+// router.get('/session', (req, res) => {
+//   const token = req.session.token;
   
-  if (!token) {
-    return res.status(401).json({ error: 'No session found' });
-  }
+//   if (!token) {
+//     return res.status(401).json({ error: 'No session found' });
+//   }
   
-  try {
-    const decoded = jwt.verify(token, 'your-jwt-secret');
-    return res.status(200).json({ session: decoded });
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid session' });
-  }
-});
+//   try {
+//     const decoded = jwt.verify(token, 'your-jwt-secret');
+//     return res.status(200).json({ session: decoded });
+//   } catch (error) {
+//     return res.status(401).json({ error: 'Invalid session' });
+//   }
+// });
 
-router.get('/verify-session', (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
+// router.get('/verify-session', (req, res) => {
+//   const token = req.headers.authorization?.split(' ')[1];
     
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
+//   if (!token) {
+//     return res.status(401).json({ error: 'No token provided' });
+//   }
   
-  try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    return res.status(200).json({ user: decoded });
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
-  }
-});
+//   try {
+//     const decoded = jwt.verify(token, SECRET_KEY);
+//     return res.status(200).json({ user: decoded });
+//   } catch (error) {
+//     return res.status(401).json({ error: 'Invalid token' });
+//   }
+// });
 
-router.post('/createsession', (req, res) => {  
+declare module 'express-session' {
+  interface SessionData {
+    user: { [key: string]: any };
+    token: string;
+  }
+  interface SessionOptions {
+    user: IUser
+  }  
+}
+
+router.post('/createsession', (req, res) => {
+  const { token, user } = req.body;
+
+  router.use(session({
+    secret: token, // Change this to your own secret
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true },
+    user: user,
+    // token: token,
+  }));
+
     
 });
   

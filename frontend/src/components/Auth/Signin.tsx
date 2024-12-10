@@ -6,7 +6,7 @@ import { Session } from '@supabase/supabase-js';
 import { SetStateAction, useEffect, useState } from 'react';
 // import { HiEye, HiEyeOff } from 'react-icons/hi';
 import { redirect } from 'react-router-dom';
-import { supabaseClient } from '../../config/supabase-client';
+// import { supabaseClient } from '../../config/supabase-client';
 // import { regex } from '../../utils/constants';
 // import Logo from './Logo';
 // import { OAuthButtonGroup } from './OAuthButtonGroup';
@@ -23,7 +23,7 @@ export const Signin = () => {
 
   // const navigate = useNavigate();
 
-  const { setUser } = useAuth();
+  const { user, setUser, login } = useAuth();
 
   const token = localStorage.getItem('token')
 
@@ -71,118 +71,6 @@ export const Signin = () => {
 
   const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
 
-
-  // function signInWithSocial(socialName: string): void {
-  //   switch (socialName) {
-  //     case 'Google':
-  //       consoleGoogle()
-  //       break;
-  //     case 'GitHub':
-  //       signGithub()
-  //       break;
-  //     case 'Twitter':
-  //       consoleTwitter()
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  // const signInWithGithub = async () => {
-  //   try {
-  //     setLoadingGithub(true)
-  //     const { error } = await supabaseClient.auth.signInWithOAuth({
-  //       provider: 'github',
-  //     });
-  //     if (error) throw error
-  //   } catch (error: unknown) {
-  //     // add toast here
-  //     
-  //     console.log(error)
-  //   }
-  // };
-
-  // const checkMagicEmail = (e: any) => {
-  //   setMagicEmailDisabled(!regex.test(e.target.value));
-  //   setMagicEmail(e.target.value)
-  // }
-
-  // const checkEmail = (e: any) => {
-  //   setEmailDisabled(!regex.test(e.target.value));
-  //   setEmail(e.target.value)
-  // }
-
-  // const handlePassword = (e: string) => {
-  //   setPassword(e.target.value)
-  // }
-
-  // const handleUsername = (e: any) => {
-  //   setUsername(e.target.value)
-  // }
-
-  // const handleName = (e: any) => {
-  //   setName(e.target.value)
-  // }
-
-  // const handleLoginWithMagic = async (email: string) => {
-  //   try {
-  //     setLoading(true);
-  //     const { error } = await supabaseClient.auth.signInWithOtp({ email });
-  //     if (error) throw error;
-  //     // toast({
-  //     //   title: 'Account confirmed.',
-  //     //   position: 'top',
-  //     //   description: 'Check your email for the login link',
-  //     //   status: 'success',
-  //     //   duration: 5000,
-  //     //   isClosable: true
-  //     // });
-  //   } catch (error: any) {
-  //     // toast({
-  //     //   title: 'Error',
-  //     //   position: 'top',
-  //     //   description: error.error_description || error.message,
-  //     //   status: 'error',
-  //     //   duration: 5000,
-  //     //   isClosable: true
-  //     // });
-  //   } finally {
-  //     setLoading(false);
-  //     setEmail('')
-  //   }
-  // };
-
-  // const consoleGoogle = () => {
-  //   console.log('Login with google...')
-  // }
-
-  // const signGithub = () => {
-  //   signInWithGithub();
-  // }
-
-  // const consoleTwitter = () => {
-  //   console.log('Login with twitter...')
-  // }
-
-
-  // commented bc of it says is not being use
-
-  // const handleCallBack = useCallback(
-  //   (stringFromChild: string) => {
-  //     signInWithSocial(stringFromChild)
-  //   },
-  //   []
-  // );
-
-
-  // const handlePasswordCallBack = useCallback(
-  //   (passwordFromChild: string) => {
-  //     setPassword(passwordFromChild)
-  //   },
-  //   []
-  // );
-
-
   const postLogInUser = async (): Promise<AxiosResponse> => {
     // const profile: Omit<IProfile, 'id'
     const user: Omit<IPossibleUser, 'id'> = {
@@ -191,24 +79,36 @@ export const Signin = () => {
     };
     // const userfetch = await logInUser(user);
     // setUser(userfetch.user);
-    return await logInUser(user);
+    // setUser(await logInUser(user))
+    // return await logInUser(user);
+    if (login != null) {
+      console.log('login != from null');
+      return await login(user);
+    } else {
+      console.log('login equal null error on postLogInUser')
+      return {data: '', status: 0, statusText: '', headers: {'': ''}, config: {}};
+    }   
   }
-
 
   const handleLogin = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     try {
       console.log('entered log in try');
       setLoading(true);
+
       const response = await postLogInUser();
-      const { token, redirectUrl, user } = response.data;
-      localStorage.setItem('token', token);
-      setUser(user);
+
+      const { redirectUrl, user } = response.data;
+
+      // localStorage.setItem('token', token);
+      console.log('user: ', user)
+      console.log('user.email: ', user.email)
+      // setUser(user);
       console.log('localStorage.token: ', localStorage.token)
 
       if (response.status === 200) {
-        localStorage.setItem('token', token);
-        console.log('localStorage.token: ', localStorage.token)
+        // localStorage.setItem('token', token);
+        // console.log('localStorage.token: ', localStorage.token)
         setToastMessage({
           title: 'Logged In',
           message: 'Successfully Logged In',
@@ -231,43 +131,6 @@ export const Signin = () => {
       setPassword('');
     }
   };
-
-
-
-  // const fetchUser = async () => {
-  //   const res: AxiosResponse<ApiDataType> = await getUserByEmail(user?.email!)
-  //   return res.data;
-  // };
-
-  // const { data: profileData, error: profileError, isLoading: isFetchingProfile, refetch: refetchUser } = useQuery(['profile'], fetchUser, {
-  //   enabled: false, retry: 2, cacheTime: 0, onSuccess(res: IUser) {
-  //     setUser(res)
-  //     if (res != null) {
-  //       setUsername(res.username)
-  //       setEmail(res.email)
-  //       setUserId(res.id)
-  //       if (res.programmingLanguages.length !== newParams.length) {
-  //         res.programmingLanguages.forEach(obj => {
-  //           newParams.push(obj)
-  //         })
-  //       }
-
-  //     } else {
-  //       setIsEditingLanguage(true)
-  //     }
-  //   },
-  //   onError: (error: any) => {
-  //     // toast({
-  //     //   title: 'Error',
-  //     //   position: 'top',
-  //     //   variant: 'subtle',
-  //     //   description: error,
-  //     //   status: 'error',
-  //     //   duration: 3000,
-  //     //   isClosable: true
-  //     // });
-  //   }
-  // });
 
   const handleRegister = async () => {
     try {
@@ -327,9 +190,9 @@ export const Signin = () => {
         console.log('loading')
       }
       console.log('res', res);
-      <CustomToast show={true} onClose={function (): void {
-        throw new Error('Function not implemented.');
-      }} title={''} message={'User created succesfully'} variant={'warning'} />
+      // <CustomToast show={true} onClose={function (): void {
+      //   throw new Error('Function not implemented.');
+      // }} title={''} message={'User created succesfully'} variant={'warning'} />
       // refetchUser()
     }
   });

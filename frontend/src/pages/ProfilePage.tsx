@@ -161,7 +161,7 @@ const ProfilePage = () => {
   if (isFetchingProfile) return <ProgressBar />
 
   return (
-    <Container>
+    <Container style={{zIndex: "10"}}>
       <Row className="justify-content-center">
         <Col xs={12} md={6} className="text-center">
           <PersonalAvatar

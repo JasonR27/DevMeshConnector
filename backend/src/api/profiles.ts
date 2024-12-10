@@ -1,13 +1,19 @@
 import express from 'express';
 import prisma from '../lib/prisma';
 import { auth } from '../middleware/auth';
+import cookieParser from 'cookie-parser';
+// import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const router = express.Router();
 
+router.use(express.json()); // Middleware to parse JSON bodies
+router.use(cookieParser()); // For parsing cookies
+
+// Your routes
 router.get('/', async (req, res) => {
   const profiles = await prisma.profiles.findMany({
     include: {
-      // programmingLanguages: {
       picture: {
         select: {
           avatarUrl: true,
@@ -18,99 +24,67 @@ router.get('/', async (req, res) => {
   res.status(200).json(profiles);
 });
 
-// router.post('/create', async (req, res) => {
-//   console.log('req.body', req.body);
-//   const { username, userId, website, authorEmail, programmingLanguages, company } = req.body;
+const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
 
-//   const result = await prisma.profiles.create({
-//     data: {
-//       user: {
-//         connect: { id: userId }, // Connect the post to the user
-//       },
-//       username,
-//       website,
-//       authorEmail,
-//       company,
-//       programmingLanguages: {
-//         connectOrCreate: programmingLanguages.map((lang: string, id: number) => ({
-//           create: { language: lang },
-//           where: { id: id },
-//         })),
-//       },
-//     },
-//   });
-//   res.json(result);
-// });
+if (!SECRET_KEY) {
+  console.log('No Secret Key');
+} else {
+  console.log('login endpoint SECRET_KEY/JWT secret: ', SECRET_KEY);
+}
 
 router.post('/create', auth, async (req, res) => {
-  console.log('console.log(req.body)', req.body);
-  const { username, userId, website, authorEmail, programmingLanguages, company } = req.body;
+  console.log('entering create profile endpoint');
+  // console.log('console.log(req.body)', req.body);
+  const token = req.cookies.token;
+  
+  console.log('Extracted token: ', token);
+
+  if (!token) {
+    return res.status(401).json({ valid: false, error: 'Invalid token' });
+  }
+
+  let userId;
+  let authorEmail = '';
+
+  jwt.verify(token, SECRET_KEY, (err: any, decoded: any) => {
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+    }
+    // Attach the decoded information to the request object
+    userId = decoded.id;
+    authorEmail = decoded.email; // Assuming the ID is stored in the token payload
+    console.log('decoded: ', decoded, ' ', 'decoded.id: ', decoded.id, 'decoded.email: ', decoded.email);
+    // next(); // Proceed to the next middleware or route handler
+  }); 
+
+  const { username, website, programmingLanguages, company } = req.body;
+
+  if (!authorEmail) {
+    console.log('author email not found');
+    return res.status(400).json({ error: 'authoremail is required' });
+  } else {
+    console.log('userId: ', userId);
+  }
 
   if (!userId) {
+    console.log('userId not found');
     return res.status(400).json({ error: 'User ID is required' });
   } else {
-    console.log('found userId');
     console.log('userId: ', userId);
   }
 
   try {
-
-    const user = await prisma.$queryRaw`
-    SELECT * FROM auth.users
-    WHERE id::text = ${userId}`;
-
-    if (!user) {
-      console.log('didnt found linked user');
-      return res.status(404).json({ error: 'User not found' });
-    } else {
-      console.log('found linked user');
-    }
-    // console.log('userId: ', userId);
-
-    // if (!User) {
-    //   return res.status(404).json({ error: 'User not found' });
-    // }
-
-    // console.log('userId: ', userId);
-
-
-
-    console.log('username, userId, website, authorEmail, programmingLanguages, company', username, userId, website, authorEmail, programmingLanguages, company);
-
-    console.log('programmingLanguages: ', programmingLanguages);
-
-    if (!programmingLanguages) {
-      return res.status(400).json({ error: 'Programming languages are required' });
-    }
-
-    // console.log(user);
-
-    // const user = await prisma.$queryRaw`
-    // SELECT * FROM auth.users
-    // WHERE id::text = ${userId}`;
-
-
-    const userExists = await prisma.$queryRaw`
-    SELECT * FROM auth.users
-    WHERE id::text = ${userId}`;
-
-    // const userExists = await prisma.users.findUnique({
-    //   where: { id: userId },
-    // });
+    const userExists = await prisma.users.findUnique({
+      where: { id: userId },
+    });
 
     if (!userExists) {
       return res.status(404).json({ error: 'User not found' });
-    } else {
-      console.log('User does exists');
     }
 
     const result = await prisma.profiles.create({
-      data: { 
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
+      data: {
+        user: { connect: { id: userId } },
         username,
         website,
         authorEmail,
@@ -119,93 +93,20 @@ router.post('/create', auth, async (req, res) => {
       },
     });
 
-    // const result = await prisma.$executeRaw`
-    //   ALTER TABLE public.profiles
-    //   ADD CONSTRAINT fk_user
-    //   FOREIGN KEY (user_id)
-    //   REFERENCES auth.users(id);
-    //   INSERT INTO public.profiles (username, userId, website, authorEmail, company, programmingLanguages)
-    //   VALUES (${username}, ${userId}, ${website}, ${authorEmail}, ${company}, ${programmingLanguages}::text[])`;
-
-    res.status(201).json(result);
-  } catch (error: any) {
-    console.error('Error creating profile:', error); // Log the error details
-    res.status(500).json({ error: error.message });
-  }
-  // catch (error: any) {
-  //   res.status(500).json({ error: error.message });
-  // } 
-
-});
-
-router.put('/updateById/:profileId', async (req, res) => {
-  const { profileId } = req.params;
-  const { username, website, company, programmingLanguages, isPublic } = req.body;
-
-  // we delete first all record with profileId
-  // await prisma.$transaction([prisma.programmingLanguages.deleteMany({ where: { profileId: profileId } })]);
-
-  // then we repopulate programmingLanguages
-  const profileUpdated = await prisma.profiles.update({
-    where: { id: profileId },
-    data: {
-      username: username,
-      website: website,
-      company: company,
-      isPublic: isPublic,
-      programmingLanguages,
-      // programmingLanguages: {
-      //   connectOrCreate: programmingLanguages.map((lang: string) => ({
-      //     create: { language: lang },
-      //     where: { id: Number(profileId) },
-      //   })),
-      // },
-    },
-  });
-
-  res.json(profileUpdated);
-});
-
-router.get('/findProfileByEmail/:authorEmail', async (req, res) => {
-  const { authorEmail } = req.params;
-
-  try {
-    console.log('entered try');
-    console.log('authorEmail: ', authorEmail);
-    const profile = await prisma.profiles.findFirst({
-      where: { authorEmail },
-      include: {
-        // programmingLanguages: {
-        //   select: {
-        //     language: true,
-        //   },
-        // },
-        picture: { select: { avatarUrl: true } },
-      },
+    // Ensure the cookie configuration
+    res.cookie('profileCreated', 'true', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600000, // 1 hour in milliseconds
     });
-    res.json(profile);
-  } catch (error) {
-    console.log('entered catch');
-    res.json({ error: `Profile with authorEmail ${authorEmail} does not exist in the database` });
+
+    return res.status(201).json(result);
+  } catch (error: any) {
+    console.error('Error creating profile:', error);
+    return res.status(500).json({ error: error.message });
   }
 });
 
-router.put('/publishProfile/:profileId', async (req, res) => {
-  const { profileId } = req.params;
-  const profileUpdated = await prisma.profiles.update({
-    where: { id: profileId },
-    data: { isPublic: true },
-  });
-  res.json(profileUpdated);
-});
-
-router.get('/:profileId', async (req, res) => {
-  const { profileId } = req.params;
-
-  const profile = await prisma.profiles.findFirst({
-    where: { id: profileId },
-  });
-  res.json(profile);
-});
 
 export default router;

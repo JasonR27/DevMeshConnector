@@ -1,32 +1,79 @@
 import express from 'express';
-
+// import cors from 'cors';
+import session from 'express-session';
 import MessageResponse from '../interfaces/MessageResponse';
 import emojis from './emojis';
+import jwt from 'jsonwebtoken';
+
+import login from './login';
 import posts from './posts';
 import users from './users';
 import profile from './profiles';
 import picture from './pictures';
 import like from './likes';
 import signup from './signup';
-import login from './login';
 import verifytoken from './verifytoken';
-// import like from './likes';
 
-const router = express.Router();
+const app = express();
 
-router.get<{}, MessageResponse>('/', (req, res) => {
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
+
+if (!SECRET_KEY) {
+  console.log('No Secret Key');
+} else {
+  console.log('index.ts SECRET_KEY/JWT secret: ', SECRET_KEY);
+}
+
+// Creating the session
+app.use(session({
+  secret: SECRET_KEY,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: false, // Change to true if using HTTPS in production
+    maxAge: 3600 * 10000, // Adjust the maxAge as needed
+  },
+}));
+
+app.get<{}, MessageResponse>('/', (req, res) => {
+  // res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+  // res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   res.json({
     message: 'API - 👋🌎🌍🌏',
   });
 });
 
-router.use('/emojis', emojis);
-router.use('/users', users);
-router.use('/posts', posts);
-router.use('/profiles', profile);
-router.use('/pictures', picture);
-router.use('/likes', like);
-router.use('/auth', signup, login, verifytoken);
+app.get('/corserrorsapp', async (req, res) => {
+  console.log('entered CorsErrors endpoint');
+  const token = jwt.sign({ id: 'user.id', email: 'user.email' }, SECRET_KEY, { expiresIn: '1h' });
+  req.session.token = token;
+  res.json({ user: { id: 'user.id ljsdlksjf', email: 'user.email: email@email.com', role: req.session.token } });  
+});
 
 
-export default router;
+app.get('/corserrorsapplogin', async (req, res) => {
+  console.log('entered get CorsErrors endpoint');
+  const token = jwt.sign({ id: 'user.id', email: 'user.email' }, SECRET_KEY, { expiresIn: '1h' });
+  req.session.token = token;
+  res.json({ user: { id: 'user.id ljsdlksjf', email: 'user.email: email@email.com', role: req.session.token } });  
+});
+
+app.post('/corserrorsapplogin', async (req, res) => {
+  console.log('entered post CorsErrors endpoint');
+  const token = jwt.sign({ id: 'user.id', email: 'user.email' }, SECRET_KEY, { expiresIn: '1h' });
+  req.session.token = token;
+  res.json({ user: { id: 'user.id ljsdlksjf', email: 'user.email: email@email.com', role: req.session.token } });  
+});
+
+app.use('/emojis', emojis);
+app.use('/users', users);
+app.use('/posts', posts);
+app.use('/profiles', profile);
+app.use('/pictures', picture);
+app.use('/likes', like);
+app.use('/auth', signup, login, verifytoken);
+
+export default app;

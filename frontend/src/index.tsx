@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ParticlesComp from './components/Particles';
 // import { Container, Row, Col, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { AuthProvider } from './components/Auth/Auth';
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Failed to find the root element');
@@ -16,11 +17,13 @@ const queryClient = new QueryClient();
 
 root.render(
   <React.StrictMode >
+
     <QueryClientProvider client={queryClient} >
-      <ParticlesComp />
+      <AuthProvider>
+        <ParticlesComp />
 
-      <App />
-
+        <App />
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

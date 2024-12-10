@@ -60,8 +60,8 @@ const ParticlesComp = () => {
                         color: "#008b8b",
                         distance: 150,
                         enable: true,
-                        opacity: 0.5,
-                        width: 5,
+                        opacity: 0.8,
+                        width: 7,
                     },
                     move: {
                         direction: "none",
@@ -87,7 +87,7 @@ const ParticlesComp = () => {
                         type: "square",
                     },
                     size: {
-                        value: { min: 1, max: 10 },
+                        value: { min: 5, max: 15 },
                     },
                 },
                 detectRetina: true,

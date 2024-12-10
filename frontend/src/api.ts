@@ -1,32 +1,95 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { Console } from 'console';
+import { FaLessThanEqual } from 'react-icons/fa';
+
+// import axios from 'axios';
+
+const axiosInstance = axios.create({
+  baseURL: 'http://localhost:8080',
+  withCredentials: true, // Include credentials (cookies) in requests
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
+export default axiosInstance;
+
+// import axios from 'axios';
+const BASE_URL = 'http://localhost:8080';
+
+// export default axios.create({
+//     baseURL: BASE_URL
+// });
+
+export const axiosPrivate = axios.create({
+    baseURL: BASE_URL,
+    headers: { 'Content-Type': 'application/json' },
+    withCredentials: true
+});
+
 
 console.log("REACT_APP_TESTBACKEND: ", import.meta.env.VITE_TESTBACKEND)
 console.log("VITE_BACKEND_URL: ", import.meta.env.VITE_BACKEND_URL)
  
-const baseUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/posts`;
+const baseUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1`;
 const profilesUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/profiles`;
 const pictureUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/pictures`;
 const likeUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/likes`;
 const usersUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/users`;
 const authUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v1/auth`;
 
-export const logInUser = async (user: IPossibleUser): Promise<AxiosResponse> => {
+export const logInUser  = async (user: IPossibleUser ): Promise<AxiosResponse> => {
   const email = user.email;
   const password = user.password;
-  try {
-    const response: AxiosResponse<ApiDataType> = await axios.post(`${authUrl}/login/`, {email, password});
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    } else {
-      throw new Error("Token is undefined");
-    }
-    // localStorage.setItem('token', response.data.token)
 
+  try {
+    // First, make the login request to get the token
+    const response: AxiosResponse<ApiDataType> = await axiosInstance.post(
+      // `${authUrl}/login/`,
+      `${authUrl}/login/`, 
+      { email, password }, 
+      // { headers: {'Content-Type': 'application/json',}, withCredentials: true } // Include credentials if needed
+    );
     return response;
   } catch (error: any) {
     throw new AxiosError(error);
   }
 };
+
+// export const verifySession = async () => {
+//   const response = await axiosInstance.get(`${authUrl}/verifytoken/`);
+//   console.log('response from verifysession: ', response);
+//   return response;
+// }
+
+export const verifySession = async () => {
+  const response = await axiosInstance.get(`${authUrl}/verifytoken/`);
+  console.log('response from verifySession: ', response);
+  return response.data.valid;
+};
+
+
+export async function fetchCorsErrors() {
+  console.log('entered fetchCorsErrors');
+  const response = await axiosInstance.get(baseUrl + '/corserrorsapp', 
+    {withCredentials: true, // Include cookies in the request
+    });
+  // const response: AxiosResponse<ApiDataType> = await axios.get('/corserrorsapp');
+  // const { data } = await axios.get("/corserrorsapp");
+  // return data;
+  return response.data;
+}
+
+export async function fetchCorsErrorsLogin() {
+  console.log('entered fetchCorsErrors');
+  const response = await axiosInstance.post(baseUrl + '/corserrorsapplogin', 
+    {withCredentials: true, // Include cookies in the request
+    });
+  // const response: AxiosResponse<ApiDataType> = await axios.get('/corserrorsapp');
+  // const { data } = await axios.get("/corserrorsapp");
+  // return data;
+  return response.data;
+}
 
 export async function getProfiles(): Promise<IProfile[]> {
   const response = await axios.get<IProfile[]>(profilesUrl);
@@ -45,6 +108,8 @@ export async function fetchPosts() {
   // const { data } = await axios.get("/api/v1/posts");
   return data;
 }
+
+
 
 export const getPost = async (id: number): Promise<AxiosResponse> => {
   const response: AxiosResponse<ApiDataType> = await axios.get(baseUrl + '/post/' + id);
@@ -93,14 +158,78 @@ export async function createUser(user: Omit<IUser, 'id'>) {
   return response;
 }
 
+// import axios from 'axios';
+
+// Function to get a specific cookie by name
+// function getCookie(name) {
+//   const value = `; ${document.cookie}`;
+//   const parts = value.split(`; ${name}=`);
+//   if (parts.length === 2) return parts.pop().split(';').shift();
+// }
+
+// export async function createProfile(profile) {
+//   // Retrieve the token from the cookie
+//   const token = getCookie('token'); // Replace 'token' with the actual cookie name
+
+//   try {
+//     const response = await axios.post(`${profilesUrl}/create`, profile, {
+//       withCredentials: true, // Include cookies in the request
+//       headers: {
+//         'Content-Type': 'application/json', // Specify content type
+//         'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+//       },
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error creating profile:', error);
+//     throw error; // Handle the error as needed
+//   }
+// }
+
+// import axios from 'axios';
+
 export async function createProfile(profile: Omit<IProfile, 'id'>) {
-  console.log('axios post to /create, res: profile')
-  const response = await axios.post(`${profilesUrl}/create`, profile);
+  console.log('axios post to /create, res: profile');
   
-  return response;
+  try {
+    const response = await axios.post(`${profilesUrl}/create`, profile, {
+      withCredentials: true, // Include cookies in the request
+      headers: {
+        'Content-Type': 'application/json', // Specify content type
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Error creating profile:', error);
+    throw error; // Rethrow or handle the error as needed
+  }
 }
 
+// export async function createProfile(profile: Omit<IProfile, 'id'>) {
+//   console.log('axios post to /create, res: profile')
+//   const response = await axios.post(`${profilesUrl}/create`, profile, 
+    
+//   );
 
+//   // const response = await axios.post(`${profilesUrl}/create`, profile, 
+//   // );
+
+//   // the withCredentials: true here, gets me a CORS error
+
+//   // const response = await axios.post(`${profilesUrl}/create`, profile, 
+//   //   { withCredentials: true, AccessControlAllowOrigin: 'localhost:3000' },
+//   // );
+
+//   // ading acao from the frontend call (not a good idea)
+
+//   // return new Response(response, {
+//   //   headers: {
+//   //     'Access-Control-Allow-Origin': 'localhost:3000'
+//   //   }
+//   // })
+  
+//   // return response;
+// }
 
 export async function saveProfile(profile: IProfile) {
   const response = await axios.put(`${profilesUrl}/updateById/${profile.id}`, profile);
@@ -130,6 +259,29 @@ export async function getPictureByProfileId(profileId: number) {
   const response = await axios.get(`${pictureUrl}/pictureByProfileId/${profileId}`);
   return response;
 }
+
+export async function getUserData() {
+  const response = await axios.get(`${authUrl}/userdata/`, { withCredentials: true });
+  return response;
+}
+
+// export async function getUserData(accToken: string | null) {
+//   const response = await axios.get(`${authUrl}/userdata/`, { headers: { Authorization: `token ${accToken}` } });
+//   return response;
+// }
+
+// export async function getUserData() {
+//   const response = await axios.get(`${authUrl}/userdata/`);
+//   return response;
+// }
+
+// export async function getUserInfo(accToken: string | null) {
+export async function getUserInfo() {
+  // const response = await axios.get(`${authUrl}/userinfo/`, { headers: { Authorization: `token ${accToken}` } });
+  const response = await axiosInstance.get(`${authUrl}/userinfo/`);
+  return response;
+}
+
 
 export async function addLike(like: Omit<ILike, 'id'>, accToken: string) {
   const response = await axios.post(`${likeUrl}/create`, like, {

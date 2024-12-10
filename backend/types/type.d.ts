@@ -1,10 +1,19 @@
+import * as express from 'express';
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: IUser; // You can replace 'any' with a more specific type if you have one
+    }
+  }
+}
+
 interface IUser {
   id: uuid;
   email?: string;
   username?: string;
-  password?: string;
+  password: string;
   paswordHash?: string;
-  token?: string,
   name: string;
   session?: string;
 }
@@ -123,8 +132,8 @@ interface ImportMeta {
 
 type ToastVariant = 'success' | 'warning' | 'danger' | 'info';
 
-interface ToastMessage {
-  title: string;
-  message: string;
-  variant: ToastVariant;
-}
+  interface ToastMessage {
+    title: string;
+    message: string;
+    variant: ToastVariant;
+  }

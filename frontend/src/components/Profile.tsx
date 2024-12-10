@@ -9,7 +9,8 @@ import { supabaseClient } from '../config/supabase-client';
 import { getRandomColor } from '../utils/functions';
 import AsyncSelect from 'react-select/async';
 import { MultiValue, ActionMeta } from 'react-select';
-import { createPicture, getPictureByProfileId, getProfileByAuthorEmail, updatePicture, createProfile, saveProfile, publishProfile } from '../api';
+import {  getUserInfo, getUserData, createPicture, getPictureByProfileId, getProfileByAuthorEmail, updatePicture, createProfile, saveProfile, publishProfile } from '../api';
+import { useAuth } from './Auth/Auth'
 
 const mappedColourOptions = pickListOptions.map(option => ({
   ...option,
@@ -33,7 +34,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<IProfile>()
   // const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
   const [session, setSession] = useState<Session | null>();
-  const [user, setUser] = useState<User>()
+  // const [user, setUser] = useState<User>()
   const [newParams, setNewParams] = useState<any[]>([]);
 
   // const [programmingLanguages, setProgrammingLanguages] = useState([]);
@@ -43,6 +44,10 @@ const Profile = () => {
   //   setProgrammingLanguages(selectedOptions.map((option: { value: any; }) => option.value));
   // };
 
+  const { user, setUser } = useAuth();
+
+  console.log('user: ', user)
+
   const handleLanguagesChange = (newValue: MultiValue<{ value: string; label: string }>, actionMeta: ActionMeta<{ value: string; label: string }>) => {
     setLanguages(newValue.map(option => option.value));
   };
@@ -50,13 +55,19 @@ const Profile = () => {
 
   useEffect(() => {
     const setData = async () => {
-      const { data: { session }, error } = await supabaseClient.auth.getSession();
-      if (error) throw error;
-      setSession(session);
-      //console.log('session from App', session?.access_token)
-      if (session) {
-        setUser(session.user)
+      // const { data: { session }, error } = await supabaseClient.auth.getSession();
+      const token = localStorage.getItem('token');
+      const setData = async () => {
+        // setUser((await getUserInfo(token)));
+        // setUser((await getUserData(token)).data.user);
       }
+      setData()
+      // if (error) throw error;
+      // setSession(session);
+      //console.log('session from App', session?.access_token)
+      // if (session) {
+      //   setUser(session.user)
+      // }
     };
 
     setData();
@@ -128,15 +139,7 @@ const Profile = () => {
   const { isLoading: isCreatingProfile, mutate: postProfile } = useMutation(postCreateProfile, {
     onSuccess(res) {
       console.log('Profile Created Succesfully!')
-      // toast({
-      //   title: 'Profile created.',
-      //   position: 'top',
-      //   variant: 'subtle',
-      //   description: '',
-      //   status: 'success',
-      //   duration: 3000,
-      //   isClosable: true
-      // });
+      // settoastshere
       refetchProfile()
     }
   });
@@ -189,7 +192,7 @@ const Profile = () => {
               />
             </Form.Group>
             <Form.Group controlId="website">
-              <Form.Label>Website</Form.Label>
+              <Form.Label>Personal Website</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="website"

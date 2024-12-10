@@ -7,7 +7,7 @@ const WelcomePage = () => {
 
   return (
     <div className="position-relative">
-      {/* <ParticlesComp /> */}
+      <ParticlesComp />
       <div
         className="position-absolute top-0 start-0 p-2 border border-secondary d-flex flex-column justify-content-center align-items-center"
         // className="position-absolute top-0 start-0 bg-white p-2 border border-secondary" style={{ zIndex: 10 }}

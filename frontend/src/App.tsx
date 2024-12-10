@@ -13,13 +13,14 @@ import NewPostPage from './pages/NewPostPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostLayout from './pages/PostLayout';
 import PostPage from './pages/PostPage';
+import CorsErrorsPage from './pages/CorsErrorsPage';
 // import ProfileLayout from './pages/ProfileLayout';
 // import ProfilePage from './pages/ProfilePage';
 import WelcomePage from './pages/WelcomePage';
 import ProfilesPage from './pages/ProfilesPage';
 import Signin from './components/Auth/Signin';
 import Profile from './components/Profile';
-import { AuthProvider } from './components/Auth/Auth';
+// import { AuthProvider } from './components/Auth/Auth';
 
 export const App = () => {
   const [signedIn, setSignedIn] = useState<boolean>(false);
@@ -77,7 +78,7 @@ export const App = () => {
   return (
     // <ChakraProvider theme={theme}>
     //not really doing anything
-    <CustomProvider theme="high-contrast">
+    <CustomProvider theme="high-contrast" style={{ zIndex: 11 }}>
       <div data-bs-theme="dark" style={{
         width: '100%',
         height: '100vh',
@@ -87,7 +88,7 @@ export const App = () => {
         backgroundPosition: 'center center'
       }} >
         <BrowserRouter>
-          <AuthProvider>
+          {/* <AuthProvider> */}
             <RootLayout>
               <Routes>
                 <Route path="/" element={<WelcomePage />} />
@@ -108,10 +109,11 @@ export const App = () => {
                   }
                 />
                 {/* <Route path="/invoices" element={<Invoices />} /> */}
+                <Route path="/corserrors" element={<CorsErrorsPage />} />
                 <Route path="/myprofiles" element={
-                  <ProtectedRoute>
-                    <ProfilesLayout style={{ zIndex: -1 }} />
-                   </ProtectedRoute>
+                  <ProtectedRoute style={{ zIndex: 12 }}>
+                    <ProfilesLayout style={{ zIndex: 11 }} />
+                  </ProtectedRoute>
                 }>
                   <Route index element={<Profile />} />
                 </Route>
@@ -125,7 +127,7 @@ export const App = () => {
                 <Route path="/login" element={<Signin />} />
               </Routes>
             </RootLayout>
-          </AuthProvider>
+          {/* </AuthProvider> */}
         </BrowserRouter>
       </div>
       {/* // </ChakraProvider> */}

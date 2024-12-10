@@ -1,25 +1,41 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    //const token = req.header('Authorization')?.replace('Bearer ', '');
-    const token = req.header('Authorization')?.split(' ')[1];
+const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
 
-    const supabaseSecret: string = `${process.env.VITE_SUPABASE_JWT_SECRET}`;
+if (!SECRET_KEY) {
+  console.log('No Secret Key');
+} else {
+  console.log('middleware auth SECRET_KEY/JWT secret: ', SECRET_KEY);
+}
 
+// Middleware function to verify JWT
+export const auth = (req: Request, res: Response, next: NextFunction) => {
+  // Parse cookies
+  cookieParser()(req, res, () => {
+    // Get the token from the cookies
+    const token = req.cookies.token;
+
+    // Check if the token exists
     if (token) {
-      //throw new Error();
-      //const checkJwt = jwt.decode(token, { complete: true, json: true });
+      console.log('token: ', token);
+      // Verify the token
+      console.log('SECRET_KEY used in auth: ', SECRET_KEY);
+      jwt.verify(token, SECRET_KEY, (err: any) => {
+        if (err) {
+          console.log('token that gave error: ', token);
+          return res.status(403).json({ message: 'Forbidden: Invalid token' });
+        }
 
-      jwt.verify(token, supabaseSecret) as JwtPayload;
-      
+        // Attach the user object to the request object
+        // req.user = user;
+        next();
+      });
     } else {
-      res.status(401).json({ msg: 'No token, auth denied!' });
+      res.status(401).json({ message: 'Unauthorized: No token provided' });
     }
-
-    next();
-  } catch (err) {
-    return res.status(400).json({ error: 'Invalid token, auth denied!' });
-  }
+  });
 };

@@ -9,9 +9,27 @@ CREATE TABLE "auth"."Users" (
     "username" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
     "session" TEXT NOT NULL,
+    "secret" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
     "role" TEXT NOT NULL,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "auth"."Sessions" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "passwordHash" TEXT NOT NULL,
+    "session" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "secret" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+
+    CONSTRAINT "Sessions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -94,10 +112,37 @@ CREATE UNIQUE INDEX "Users_email_key" ON "auth"."Users"("email");
 CREATE UNIQUE INDEX "Users_username_key" ON "auth"."Users"("username");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Users_session_key" ON "auth"."Users"("session");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_secret_key" ON "auth"."Users"("secret");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_token_key" ON "auth"."Users"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sessions_email_key" ON "auth"."Sessions"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sessions_username_key" ON "auth"."Sessions"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sessions_session_key" ON "auth"."Sessions"("session");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sessions_token_key" ON "auth"."Sessions"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Sessions_secret_key" ON "auth"."Sessions"("secret");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Profiles_authorEmail_key" ON "public"."Profiles"("authorEmail");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Picture_profileId_key" ON "public"."Picture"("profileId");
+
+-- AddForeignKey
+ALTER TABLE "auth"."Sessions" ADD CONSTRAINT "Sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Profiles" ADD CONSTRAINT "Profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

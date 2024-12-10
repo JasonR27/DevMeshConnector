@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 // const app = express();
 const router = express.Router();
 const prisma = new PrismaClient();
-const saltRounds = 15;
+const saltRounds = 12;
 
 router.use(express.json()); 
 
@@ -27,8 +27,10 @@ router.post('/signup', async (req, res) => {
         passwordHash: passwordHash,
         username: username,
         name: name,
+        token: '',
         session: '',
         role: '',
+        secret: '',
       },
     });
 
@@ -39,10 +41,13 @@ router.post('/signup', async (req, res) => {
       body: JSON.stringify({ email, password }), // Use the same email and password from signup
     });
     
-    const loginData = await loginResponse.json();
+    // const loginData = await loginResponse.json();
+    // newUser.token = loginData.token;
+
+    console.log('signup endpoint logging user in');
     
     if (loginResponse.ok) {
-      return res.status(201).json({ token: loginData.token, user: newUser, redirectUrl: '/myprofiles' });
+      return res.status(201).json({ redirectUrl: '/myprofiles' });
     } else {
       return res.status(401).json({ error: 'Login failed after signup' });
     }
