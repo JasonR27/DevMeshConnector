@@ -1,6 +1,6 @@
 import express from 'express';
 // import cors from 'cors';
-import session from 'express-session';
+// import session from 'express-session';
 import MessageResponse from '../interfaces/MessageResponse';
 import emojis from './emojis';
 import jwt from 'jsonwebtoken';
@@ -28,15 +28,15 @@ if (!SECRET_KEY) {
 }
 
 // Creating the session
-app.use(session({
-  secret: SECRET_KEY,
-  cookie: {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: false, // Change to true if using HTTPS in production
-    maxAge: 3600 * 10000, // Adjust the maxAge as needed
-  },
-}));
+// app.use(session({
+//   secret: SECRET_KEY,
+//   cookie: {
+//     httpOnly: true,
+//     sameSite: 'strict',
+//     secure: false, // Change to true if using HTTPS in production
+//     maxAge: 3600 * 10000, // Adjust the maxAge as needed
+//   },
+// }));
 
 app.get<{}, MessageResponse>('/', (req, res) => {
   // res.header('Access-Control-Allow-Origin', 'http://localhost:3000');

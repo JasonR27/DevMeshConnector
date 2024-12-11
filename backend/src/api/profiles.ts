@@ -99,12 +99,40 @@ router.post('/create', auth, async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 3600000, // 1 hour in milliseconds
-    });
+    }).send({ redirectUrl: '/myprofiles' });
 
     return res.status(201).json(result);
   } catch (error: any) {
     console.error('Error creating profile:', error);
     return res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/findProfileByEmail/:authorEmail', async (req, res) => {
+  const { authorEmail } = req.params;
+
+  try {
+    const profile = await prisma.profiles.findFirst({
+      where: { authorEmail },
+    });
+    console.log('profile: ', profile);
+    res.json(profile);
+  } catch (error) {
+    res.json({ error: `Profile with authorEmail ${authorEmail} does not exist in the database` });
+  }
+});
+
+router.get('/findProfilesByEmail/:authorEmail', async (req, res) => {
+  const { authorEmail } = req.params;
+
+  try {
+    const profile = await prisma.profiles.findFirst({
+      where: { authorEmail },
+    });
+    console.log('profile: ', profile);
+    res.json(profile);
+  } catch (error) {
+    res.json({ error: `Profile with authorEmail ${authorEmail} does not exist in the database` });
   }
 });
 

@@ -19,6 +19,7 @@ import { AuthContext, useAuth } from './Auth/Auth'
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import { getUserInfo, getUserData } from '../api';
 import { verifySession } from '../api';
+import { postLogOut } from '../api';
 
 
 
@@ -29,11 +30,12 @@ const MainNavigation = () => {
   // const [imageUrl, setImageUrl] = useState<string | undefined>();
   const [profile, setProfile] = useState<IProfile>()
   // const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
   const navigate = useNavigate();
 
   const { user } = useContext(AuthContext);
 
-  // console.log('useAuth(): ', useAuth())
+  console.log('useAuth(): ', useAuth())
 
   console.log('user: ', user)
 
@@ -41,28 +43,21 @@ const MainNavigation = () => {
 
   console.log('user email: ', user?.email)
 
-
-  // const isUserLoggedIn = async () => {
-  //   // const token = localStorage.getItem('token');
-  //   const isValid = verifySession;
-  //   console.log('isValid: ', isValid);
-  //   if (isValid.name) {
-  //     console.log('User is logged in');
-  //     return true;
-  //   } else {
-  //     console.log('No user token found');
-  //     return false;
-  //   }
-  // }
-
   const isUserLoggedIn = async () => {
     try {
       const isValid = await verifySession();  // await the async function
       console.log('isValid:', isValid);
-      if (isValid) {
+      if (isValid) {  
+        setIsLoggedIn(true);          
         console.log('User is logged in');
+        if (isValid === true) {
+          setIsLoggedIn(true);          
+        }
         return true;
       } else {
+        if (isValid === false) {
+          setIsLoggedIn(false);          
+        }
         console.log('No user token found');
         return false;
       }
@@ -71,6 +66,8 @@ const MainNavigation = () => {
       return false;
     }
   };
+
+  isUserLoggedIn();
 
   // const fetchProfile = async () => {
   //   const res: AxiosResponse<ApiDataType> = await getProfileByAuthorEmail(session?.user?.email!)
@@ -141,54 +138,54 @@ const MainNavigation = () => {
   //   }
   // }, [session?.user, profile, user, refetchProfile])
 
-  function removeToken(user: IUser) {
-    const token = localStorage.getItem('token');
+  // function removeToken(user: IUser) {
+  //   const token = localStorage.getItem('token');
 
-    if (!token) {
-      console.error('No token found');
-      return;
-    }
+  //   if (!token) {
+  //     console.error('No token found');
+  //     return;
+  //   }
 
-    const email = user?.email || ''; // Ensure email is a string
+  //   const email = user?.email || ''; // Ensure email is a string
 
-    if (!email) {
-      console.error('No user email found');
-      return;
-    }
+  //   if (!email) {
+  //     console.error('No user email found');
+  //     return;
+  //   }
 
-    fetch('http://localhost:8080/api/v1/auth/logout', { // backend URL
-      method: 'POST', // or 'POST' if your endpoint expects a POST request
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': token, // Include the token in the Authorization header
-        'email': email,
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.valid) {
-          console.log('Token is valid');
-          // setIsVerified(true)
-          // Proceed with authenticated user actions
-        } else {
-          console.error('Invalid token');
-          // setIsVerified(false)
-          // Handle invalid token case
-        }
-      })
-      .catch(error => console.error('Error:', error));
-  }
+  //   fetch('http://localhost:8080/api/v1/auth/logout', { // backend URL
+  //     method: 'POST', // or 'POST' if your endpoint expects a POST request
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': token, // Include the token in the Authorization header
+  //       'email': email,
+  //     }
+  //   })
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       if (data.valid) {
+  //         console.log('Token is valid');
+  //         // setIsVerified(true)
+  //         // Proceed with authenticated user actions
+  //       } else {
+  //         console.error('Invalid token');
+  //         // setIsVerified(false)
+  //         // Handle invalid token case
+  //       }
+  //     })
+  //     .catch(error => console.error('Error:', error));
+  // }
 
   // removeToken(user);
 
   const signOut = async () => {
     // await supabaseClient.auth.signOut()
     // Clear the JWT token from local storage
-    removeToken(user);
-    localStorage.removeItem('token');
+    // removeToken(user);
+    postLogOut();    
 
     // Optionally, you can clear all local storage data
-    // localStorage.clear();
+    localStorage.clear();
 
     // Redirect to the sign-in or home page
     window.location.href = '/login';
@@ -273,7 +270,7 @@ const MainNavigation = () => {
                   <li><a className="dropdown-item" href="https://stackup.dev/">Hackatons</a></li>
                   <li><a className="dropdown-item" href="https://www.geeksforgeeks.org/">Events</a></li>
                   <div>
-                    {isUserLoggedIn() ? (
+                    {isLoggedIn ? (
                       <button className="btn btn-danger m-1 p-2 pl-5 pr-9" onClick={signOut}>Sign Out Button</button>
                     ) : (
                       <button className="btn btn-primary m-1 p-2 pl-5 pr-9" onClick={handleClickSignIn}>Sign In</button>
@@ -292,7 +289,7 @@ const MainNavigation = () => {
             <div>
 
               {
-                isUserLoggedIn() ? (
+                isLoggedIn ? (
                   <div className='text-success'>Welcome, {user?.name}</div>
                 ) : (
                   <button className="btn btn-primary m-1 p-2 pl-5 pr-9" onClick={handleClickSignIn}>Sign In</button>

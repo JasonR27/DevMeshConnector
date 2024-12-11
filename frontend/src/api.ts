@@ -126,6 +126,23 @@ export const getUserByEmail = async (userEmail: string): Promise<AxiosResponse> 
   }
 };
 
+// export async function getProfiles(): Promise<IProfile[]> {
+//   const response = await axios.get<IProfile[]>(profilesUrl);
+//   const data: IProfile[] = response.data;
+//   return data;
+// }
+
+export const getProfilesByAuthorEmail = async (authorEmail: string): Promise<IProfile[]> => {
+  try {
+    const response = await axios.get<IProfile[]>(`${profilesUrl}/findProfilesByEmail/${authorEmail}`);
+    // const response: AxiosResponse<ApiDataType> = await axios.get(`8080/findProfileByEmail/${authorEmail}`);
+    const data: IProfile[] = response.data;
+    return data;
+  } catch (error: any) {
+    throw new AxiosError(error);
+  }
+};
+
 export const getProfileByAuthorEmail = async (authorEmail: string): Promise<AxiosResponse> => {
   try {
     const response: AxiosResponse<ApiDataType> = await axios.get(`${profilesUrl}/findProfileByEmail/${authorEmail}`);
@@ -279,6 +296,12 @@ export async function getUserData() {
 export async function getUserInfo() {
   // const response = await axios.get(`${authUrl}/userinfo/`, { headers: { Authorization: `token ${accToken}` } });
   const response = await axiosInstance.get(`${authUrl}/userinfo/`);
+  return response;
+}
+
+export async function postLogOut() {
+  // const response = await axios.get(`${authUrl}/userinfo/`, { headers: { Authorization: `token ${accToken}` } });
+  const response = await axiosInstance.post(`${authUrl}/logout/`);
   return response;
 }
 

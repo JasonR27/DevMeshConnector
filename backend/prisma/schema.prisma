@@ -15,31 +15,12 @@ model Users {
   email        String     @unique
   username     String     @unique
   passwordHash String
-  session      String     @unique
-  secret       String     @unique
-  token        String     @unique
   role         String
   posts        Posts[]
   comments     Comments[]
   friends      Friends[]
   likes        Likes[]
   Profiles     Profiles[]
-  @@schema("auth")
-  Sessions Sessions[]
-}
-
-model Sessions {
-  id           String     @id @default(uuid())
-  userId       String     @unique
-  user         Users      @relation(fields: [userId], references: [id])
-  name         String
-  email        String     @unique
-  username     String     @unique
-  passwordHash String
-  session      String     @unique
-  token        String     @unique
-  secret       String     @unique
-  role         String
   @@schema("auth")
 }
 

@@ -80,10 +80,8 @@ const generateSecret = () => {
 // });
 
 router.post('/login', async (req, res) => {
-  // res.header('Access-Control-Allow-Origin', 'http//localhost:3000');
+  
   console.log('Entered login endpoint');
-  // console.log(`Incoming Request: ${req.method} ${req.url}`);
-  // console.log('Request Headers:', req.headers);
   const { email, password } = req.body;
   console.log('email: ', email);
 
@@ -101,43 +99,9 @@ router.post('/login', async (req, res) => {
     console.log('after token sing in lines');
 
     try {
-      // Attempt to update the user's session to an empty string
 
-      const session = await prisma.sessions.findUnique({ where: { userId: user.id } });
 
-      if (session) {
-        console.log('session entry found');
-        // const updatedSession = 
-        await prisma.sessions.update({
-          where: { userId: user.id },
-          data: {
-            // userId: user.id,
-            name: user.name,
-            email: user.email,
-            username: user.username,
-            passwordHash: user.passwordHash,
-            session: '',
-            token: token,
-            secret: generatedSecret,
-            role: '',
-          }, // Clear the session
-        });
 
-      } else {
-        await prisma.sessions.create({
-          data: {
-            userId: user.id,
-            name: user.name,
-            email: user.email,
-            username: user.username,
-            passwordHash: user.passwordHash,
-            session: '',
-            token: token,
-            secret: generatedSecret,
-            role: '',
-          }, // Clear the session
-        });
-      }
 
       // if (typeof cookie === 'undefined') {
       //   console.error('cookie is undefined');
@@ -172,18 +136,15 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/logout', async (req, res) => {
+router.post('/logout', auth, async (req, res) => {
   console.log('Entering logout endpoint');
   const { email } = req.body;
   console.log('email: ', email);
 
   try {
-    // Attempt to update the user's session to an empty string
+    // Cleaning session cookies
 
-    // const updatedSession = await prisma.sessions.delete({
-    await prisma.sessions.delete({
-      where: { email }, // Clear the session
-    });
+    res.clearCookie('token'); // Clear specific cookie
 
     // console.log('User signed out successfully:', updatedUser);
     console.log('User  signed out successfully:');
@@ -196,33 +157,16 @@ router.post('/logout', async (req, res) => {
   }
 });
 
-router.get('/userdata', auth, async (req, res) => {
-  console.log('Entered get userdata endpoint');
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ valid: false, error: 'No token provided' });
-  }
-
-  // Extracting the token from the Bearer token format
-  const token = authHeader.split(' ')[1]; // This assumes the header is in the format "Bearer <token>"
-
-  console.log('Extracted token: ', token);
-
-  if (!token) {
-    return res.status(401).json({ valid: false, error: 'Couldn\'t extract token from headers' });
-  }
-
-  try {
-    const user = await prisma.users.findUnique({ where: { token: token } });
-    // console.log('User found');
-    // console.log('User data:', user);
-    return res.json({ user: user });
-  } catch (error) {
-    console.error('user verification error(user not found): ', error);
-    return res.status(401).json({ error: 'User not found' });
-  }
-});
+// router.get('/userdata', auth, async (req, res) => {
+  
+//   try {
+  
+//     return res.json({ user: 'user' });
+//   } catch (error) {
+//     console.error('user verification error(user not found): ', error);
+//     return res.status(401).json({ error: 'User not found' });
+//   }
+// });
 
 
 declare global {

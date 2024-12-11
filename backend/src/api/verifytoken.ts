@@ -29,6 +29,7 @@ router.get('/verifytoken', async (req, res) => {
   console.log('Extracted token: ', token);
 
   if (!token) {
+    console.log('token is undefined');
     return res.status(401).json({ valid: false, error: 'Invalid token' });
   }
 
@@ -43,6 +44,7 @@ router.get('/verifytoken', async (req, res) => {
   try {
     const decoded = jwt.verify(token, SECRET_KEY); // Ensure SECRET_KEY is correct
     console.log('verifytoken endpoint Token is valid, decoded token: ', decoded);
+    
     return res.json({ valid: true });
   } catch (error) {
     console.error('Token verification error: ', error);

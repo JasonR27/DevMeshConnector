@@ -1,6 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
+import { randomBytes } from 'crypto';
 // import jwt from 'jsonwebtoken';
 
 // const app = express();
@@ -9,6 +10,12 @@ const prisma = new PrismaClient();
 const saltRounds = 12;
 
 router.use(express.json()); 
+
+const generateSecret = () => {
+  return randomBytes(32).toString('hex'); // Generates a 64-character hexadecimal string
+};
+
+const generatedSecret = generateSecret();
 
 router.post('/signup', async (req, res) => {
   console.log('Its entering router.post /signup endpoint');
@@ -27,10 +34,7 @@ router.post('/signup', async (req, res) => {
         passwordHash: passwordHash,
         username: username,
         name: name,
-        token: '',
-        session: '',
         role: '',
-        secret: '',
       },
     });
 

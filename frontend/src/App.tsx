@@ -18,6 +18,7 @@ import CorsErrorsPage from './pages/CorsErrorsPage';
 // import ProfilePage from './pages/ProfilePage';
 import WelcomePage from './pages/WelcomePage';
 import ProfilesPage from './pages/ProfilesPage';
+import MyProfilesPage from './pages/MyProfilesPage';
 import Signin from './components/Auth/Signin';
 import Profile from './components/Profile';
 // import { AuthProvider } from './components/Auth/Auth';
@@ -123,6 +124,13 @@ export const App = () => {
                   </ProtectedRoute>
                 }>
                   <Route index element={<Profile />} />
+                </Route>
+                <Route path="/profiles/myprofiles" element={
+                  <ProtectedRoute >
+                    <ProfilesLayout />
+                  </ProtectedRoute>
+                }>
+                  <Route index element={<MyProfilesPage />} />
                 </Route>
                 <Route path="/login" element={<Signin />} />
               </Routes>
