@@ -8,28 +8,11 @@ CREATE TABLE "auth"."Users" (
     "email" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "session" TEXT NOT NULL,
-    "secret" TEXT NOT NULL,
-    "token" TEXT NOT NULL,
     "role" TEXT NOT NULL,
+    "mainProfileId" TEXT,
+    "currentProfileId" TEXT,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "auth"."Sessions" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
-    "passwordHash" TEXT NOT NULL,
-    "session" TEXT NOT NULL,
-    "token" TEXT NOT NULL,
-    "secret" TEXT NOT NULL,
-    "role" TEXT NOT NULL,
-
-    CONSTRAINT "Sessions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -79,10 +62,10 @@ CREATE TABLE "public"."Comments" (
     "id" TEXT NOT NULL,
     "postId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
-    "img" TEXT NOT NULL,
-    "audio" TEXT NOT NULL,
-    "file" TEXT NOT NULL,
+    "content" TEXT,
+    "img" TEXT,
+    "audio" TEXT,
+    "file" TEXT,
 
     CONSTRAINT "Comments_pkey" PRIMARY KEY ("id")
 );
@@ -98,7 +81,8 @@ CREATE TABLE "public"."Friends" (
 -- CreateTable
 CREATE TABLE "public"."Likes" (
     "id" TEXT NOT NULL,
-    "postId" TEXT NOT NULL,
+    "postId" TEXT,
+    "commentId" TEXT,
     "userId" TEXT NOT NULL,
     "profileId" TEXT NOT NULL,
 
@@ -112,37 +96,25 @@ CREATE UNIQUE INDEX "Users_email_key" ON "auth"."Users"("email");
 CREATE UNIQUE INDEX "Users_username_key" ON "auth"."Users"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Users_session_key" ON "auth"."Users"("session");
+CREATE UNIQUE INDEX "Users_mainProfileId_key" ON "auth"."Users"("mainProfileId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Users_secret_key" ON "auth"."Users"("secret");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Users_token_key" ON "auth"."Users"("token");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Sessions_email_key" ON "auth"."Sessions"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Sessions_username_key" ON "auth"."Sessions"("username");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Sessions_session_key" ON "auth"."Sessions"("session");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Sessions_token_key" ON "auth"."Sessions"("token");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Sessions_secret_key" ON "auth"."Sessions"("secret");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Profiles_authorEmail_key" ON "public"."Profiles"("authorEmail");
+CREATE UNIQUE INDEX "Users_currentProfileId_key" ON "auth"."Users"("currentProfileId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Picture_profileId_key" ON "public"."Picture"("profileId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Likes_profileId_postId_key" ON "public"."Likes"("profileId", "postId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Likes_profileId_commentId_key" ON "public"."Likes"("profileId", "commentId");
+
 -- AddForeignKey
-ALTER TABLE "auth"."Sessions" ADD CONSTRAINT "Sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "auth"."Users" ADD CONSTRAINT "Users_mainProfileId_fkey" FOREIGN KEY ("mainProfileId") REFERENCES "public"."Profiles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "auth"."Users" ADD CONSTRAINT "Users_currentProfileId_fkey" FOREIGN KEY ("currentProfileId") REFERENCES "public"."Profiles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Profiles" ADD CONSTRAINT "Profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -166,7 +138,10 @@ ALTER TABLE "public"."Comments" ADD CONSTRAINT "Comments_userId_fkey" FOREIGN KE
 ALTER TABLE "public"."Friends" ADD CONSTRAINT "Friends_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth"."Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."Likes" ADD CONSTRAINT "Likes_postId_fkey" FOREIGN KEY ("postId") REFERENCES "public"."Posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."Likes" ADD CONSTRAINT "Likes_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES "public"."Comments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."Likes" ADD CONSTRAINT "Likes_postId_fkey" FOREIGN KEY ("postId") REFERENCES "public"."Posts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Likes" ADD CONSTRAINT "Likes_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "public"."Profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

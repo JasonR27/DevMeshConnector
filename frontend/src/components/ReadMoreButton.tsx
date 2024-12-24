@@ -4,15 +4,17 @@ import { Link } from 'react-router-dom';
 
 interface ReadMoreButtonProps {
   postId: number;
+  onClick?: () => void;
 }
 
-export const ReadmoreButton: React.FC<ReadMoreButtonProps> = ({ postId }) => {
+export const ReadmoreButton: React.FC<ReadMoreButtonProps> = ({ postId, onClick }) => {
   return (
-    <Link to={postId.toString()}>
+    // <Link>
       <Stack direction="horizontal" className="justify-content-end" gap={3}>
         <div>
           <Button
             className="flex-grow-1 rounded-md"
+            onClick={onClick}
             style={{
               backgroundColor: '#007bff',
               color: 'white',
@@ -36,6 +38,6 @@ export const ReadmoreButton: React.FC<ReadMoreButtonProps> = ({ postId }) => {
           </Button>
         </div>
       </Stack>
-    </Link>
+    // </Link>
   );
 };

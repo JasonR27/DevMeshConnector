@@ -1,10 +1,9 @@
 import { fetchPosts } from '../api';
 import { useQuery } from 'react-query';
-
 import Posts from '../components/Posts';
 import { Spinner, Alert } from 'react-bootstrap';
 
-function BlogPostsPage() {
+function PostsPage() {
   const { data, error, isError, isLoading } = useQuery('posts', fetchPosts);
 
   if (isLoading) {
@@ -23,4 +22,4 @@ function BlogPostsPage() {
   );
 }
 
-export default BlogPostsPage;
+export default PostsPage;

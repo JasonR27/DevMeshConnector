@@ -173,7 +173,7 @@ const ProfilePage = () => {
             }}
           />
           <div className="text-center">
-            <p className="text-muted mb-4">{session?.user?.email}</p>
+            <p className="text-muted mb-4">SB session?{session?.user?.email}</p>
             <Badge pill bg={isPublic ? "success" : "secondary"}>
               {isPublic ? "Public" : "Private"}
             </Badge>

@@ -1,20 +1,14 @@
-import React, { useEffect, useState, useContext } from "react";
-import { getProfilesByUser } from "../api";
+import React, { useEffect, useState } from "react";
+import { getProfiles } from "../api";
 import { useQuery } from "react-query";
-import Profiles from "../components/Profiles";
+import Users from "../components/Users";
 import { Spinner, Alert, Container } from "react-bootstrap";
-import { AuthContext, useAuth } from '../components/Auth/Auth'
 
-
-
-
-const MyProfilesPage: React.FC = () => {
+const UsersPage: React.FC = () => {
   const [profiles, setProfiles] = useState<IProfile[]>();
-  const { user } = useContext(AuthContext);
-  console.log('React contxt user on myprofiles: ', user);
 
   const fetchProfiles = async (): Promise<IProfile[]> => {
-    const res: IProfile[] = await getProfilesByUser();
+    const res: IProfile[] = await getProfiles();
     return res;
   };
   
@@ -64,11 +58,12 @@ const MyProfilesPage: React.FC = () => {
 
   return (
     <Container>
+            <h1 className='text-white position-absolute'>Here are the main profiles of every user</h1>
       {isLoading && <p>Loading profiles...</p>}
       {error && <p>{(error as Error).message}</p>}
-      {!error && profiles && <Profiles profiles={profiles} />}
+      {!error && profiles && <Users profiles={profiles} />}
     </Container>
   );
 };
 
-export default MyProfilesPage;
+export default UsersPage;

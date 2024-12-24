@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Button, Badge, Dropdown } from 'react-bootst
 import { BsThreeDotsVertical } from 'react-icons/bs';
 // import { truncate } from '../utils/functions';
 import ProfileAvatar from './ProfileAvatar';
-import '../styles/Profiles.css'; // Import the CSS file
+// import '../styles/Profiles.css'; // Import the CSS file
 import { AuthContext, useAuth } from './Auth/Auth'
 import { useContext } from 'react';
 import { deleteProfile, SelectAsCurrent, SelectAsMain } from '../api';
@@ -19,7 +19,7 @@ export function truncate(text: string, maxLength: number = 10): string {
 }
 
 
-const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
+const Users: React.FC<ProfilesProps> = ({ profiles }) => {
   const { user } = useContext(AuthContext);
 
   console.log('typeof profiles arg in Profiles Comp 3rd line: ', typeof(profiles));
@@ -105,7 +105,7 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
         
         {profiles.map(({ id, username, company, authorEmail, website, programmingLanguages, picture }, i) => (
           <Col key={i} md={6} lg={4} className="mb-4">
-            <Card className="shadow-sm madeProfile4">
+            <Card className="shadow-sm">
               <Card.Header className="card-header d-flex justify-content-between">
                 <div className="d-flex align-items-center">
                   <ProfileAvatar url={picture?.avatarUrl} avatarName={truncate(user.name)} />
@@ -120,6 +120,7 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
                     <BsThreeDotsVertical />
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
+                  <Dropdown.Item href="#" onClick={() => SelectMain(id)}>Send Request to connect</Dropdown.Item>
                     <Dropdown.Item href="#">Edit</Dropdown.Item>
                     <Dropdown.Item href="#" onClick={() => SelectMain(id)}>Select as main</Dropdown.Item>
                     <Dropdown.Item href="#" onClick={() => SelectCurrent(id)}>Select as current</Dropdown.Item>
@@ -144,4 +145,4 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
   );
 };
 
-export default Profiles;
+export default Users;

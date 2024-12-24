@@ -1,0 +1,11 @@
+/* global.css */
+body, html {
+    height: 100%;
+    margin: 0vh;
+    background-color: darkgreen;
+    width: 100%;
+  }
+  
+  #root {
+    background-color: blue; /* Replace this with your desired background color */
+ }

@@ -1,27 +1,28 @@
 import React, { useEffect, useState, useContext } from "react";
-import { getProfilesByUser } from "../api";
+import { getMainProfileByAuthorEmail } from "../api";
 import { useQuery } from "react-query";
 import Profiles from "../components/Profiles";
 import { Spinner, Alert, Container } from "react-bootstrap";
 import { AuthContext, useAuth } from '../components/Auth/Auth'
 
 
-
-
-const MyProfilesPage: React.FC = () => {
-  const [profiles, setProfiles] = useState<IProfile[]>();
+const MainProfilePage: React.FC = () => {
+  const [profile, setProfile] = useState<IProfile[]>();
   const { user } = useContext(AuthContext);
-  console.log('React contxt user on myprofiles: ', user);
+  console.log('React context user on mainprofile.tsx: ', user);
+  console.log('React context user email on mainprofile.tsx: ', user?.email);
+  // console.log('not printing')
 
-  const fetchProfiles = async (): Promise<IProfile[]> => {
-    const res: IProfile[] = await getProfilesByUser();
+  const fetchProfile = async (): Promise<IProfile[]> => {
+    console.log('React context user email on fetchProfile on mainprofile.tsx: ', user?.email);
+    const res: IProfile[] = await getMainProfileByAuthorEmail(user?.email);
     return res;
   };
   
 
-  const { data: profilesData, error, isError, isLoading } = useQuery<IProfile[]>(
-    "profiles",
-    fetchProfiles,
+  const { data: profileData, error, isError, isLoading } = useQuery<IProfile[]>(
+    "profile",
+    fetchProfile,
     {
       enabled: true,
       retry: 2,
@@ -37,10 +38,10 @@ const MyProfilesPage: React.FC = () => {
   );
 
   useEffect(() => {
-    if (profilesData) {
-      setProfiles(profilesData);
+    if (profileData) {
+      setProfile(profileData);
     }
-  }, [profilesData]);
+  }, [profileData]);
 
   if (isLoading) {
     return (
@@ -60,15 +61,17 @@ const MyProfilesPage: React.FC = () => {
         </Alert>
       </Container>
     );
-  }  
+  }
+  
+  console.log('Main profile data: ', profile);
 
   return (
     <Container>
       {isLoading && <p>Loading profiles...</p>}
       {error && <p>{(error as Error).message}</p>}
-      {!error && profiles && <Profiles profiles={profiles} />}
+      {!error && profile && <Profiles profiles={profile} />}
     </Container>
   );
 };
 
-export default MyProfilesPage;
+export default MainProfilePage;

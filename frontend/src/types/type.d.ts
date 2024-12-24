@@ -24,7 +24,7 @@ interface IPost {
   createdAt?: string;
   updatedAt?: string;
   accToken?: string;
-  profileId: number;
+  profileId?: number;
   profile?: IProfile;
   likes?: ILike[];
 }
@@ -59,6 +59,7 @@ interface IProfile {
   isPublic?: boolean;
   picture?: IPicture;
   programmingLanguages: string[];
+  mainOptions?: boolean;
 }
 
 
@@ -83,7 +84,7 @@ type GetPostsResponse = {
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  signedIn: boolean;
+  // signedIn?: boolean;
 }
 
 interface ProfilePageProps {

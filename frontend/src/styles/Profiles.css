@@ -1,0 +1,47 @@
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .text-wrap {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* .text-truncate {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+} */
+
+  .madeProfile {
+    background-color: gray;
+  }
+
+  .madeProfile2 {
+    background-color: blue;
+  }
+
+  .madeProfile3 {
+    background-color: green;
+  }
+
+  .madeProfile4 {
+    /* background-color:black; */
+    /* border:5px dashed gray; */
+    /* width: 29vw;
+    height: 25vh; */
+  }
+
+  .dropdown-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+  }
+  
+  .card-header {
+    position: relative; /* Ensure the card header is positioned relative */
+  }
+  

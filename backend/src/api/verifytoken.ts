@@ -23,27 +23,27 @@ router.use(cookieParser()); // For parsing cookies
 // const SECRET_KEY: string = process.env.REACT_APP_SUPABASE_JWT_SECRET || 'default_secret_key';
 
 router.get('/verifytoken', async (req, res) => {
-  console.log('Entered verify token endpoint - testing');
+  // console.log('Entered verify token endpoint - testing');
   const token = req.cookies.token;
 
-  console.log('Extracted token: ', token);
+  // console.log('Extracted token: ', token);
 
   if (!token) {
-    console.log('token is undefined');
+    // console.log('token is undefined');
     return res.status(401).json({ valid: false, error: 'Invalid token' });
   }
 
   const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
 
   if (!SECRET_KEY) {
-    console.log('No Secret Key');
+    // console.log('No Secret Key');
   } else {
-    console.log('login endpoint SECRET_KEY: ', SECRET_KEY);
+    // console.log('verify token endpoint SECRET_KEY: ', SECRET_KEY);
   }
-
+  
   try {
     const decoded = jwt.verify(token, SECRET_KEY); // Ensure SECRET_KEY is correct
-    console.log('verifytoken endpoint Token is valid, decoded token: ', decoded);
+    // console.log('verifytoken endpoint Token is valid, decoded token: ', decoded);
     
     return res.json({ valid: true });
   } catch (error) {

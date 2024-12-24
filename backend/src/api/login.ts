@@ -15,7 +15,7 @@ import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
-// console.log('cookie:', cookie);
+// // console.log('cookie:', cookie);
 
 const router = express.Router();
 
@@ -55,9 +55,9 @@ router.use(bodyParser.json());
 const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
 
 if (!SECRET_KEY) {
-  console.log('No Secret Key');
+  // console.log('No Secret Key');
 } else {
-  console.log('login endpoint SECRET_KEY/JWT secret: ', SECRET_KEY);
+  // console.log('login endpoint SECRET_KEY/JWT secret: ', SECRET_KEY);
 }
 
 import { randomBytes } from 'crypto';
@@ -67,7 +67,7 @@ const generateSecret = () => {
 };
 
 // router.options('*', (req, res) => {
-//   console.log('Received OPTIONS request login.ts');
+//   // console.log('Received OPTIONS request login.ts');
 //   res.header('Access-Control-Allow-Origins', 'http//:localhost:3000');
 //   res.sendStatus(200); // Respond with a 200 OK status
 // });
@@ -81,33 +81,26 @@ const generateSecret = () => {
 
 router.post('/login', async (req, res) => {
   
-  console.log('Entered login endpoint');
+  // console.log('Entered login endpoint');
   const { email, password } = req.body;
-  console.log('email: ', email);
+  // console.log('email: ', email);
 
   const user = await prisma.users.findUnique({ where: { email: email } });
 
   if (user && await bcrypt.compare(password, user.passwordHash)) {
     // Ensure the user ID is unique
     const generatedSecret = generateSecret();
-    console.log('process.env.SUPABASE_JWT_SECRET: ', process.env.SUPABASE_JWT_SECRET);
+    // console.log('process.env.SUPABASE_JWT_SECRET: ', process.env.SUPABASE_JWT_SECRET);
     const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
     if (token) {
-      console.log('Generated token for user ID:', user.id);
-      console.log('token: ', token);
+      // console.log('Generated token for user ID:', user.id);
+      // console.log('token: ', token);
     }
-    console.log('after token sing in lines');
+    // console.log('after token sing in lines');
 
     try {
 
-
-
-
-      // if (typeof cookie === 'undefined') {
-      //   console.error('cookie is undefined');
-      // } else {
-
-      console.log('New session generated succesfully:');
+      // console.log('New session generated succesfully:');
 
       res.cookie('token', token, {
         httpOnly: true,
@@ -129,7 +122,7 @@ router.post('/login', async (req, res) => {
     //   redirectUrl: '/myprofiles',
     // });
     
-    console.log('New token assigned successfully');
+    // console.log('New token assigned successfully');
 
   } else {
     return res.status(401).json({ error: 'Invalid credentials' });
@@ -137,17 +130,17 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', auth, async (req, res) => {
-  console.log('Entering logout endpoint');
+  // console.log('Entering logout endpoint');
   const { email } = req.body;
-  console.log('email: ', email);
+  // console.log('email: ', email);
 
   try {
     // Cleaning session cookies
 
     res.clearCookie('token'); // Clear specific cookie
 
-    // console.log('User signed out successfully:', updatedUser);
-    console.log('User  signed out successfully:');
+    // // console.log('User signed out successfully:', updatedUser);
+    // console.log('User  signed out successfully:');
     return res.json({
       redirectUrl: '/profiles',
     });
@@ -182,12 +175,12 @@ declare global {
 // });
 
 router.get('/userinfo', auth, async (req: Request, res: Response) => {
-  console.log('Entered get user info  endpoint');
+  // console.log('Entered get user info  endpoint');
   const token = req.cookies.token;
   let userId;
   // let userEmail;
 
-  console.log('user info endpoint token: ', token);
+  // console.log('user info endpoint token: ', token);
 
   jwt.verify(token, SECRET_KEY, (err: any, decoded: any) => {
     if (err) {
@@ -196,31 +189,32 @@ router.get('/userinfo', auth, async (req: Request, res: Response) => {
     // Attach the decoded information to the request object
     userId = decoded.id;
     // userEmail = decoded.email; 
-    console.log('decoded: ', decoded, ' ', 'decoded.id: ', decoded.id, 'decoded.email: ', decoded.email);
+    // console.log('decoded: ', decoded, ' ', 'decoded.id: ', decoded.id, 'decoded.email: ', decoded.email);
     // next(); // Proceed to the next middleware or route handler
   });
 
   const user = await prisma.users.findUnique({ where: { id: userId } });
 
   res.json({ user: { email: user?.email, name: user?.name, username: user?.username } });
+  
 });
 
-router.get('/gettoken', async (req: Request, res: Response) => {
-  console.log('Entered get user info  endpoint');
+// router.get('/gettoken', async (req: Request, res: Response) => {
+//   // console.log('Entered get user info  endpoint');
 
-  const authHeader = req.headers.authorization;
+//   const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    return res.status(401).json({ valid: false, error: 'No token provided' });
-  }
+//   if (!authHeader) {
+//     return res.status(401).json({ valid: false, error: 'No token provided' });
+//   }
 
-  // Extracting the token from the Bearer token format
-  const token = authHeader.split(' ')[1]; // This assumes the header is in the format "Bearer <token>"
+//   // Extracting the token from the Bearer token format
+//   const token = authHeader.split(' ')[1]; // This assumes the header is in the format "Bearer <token>"
 
 
 
-  res.json({ token: token });
-});
+//   res.json({ token: token });
+// });
 
 
 export default router;

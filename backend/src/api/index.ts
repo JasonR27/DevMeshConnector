@@ -13,6 +13,7 @@ import picture from './pictures';
 import like from './likes';
 import signup from './signup';
 import verifytoken from './verifytoken';
+import comments from './comments';
 
 const app = express();
 
@@ -22,12 +23,12 @@ app.use(express.json());
 const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
 
 if (!SECRET_KEY) {
-  console.log('No Secret Key');
+  // console.log('No Secret Key');
 } else {
-  console.log('index.ts SECRET_KEY/JWT secret: ', SECRET_KEY);
+  // console.log('index.ts SECRET_KEY/JWT secret: ', SECRET_KEY);
 }
 
-// Creating the session
+// Creating the session // JWT is normallu use for serverless web apps
 // app.use(session({
 //   secret: SECRET_KEY,
 //   cookie: {
@@ -39,15 +40,13 @@ if (!SECRET_KEY) {
 // }));
 
 app.get<{}, MessageResponse>('/', (req, res) => {
-  // res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-  // res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
   res.json({
     message: 'API - 👋🌎🌍🌏',
   });
 });
 
 app.get('/corserrorsapp', async (req, res) => {
-  console.log('entered CorsErrors endpoint');
+  // console.log('entered CorsErrors endpoint');
   const token = jwt.sign({ id: 'user.id', email: 'user.email' }, SECRET_KEY, { expiresIn: '1h' });
   req.session.token = token;
   res.json({ user: { id: 'user.id ljsdlksjf', email: 'user.email: email@email.com', role: req.session.token } });  
@@ -55,14 +54,14 @@ app.get('/corserrorsapp', async (req, res) => {
 
 
 app.get('/corserrorsapplogin', async (req, res) => {
-  console.log('entered get CorsErrors endpoint');
+  // console.log('entered get CorsErrors endpoint');
   const token = jwt.sign({ id: 'user.id', email: 'user.email' }, SECRET_KEY, { expiresIn: '1h' });
   req.session.token = token;
   res.json({ user: { id: 'user.id ljsdlksjf', email: 'user.email: email@email.com', role: req.session.token } });  
 });
 
 app.post('/corserrorsapplogin', async (req, res) => {
-  console.log('entered post CorsErrors endpoint');
+  // console.log('entered post CorsErrors endpoint');
   const token = jwt.sign({ id: 'user.id', email: 'user.email' }, SECRET_KEY, { expiresIn: '1h' });
   req.session.token = token;
   res.json({ user: { id: 'user.id ljsdlksjf', email: 'user.email: email@email.com', role: req.session.token } });  
@@ -74,6 +73,7 @@ app.use('/posts', posts);
 app.use('/profiles', profile);
 app.use('/pictures', picture);
 app.use('/likes', like);
+app.use('/comments', comments);
 app.use('/auth', signup, login, verifytoken);
 
 export default app;

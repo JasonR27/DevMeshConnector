@@ -17,6 +17,7 @@ import { useMutation } from 'react-query';
 import { AxiosResponse } from 'axios';
 // import 'console-polyfill';
 import { useAuth } from './Auth'
+import { useNavigate } from 'react-router-dom';
 
 
 export const Signin = () => {
@@ -24,14 +25,8 @@ export const Signin = () => {
   // const navigate = useNavigate();
 
   const { user, setUser, login } = useAuth();
+  const navigate = useNavigate();
 
-  const token = localStorage.getItem('token')
-
-  if (!token) {
-    // window.location.href = '/login';
-    // navigate('/login');
-    redirect('/myprofiles')
-  }
   // const formBackground = useColorModeValue('gray.100', 'gray.700');
   // Hook for signup state management
   const [email, setEmail] = useState<string>('');
@@ -144,7 +139,7 @@ export const Signin = () => {
         console.log('error: ', Error, Error.name)
       } else {
         // toast
-        postUser()
+        // postUser()
         console.log('Registered Succesfully')
         // navigate("/myprofiles");
         // window.location.href = '/myprofiles';
@@ -170,13 +165,27 @@ export const Signin = () => {
       password: password,
       name: name,
     };
-    return await createUser(user);
+
+    // return await createUser(user);
+
+    try {
+        const response: AxiosResponse = await createUser(user);
+        const { redirectUrl } = response.data;
+    
+        if (redirectUrl) {
+          // Use react-router-dom's useNavigate to redirect
+          navigate(redirectUrl);
+        }
+      } catch (error) {
+        console.error('Error creating profile:', error);
+        // Handle error
+      }
   }
 
   const { isLoading: isCreatingUser, mutate: postUser } = useMutation(postCreateUser, {
     onSuccess(res) {
       console.log('Profile Created Succesfully!');
-      redirect('/myprofiles')
+      redirect('/profiles/myprofiles')
       // toast({
       //   title: 'Profile created.',
       //   position: 'top',

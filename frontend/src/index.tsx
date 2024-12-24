@@ -6,10 +6,12 @@ import * as serviceWorker from './serviceWorker';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ParticlesComp from './components/Particles';
-// import { Container, Row, Col, Form, FormGroup, Label, Input, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { AuthProvider } from './components/Auth/Auth';
+// import RootLayout from './components/RootLayout';
+import './styles/Global.css';
 
 const container = document.getElementById('root');
+
 if (!container) throw new Error('Failed to find the root element');
 const root = ReactDOM.createRoot(container);
 
@@ -20,9 +22,11 @@ root.render(
 
     <QueryClientProvider client={queryClient} >
       <AuthProvider>
+        
         <ParticlesComp />
-
-        <App />
+        {/* <RootLayout> */}
+        <App/>
+        {/* </RootLayout> */}
       </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>

@@ -9,8 +9,9 @@ import { supabaseClient } from '../config/supabase-client';
 import { getRandomColor } from '../utils/functions';
 import AsyncSelect from 'react-select/async';
 import { MultiValue, ActionMeta } from 'react-select';
-import {  getUserInfo, getUserData, createPicture, getPictureByProfileId, getProfileByAuthorEmail, updatePicture, createProfile, saveProfile, publishProfile } from '../api';
+import { getUserInfo, getUserData, createPicture, getPictureByProfileId, getProfileByAuthorEmail, updatePicture, createProfile, saveProfile, publishProfile } from '../api';
 import { useAuth } from './Auth/Auth'
+import { useNavigate } from 'react-router-dom';
 
 const mappedColourOptions = pickListOptions.map(option => ({
   ...option,
@@ -27,22 +28,14 @@ const Profile = () => {
   const [isEditingLanguage, setIsEditingLanguage] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isPublishingProfile, setIsPublishingProfile] = useState<boolean>(false);
-  // const [isCreatingProfile, setIsCreatingProfile] = useState<boolean>(false);
   const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
   const [profileId, setProfileId] = useState<String>()
   const [authorEmail, setAuthorEmail] = useState<string>();
   const [profile, setProfile] = useState<IProfile>()
-  // const [languages, setLanguages] = useState<IProgrammingLanguage[] | undefined>();
   const [session, setSession] = useState<Session | null>();
-  // const [user, setUser] = useState<User>()
   const [newParams, setNewParams] = useState<any[]>([]);
-
-  // const [programmingLanguages, setProgrammingLanguages] = useState([]);
   const [languages, setLanguages] = useState<string[]>([]);
-
-  // const handleLanguagesChange = (selectedOptions: { map: (arg0: (option: any) => any) => React.SetStateAction<never[]>; }) => {
-  //   setProgrammingLanguages(selectedOptions.map((option: { value: any; }) => option.value));
-  // };
+  const [mainOptions, setMainOptions] = useState<boolean>(false);
 
   const { user, setUser } = useAuth();
 
@@ -52,30 +45,6 @@ const Profile = () => {
     setLanguages(newValue.map(option => option.value));
   };
 
-
-  useEffect(() => {
-    const setData = async () => {
-      // const { data: { session }, error } = await supabaseClient.auth.getSession();
-      const token = localStorage.getItem('token');
-      const setData = async () => {
-        // setUser((await getUserInfo(token)));
-        // setUser((await getUserData(token)).data.user);
-      }
-      setData()
-      // if (error) throw error;
-      // setSession(session);
-      //console.log('session from App', session?.access_token)
-      // if (session) {
-      //   setUser(session.user)
-      // }
-    };
-
-    setData();
-  }, []);
-
-  const handleLanguages = (e: any) => {
-    // Handle language selection
-  };
 
   const fetchProfile = async () => {
     const res: AxiosResponse<ApiDataType> = await getProfileByAuthorEmail(user?.email!)
@@ -104,37 +73,45 @@ const Profile = () => {
       }
     },
     onError: (error: any) => {
-      // toast({
-      //   title: 'Error',
-      //   position: 'top',
-      //   variant: 'subtle',
-      //   description: error,
-      //   status: 'error',
-      //   duration: 3000,
-      //   isClosable: true
-      // });
+      // settoastshere
     }
   });
 
-  const postCreateProfile = async (): Promise<AxiosResponse> => {
-    // const profile: Omit<IProfile, 'id'> = {
-    console.log('inside postCreateProfile')
-    console.log('website: ', website)
-    console.log('username: ', username)
-    console.log('website: ', website)
-    console.log('company: ', company)
-    console.log('languages: ', languages)
-    const profile: Omit<IProfile, 'id'> = {
-      // userId:
-      userId: user?.id!,
-      website: website!,
-      username: username!,
-      company: company!,
-      authorEmail: user?.email!,
-      programmingLanguages: languages!
-    };
-    return await createProfile(profile);
+// Ensure this is inside your functional component
+const navigate = useNavigate();
+
+const postCreateProfile = async (): Promise<void> => {
+  console.log('inside postCreateProfile');
+  console.log('website: ', website);
+  console.log('username: ', username);
+  console.log('company: ', company);
+  console.log('languages: ', languages);
+  console.log('mainOptions: ', mainOptions);
+
+  const profile: Omit<IProfile, 'id'> & { mainOptions: boolean } = {
+    userId: user?.id!,
+    website: website!,
+    username: username!,
+    company: company!,
+    authorEmail: user?.email!,
+    programmingLanguages: languages!,
+    mainOptions: mainOptions  // Add mainProfile to the request
+  } 
+  // , {mainProfile: mainOptions } // Add mainProfile to the request}
+
+  try {
+    const response: AxiosResponse = await createProfile(profile);
+    const { redirectUrl } = response.data;
+
+    if (redirectUrl) {
+      // Use react-router-dom's useNavigate to redirect
+      navigate(redirectUrl);
+    }
+  } catch (error) {
+    console.error('Error creating profile:', error);
+    // Handle error
   }
+};
 
   const { isLoading: isCreatingProfile, mutate: postProfile } = useMutation(postCreateProfile, {
     onSuccess(res) {
@@ -162,22 +139,16 @@ const Profile = () => {
     try {
       if (profileId) {
         console.log('profileId already exists')
-        // updateProfile()
       } else {
         postProfile()
       }
     } catch (err) {
       console.log('Error creating profile')
-      // setPostResult(fortmatResponse(err));
     }
   }
 
-  // const handleLanguagesChange = (selectedOptions: any[]) => {
-  //   setLanguages(selectedOptions.map((option: { value: any; }) => option.value));
-  // };
-
   return (
-    <Container className="my-5">
+    <Container className="my-5 position-relative">
       <Row className="justify-content-center">
         <Col md={8}>
           <Stack gap={4} className="bg-light p-4 rounded shadow">
@@ -229,23 +200,6 @@ const Profile = () => {
                     }, 3000);
                   }}
                 />
-
-                {/* <AsyncSelect
-                  onChange={(e) => setLanguages(e.target.value)}
-                  isMulti
-                  name="colors"
-                  options={mappedColourOptions}
-                  placeholder="ex: JavaScript, C, Assembly"
-                  closeMenuOnSelect={false}
-                  loadOptions={(inputValue, callback) => {
-                    setTimeout(() => {
-                      const values = mappedColourOptions.filter((i) =>
-                        i.label.toLowerCase().includes(inputValue.toLowerCase()),
-                      );
-                      callback(values);
-                    }, 3000);
-                  }}
-                /> */}
               </Form.Group>
             ) : (
               <>
@@ -258,6 +212,20 @@ const Profile = () => {
                 </Stack>
               </>
             )}
+            {/* Select as main section */}
+            <>
+              <label htmlFor="mainOptions">Choose as Main Profile:</label>
+              <select name="mainOptions" id="cars" onChange={(e) => {
+                if (e.target.value == 'true') {
+                  setMainOptions(true);
+                } else {
+                  setMainOptions(false);
+                }
+              }}>
+                <option value='true'>Yes</option>
+                <option value='false'>No</option>
+              </select>
+            </>
             {!isPublic && (
               <Button variant="danger" onClick={onOpen}>
                 <FaAddressBook /> Publish profile

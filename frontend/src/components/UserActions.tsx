@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Button, Row, Col } from 'react-bootstrap';
 
-const ProfilesActions: React.FC = () => {
+const UserActions: React.FC = () => {
   return (
-    <Container fluid className="bg-dark py-3">
+    <Container fluid className="bg-black py-3">
       <Row className="">
         <Col>
           <Link to="/profiles/new">
@@ -35,8 +35,28 @@ const ProfilesActions: React.FC = () => {
           </Link>
         </Col>
       </Row>
+      {/* <h1 className='text-white position-absolute'>Here are the main profiles of every user</h1> */}
     </Container>
   );
 };
 
-export default ProfilesActions;
+export default UserActions;
+
+// another version
+
+// import React from 'react';
+// import './UserActions.css';
+
+// const UserActions = () => {
+//   return (
+//     <div className="user-actions-container">
+//       <h1 className="user-actions-title">User Actions</h1>
+//       <div className="actions">
+//         {/* Add your actions here */}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default UserActions;
+

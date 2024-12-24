@@ -5,7 +5,7 @@ import { FaPlus } from "react-icons/fa";
 
 const PostActions: React.FC = () => {
   return (
-    <Container fluid className="bg-light py-2">
+    <Container fluid className="bg-dark py-2">
       <Row className="align-items-center justify-content-between">
         <Col>
           <Link to="/post/new">

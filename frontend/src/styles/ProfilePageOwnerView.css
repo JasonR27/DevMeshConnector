@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: red;
+}
+
+.profile-container {
+    max-width: 600px;
+    margin: auto;
+    background: darkslategrey;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    text-align: center;
+    padding: 20px;
+}
+
+.profile-pic {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+.username {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.bio {
+    color: darkcyan;
+}
+
+.profile-nav {
+    background-color: gray;
+    padding: 10px;
+}
+
+.profile-nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: space-around;
+}
+
+.posts {
+    padding: 20px;
+}
+
+.post {
+    background: gray;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
