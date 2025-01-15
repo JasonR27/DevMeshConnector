@@ -22,7 +22,7 @@ export function truncate(text: string, maxLength: number = 10): string {
 const Users: React.FC<ProfilesProps> = ({ profiles }) => {
   const { user } = useContext(AuthContext);
 
-  console.log('typeof profiles arg in Profiles Comp 3rd line: ', typeof(profiles));
+  console.log('typeof profiles arg in Profiles Comp 3rd line: ', typeof (profiles));
   console.log('profiles arg in Profiles Comp 3rd line: ', profiles);
 
   const navigate = useNavigate();
@@ -36,17 +36,17 @@ const Users: React.FC<ProfilesProps> = ({ profiles }) => {
       //   console.error('Error deleting profile:', error);
       // }
       try {
-          const response: AxiosResponse = await deleteProfile(profileId); // Remove the deleted profile from the state 
-          const { redirectUrl } = response.data;
-      
-          if (redirectUrl) {
-            // Use react-router-dom's useNavigate to redirect
-            navigate(redirectUrl);
-          }
-        } catch (error) {
-          console.error('Error creating profile:', error);
-          // Handle error
+        const response: AxiosResponse = await deleteProfile(profileId); // Remove the deleted profile from the state 
+        const { redirectUrl } = response.data;
+
+        if (redirectUrl) {
+          // Use react-router-dom's useNavigate to redirect
+          navigate(redirectUrl);
         }
+      } catch (error) {
+        console.error('Error creating profile:', error);
+        // Handle error
+      }
     }
   };
 
@@ -59,40 +59,40 @@ const Users: React.FC<ProfilesProps> = ({ profiles }) => {
       //   console.error('Error deleting profile:', error);
       // }
       try {
-          const response: AxiosResponse = await SelectAsMain(profileId); // Remove the deleted profile from the state 
-          const { redirectUrl } = response.data;
-      
-          if (redirectUrl) {
-            // Use react-router-dom's useNavigate to redirect
-            navigate(redirectUrl);
-          }
-        } catch (error) {
-          console.error('Error creating profile:', error);
-          // Handle error
+        const response: AxiosResponse = await SelectAsMain(profileId); // Remove the deleted profile from the state 
+        const { redirectUrl } = response.data;
+
+        if (redirectUrl) {
+          // Use react-router-dom's useNavigate to redirect
+          navigate(redirectUrl);
         }
+      } catch (error) {
+        console.error('Error creating profile:', error);
+        // Handle error
+      }
     }
   };
 
   const SelectCurrent = async (profileId: any) => {
     if (window.confirm('Are you sure you want to select this profile to continue browsing with it as your current profile?')) {
-      
+
       try {
-          const response: AxiosResponse = await SelectAsCurrent(profileId); // Remove the deleted profile from the state 
-          const { redirectUrl } = response.data;
-      
-          if (redirectUrl) {
-            // Use react-router-dom's useNavigate to redirect
-            navigate(redirectUrl);
-          }
-        } catch (error) {
-          console.error('Error creating profile:', error);
-          // Handle error
+        const response: AxiosResponse = await SelectAsCurrent(profileId); // Remove the deleted profile from the state 
+        const { redirectUrl } = response.data;
+
+        if (redirectUrl) {
+          // Use react-router-dom's useNavigate to redirect
+          navigate(redirectUrl);
         }
+      } catch (error) {
+        console.error('Error creating profile:', error);
+        // Handle error
+      }
     }
   };
 
   // Ensure profiles is an array before mapping 
-  if (!Array.isArray(profiles)) { 
+  if (!Array.isArray(profiles)) {
     console.log('params profiles is not an array');
     return null; // Or some fallback UI }
   } else {
@@ -102,7 +102,7 @@ const Users: React.FC<ProfilesProps> = ({ profiles }) => {
   return (
     <Container className="py-5">
       <Row>
-        
+
         {profiles.map(({ id, username, company, authorEmail, website, programmingLanguages, picture }, i) => (
           <Col key={i} md={6} lg={4} className="mb-4">
             <Card className="shadow-sm">
@@ -120,11 +120,11 @@ const Users: React.FC<ProfilesProps> = ({ profiles }) => {
                     <BsThreeDotsVertical />
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                  <Dropdown.Item href="#" onClick={() => SelectMain(id)}>Send Request to connect</Dropdown.Item>
-                    <Dropdown.Item href="#">Edit</Dropdown.Item>
-                    <Dropdown.Item href="#" onClick={() => SelectMain(id)}>Select as main</Dropdown.Item>
-                    <Dropdown.Item href="#" onClick={() => SelectCurrent(id)}>Select as current</Dropdown.Item>
-                    <Dropdown.Item href="#" onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
+                    <Dropdown.Item href="#" onClick={() => SelectMain(id)}>Send Request to connect</Dropdown.Item>
+                    <Dropdown.Item href="#" onClick={() => SelectMain(id)}>Go to personal page</Dropdown.Item>
+                    <Dropdown.Item href="#" onClick={() => handleDelete(id)}>Follow</Dropdown.Item>
+                    <Dropdown.Item href="#" onClick={() => SelectCurrent(id)}>Report</Dropdown.Item>
+                    <Dropdown.Item href="#" onClick={() => SelectCurrent(id)}>Block</Dropdown.Item>                
                   </Dropdown.Menu>
                 </Dropdown>
               </Card.Header>

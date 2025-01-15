@@ -38,17 +38,11 @@ router.post('/create', auth, async (req, res) => {
   }
 });
 
-router.put('/edit/:id', auth, async (req, res) => {
-  console.log('entered edit comment endpoint');
-
-  const { id, content } = req.params;
+router.post('/create/commentoncomment', auth, async (req, res) => {
+  console.log('entered create comment on comment endpoint');
+  const { commentId, content, img, audio, file } = req.body;
+  console.log('content: ', content);
   const token = req.cookies.token;
-
-  console.log('smain id: ', id);
-
-  if (!token) {
-    return res.status(401).json({ valid: false, error: 'Invalid token' });
-  }
 
   let userId;
 
@@ -60,24 +54,49 @@ router.put('/edit/:id', auth, async (req, res) => {
   });
 
   try {
-    const userExists = await prisma.users.findUnique({
-      where: { id: userId },
+    console.log('entered commentoncomment try: ', commentId);
+
+    const comment = await prisma.comments.create({
+      data: {
+        content,
+        commentHierarchy: { connect: { id: commentId } },
+        user: { connect: { id: userId } },
+      },
     });
 
+    res.status(201).json(comment);
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    res.status(500).json({ error: 'An error occurred while creating the comment' });
+  }
+});
 
-    if (!userExists) {
-      console.log('user doesnt exist');
+
+router.put('/edit/:id', auth, async (req, res) => {
+  console.log('entered edit post');
+  // const { id } = req.params;
+  const { commentId, content } = req.body;
+  console.log('id: ', commentId, ', content: ', content);
+
+  try {
+    const commentExists = await prisma.comments.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!commentExists) {
+      console.log('user doesn\'t exist');
       return res.status(404).json({ error: 'User not found' });
     } else {
+      console.log('comment exists');
       await prisma.comments.update({
-        where: { id },
+        where: { id: commentId },
         data: { content: content },
       });
       return res.status(200).json({ message: 'Main profile updated successfully', redirectUrl: '/profiles/myprofile' });
     }    
-    // return res.status(201).json({ profile, redirectUrl: '/profiles/myprofiles' });
+    // return res.status(200).json(profile);
   } catch (error) {
-    console.error('Error setting main profile:', error);
+    console.error('Error deleting profile:', error);
     return res.status(500).json({ error });
   }
 });

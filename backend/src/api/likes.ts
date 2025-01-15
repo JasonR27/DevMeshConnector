@@ -147,4 +147,84 @@ router.post('/create', auth, async (req, res) => {
   }
 });
 
+router.post('/comments/createlike', auth, async (req, res) => {
+  console.log('Entered create comment like endpoint');
+
+  const { commentId } = req.body;
+
+  const token = req.cookies.token;
+  let userId;
+  // let userName;
+
+  jwt.verify(token, SECRET_KEY, (err: any, decoded: any) => {
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+    }
+    userId = decoded.id;
+    // userName = decoded.name;
+  });
+
+  console.log('create comment like endpoint userId endpoint user id: ', userId);
+
+  try {
+    console.log('Entered try block');
+
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      console.log('User not found');
+    }
+
+    const profile = await prisma.profiles.findUnique({
+      where: { id: user?.currentProfileId as string },
+    });
+
+    if (!profile) {
+      console.log('Profile not found');
+    }
+
+    const profileId = profile?.id as string;
+
+    if (!profileId) {
+      console.log('profileId not found');
+    }
+
+    if (profileId) {
+      console.log('profileId: ', profileId);
+    }
+
+    const existingLike = await prisma.likes.findUnique({
+      where: {
+        profileId_commentId: {
+          profileId: profileId,
+          commentId: commentId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      console.log('removing existing like');
+      await prisma.likes.delete({
+        where: { id: existingLike.id },
+      });
+      return res.status(200).json({ message: 'Like removed' });
+    } else {
+      console.log('creating like');
+      await prisma.likes.create({
+        data: {
+          commentId: commentId,
+          profileId: profileId,
+          userId: user?.id as string,
+        },
+      });
+      return res.status(200).json({ message: 'Like added' });
+    }
+  } catch (error) {
+    console.log('Error: ', error);
+    return res.status(400).json({ error: 'Unauthorized' });
+  }
+});
+
 export default router;

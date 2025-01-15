@@ -16,6 +16,12 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const posts = await prisma.posts.findMany({
     include: {
+      comments: {
+        include: {
+          likes: true, // Include likes for each comment
+          comments: true, // Include comments for each comment
+        },
+      },
       profile: {
         select: {
           authorEmail: true,
@@ -41,7 +47,7 @@ router.get('/profile/current', auth, async (req, res) => {
     // Attach the decoded information to the request object
     userId = decoded.id;
     // authorEmail = decoded.email; // Assuming the ID is stored in the token payload
-    console.log('decoded: ', decoded, ' ', 'decoded.id: ', decoded.id, 'decoded.email: ', decoded.email);
+    // console.log('decoded: ', decoded, ' ', 'decoded.id: ', decoded.id, 'decoded.email: ', decoded.email);
     // next(); // Proceed to the next middleware or route handler
   });
 
@@ -49,17 +55,23 @@ router.get('/profile/current', auth, async (req, res) => {
     where: { id: userId },
   });
 
-  console.log('userId: ', userId);
-  console.log('user: ', user?.email);
+  // console.log('userId: ', userId);
+  // console.log('user: ', user?.email);
 
   const currentProfile = await prisma.profiles.findUnique({
     where: { id: user?.currentProfileId as string },
   });
 
   const posts = await prisma.posts.findMany({
+    
     where: { profileId: currentProfile?.id },
     include: {
-      comments: true,
+      comments: {
+        include: {
+          likes: true, // Include likes for each comment
+          comments: true, // Include comments for each comment
+        },
+      },
       profile: {
         select: {
           authorEmail: true,
@@ -69,6 +81,7 @@ router.get('/profile/current', auth, async (req, res) => {
       likes: { select: { id: true } },
     },
   });
+  
 
   res.status(200).json(posts);
 });
@@ -134,6 +147,7 @@ router.get('/post/:id', async (req, res) => {
       include: {
         profile: {
           select: {
+            user:true,
             authorEmail: true,
             picture: { select: { avatarUrl: true } },
           },

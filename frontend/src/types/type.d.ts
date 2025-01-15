@@ -60,6 +60,7 @@ interface IProfile {
   picture?: IPicture;
   programmingLanguages: string[];
   mainOptions?: boolean;
+  user: User?;
 }
 
 

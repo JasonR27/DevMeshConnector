@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const verifyToken = async () => {
       try {
         // const response = await axios.get(`${authUrl}/userinfo/`);
-        const response = await axios.get('http://localhost:8080/api/v1/auth/verifytoken', {
+        const response = await axios.get('http://localhost:8080/api/v2/auth/verifytoken', {
           withCredentials: true, // Include cookies in the request
           headers: {
             'Content-Type': 'application/json',

@@ -20,7 +20,9 @@ export function truncate(text: string, maxLength: number = 10): string {
 
 
 const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
-  const { user } = useContext(AuthContext);
+
+  // const { user } = useContext(AuthContext);
+  const { user: authUser } = useContext(AuthContext);
 
   console.log('typeof profiles arg in Profiles Comp 3rd line: ', typeof(profiles));
   console.log('profiles arg in Profiles Comp 3rd line: ', profiles);
@@ -103,7 +105,7 @@ const Profiles: React.FC<ProfilesProps> = ({ profiles }) => {
     <Container className="py-5">
       <Row>
         
-        {profiles.map(({ id, username, company, authorEmail, website, programmingLanguages, picture }, i) => (
+        {profiles.map(({ id, username, company, authorEmail, website, programmingLanguages, picture, user }, i) => (
           <Col key={i} md={6} lg={4} className="mb-4">
             <Card className="shadow-sm madeProfile4">
               <Card.Header className="card-header d-flex justify-content-between">

@@ -157,10 +157,9 @@ export const getProfilesByUser = async (): Promise<IProfile[]> => {
   }
 };
 
-export const getMainProfileByAuthorEmail = async (authorEmail: string): Promise<IProfile[]> => {
+export const getMainProfile = async (): Promise<IProfile[]> => {
   try {
-    const response = await axiosInstance.get<IProfile[]>(`${profilesUrl}/main/${authorEmail}`);
-    // const response: AxiosResponse<ApiDataType> = await axios.get(`8080/findProfileByEmail/${authorEmail}`);
+    const response = await axiosInstance.get<IProfile[]>(`${profilesUrl}/main`);
     const data: IProfile[] = response.data;
     console.log('api.ts mainprfbyemail data: ', data);
     return data;
@@ -169,9 +168,9 @@ export const getMainProfileByAuthorEmail = async (authorEmail: string): Promise<
   }
 };
 
-export const getCurrentProfileByAuthorEmail = async (authorEmail: string): Promise<IProfile[]> => {
+export const getCurrentProfile = async (): Promise<IProfile[]> => {
   try {
-    const response = await axiosInstance.get<IProfile[]>(`${profilesUrl}/current/${authorEmail}`);
+    const response = await axiosInstance.get<IProfile[]>(`${profilesUrl}/current`);
     // const response: AxiosResponse<ApiDataType> = await axios.get(`8080/findProfileByEmail/${authorEmail}`);
     const data: IProfile[] = response.data;
     console.log('api.ts mainprfbyemail data: ', data);
@@ -226,6 +225,17 @@ export const editPost = async (postId: string, content: string) => {
   }
 };
 
+export const editComment = async (commentId: string, content: string) => {
+  try {
+    console.log('content: ', content);
+    const response = await axiosInstance.put(`${commentsUrl}/edit/${commentId}`, {content, commentId});
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting profile:', error);
+    throw error;
+  }
+};
+
 export const deleteComment = async (profileId: string) => {
   try {
     const response = await axios.delete(`${commentsUrl}/delete/${profileId}`, {
@@ -237,19 +247,6 @@ export const deleteComment = async (profileId: string) => {
     throw error;
   }
 };
-
-export const editComment = async (profileId: string) => {
-  try {
-    const response = await axios.put(`${commentsUrl}/edit/${profileId}`, {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting profile:', error);
-    throw error;
-  }
-};
-
 
 
 export const SelectAsMain = async (profileId: string) => {
@@ -282,7 +279,16 @@ export const addComment = async (postId: string, content: string) => {
   return response.data;
 };
 
-
+export const commentOnComment = async (commentId: string, content: string) => {
+  try {
+    console.log('content: ', content);
+    const response = await axiosInstance.post(`${commentsUrl}/create/commentoncomment`, {content, commentId});
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting profile:', error);
+    throw error;
+  }
+};
 
 export async function addPost(post: Omit<IPost, 'id'>) {
   const response = await axiosInstance.post(`${postsUrl}/create`, post);
@@ -383,6 +389,12 @@ export async function postLogOut() {
 
 export async function addLike(postId?: string, commentId?: string) {
   const response = await axiosInstance.post(`${likeUrl}/create`, { postId, commentId }
+);
+return response;
+}
+
+export async function addLikeForComment(commentId?: string) {
+  const response = await axiosInstance.post(`${likeUrl}/comments/createlike`, { commentId }
 );
 return response;
 }

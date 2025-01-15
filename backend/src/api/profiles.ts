@@ -28,6 +28,7 @@ router.get('/', async (req, res) => {
           avatarUrl: true,
         },
       },
+      user: true,
     },
   });
   // console.log('profiles: ', profiles);
@@ -61,6 +62,14 @@ router.get('/findProfilesByUser/', auth, async (req, res) => {
 
     const profiles = await prisma.profiles.findMany({
       where: { userId: user?.id },
+      include: {
+        picture: {
+          select: {
+            avatarUrl: true,
+          },
+        },
+        user: true,
+      },
     });
 
     
@@ -174,21 +183,8 @@ router.post('/create', auth, async (req, res) => {
 
 // response with the main profile
 
-router.get('/main/:authorEmail', auth, async (req, res) => {
+router.get('/main', auth, async (req, res) => {
   // console.log('entered get main profile by email endpoint');
-
-  const { authorEmail } = req.params;
-
-  // console.log('Main Profile email: ', authorEmail);
-
-  // try {
-  //   const user = await prisma.users.findUnique({
-  //     where: { email: authorEmail },
-  //   });
-
-  //   const profile = await prisma.profiles.findUnique({
-  //     where: { id: user?.mainProfileId as string },
-  //   });
 
   const token = req.cookies.token;
 
@@ -214,6 +210,9 @@ router.get('/main/:authorEmail', auth, async (req, res) => {
 
     const profile = await prisma.profiles.findUnique({
       where: { id: user?.mainProfileId as string },
+      include: {
+        user: true,
+      },
     });
 
     // console.log('user: ', user);
@@ -226,10 +225,8 @@ router.get('/main/:authorEmail', auth, async (req, res) => {
   }
 });
 
-router.get('/current/:authorEmail', auth, async (req, res) => {
+router.get('/current', auth, async (req, res) => {
   // console.log('entered get current profile by email endpoint');
-
-  const { authorEmail } = req.params;
 
   // console.log('current Profile email: ', authorEmail);
 
@@ -257,6 +254,9 @@ router.get('/current/:authorEmail', auth, async (req, res) => {
 
     const profile = await prisma.profiles.findUnique({
       where: { id: user?.currentProfileId as string },
+      include: {
+        user: true,
+      },
     });
 
     // console.log('user: ', user);

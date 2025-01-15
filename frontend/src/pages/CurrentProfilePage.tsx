@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { getCurrentProfileByAuthorEmail } from "../api";
+import { getCurrentProfile } from "../api";
 import { useQuery } from "react-query";
 import Profiles from "../components/Profiles";
 import { Spinner, Alert, Container } from "react-bootstrap";
@@ -15,7 +15,7 @@ const CurrentProfilePage: React.FC = () => {
 
   const fetchProfile = async (): Promise<IProfile[]> => {
     console.log('React context user email on fetchProfile on mainprofile.tsx: ', user?.email);
-    const res: IProfile[] = await getCurrentProfileByAuthorEmail(user?.email);
+    const res: IProfile[] = await getCurrentProfile();
     return res;
   };
   

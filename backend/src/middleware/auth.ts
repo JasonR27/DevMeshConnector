@@ -6,11 +6,11 @@ dotenv.config();
 
 const SECRET_KEY: string = process.env.SUPABASE_JWT_SECRET || 'default_secret_key';
 
-if (!SECRET_KEY) {
-  // console.log('No Secret Key');
-} else {
-  // console.log('middleware auth SECRET_KEY/JWT secret: ', SECRET_KEY);
-}
+// if (!SECRET_KEY) {
+//   console.log('No Secret Key');
+// } else {
+//   console.log('middleware auth SECRET_KEY/JWT secret: ', SECRET_KEY);
+// }
 
 // Middleware function to verify JWT
 export const auth = (req: Request, res: Response, next: NextFunction) => {
@@ -26,10 +26,9 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
       // console.log('SECRET_KEY used in auth: ', SECRET_KEY);
       jwt.verify(token, SECRET_KEY, (err: any) => {
         if (err) {
-          // console.log('token that gave error: ', token);
+          console.log('token that gave error: ', token);
           return res.status(403).json({ message: 'Forbidden: Invalid token' });
         }
-
         // Attach the user object to the request object
         // req.user = user;
         next();

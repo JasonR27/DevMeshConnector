@@ -13,13 +13,14 @@ import ProfileAvatar from './ProfileAvatar';
 import '../styles/Posts.css';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from 'react-query';
-import { addLike, addComment, deletePost, deleteComment, editPost } from '../api';
+import { addLike, addLikeForComment, addComment, deletePost, deleteComment, editPost, editComment, commentOnComment } from '../api';
 import { AxiosResponse } from 'axios';
 
 interface Comment {
   id: string;
   authorEmail: string;
   content: string;
+  likes: any[];
 }
 
 interface Post {
@@ -44,8 +45,12 @@ interface PostsProps {
 const Posts: React.FC<PostsProps> = ({ posts }) => {
   const [commentText, setCommentText] = useState('');
   const [editPostText, setEditPostText] = useState('');
+  const [editCommentText, setEditCommentText] = useState('');
+  const [commentOnCommentText, setCommentOnCommentText] = useState('');
   const [isCommentFormVisible, setIsCommentFormVisible] = useState<{ [key: string]: boolean }>({});
   const [isEditPostFormVisible, setIsEditPostFormVisible] = useState<{ [key: string]: boolean }>({});
+  const [isEditCommentFormVisible, setIsEditCommentFormVisible] = useState<{ [key: string]: boolean }>({});
+  const [isCommentOnCommentFormVisible, setIsCommentOnCommentFormVisible] = useState<{ [key: string]: boolean }>({});
   const queryClient = useQueryClient();
   const [readMore, setReadMore] = useState<{ [key: string]: boolean }>({});
   // const [readMore, setReadMore] = useState<boolean>(false);
@@ -117,12 +122,27 @@ const Posts: React.FC<PostsProps> = ({ posts }) => {
     setEditPostText(content);
   };
 
-  const handleDeleteComment = async (profileId: string) => {
+  const handleToggleEditCommentForm = (postId: string, content: string) => {
+    setIsEditCommentFormVisible(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+    setEditCommentText(content);
+  };
+
+  const handleToggleCommentOnCommentForm = (postId: string, content: string) => {
+    setIsCommentOnCommentFormVisible(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+    setCommentOnCommentText(content);
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
     if (window.confirm('Are you sure you want to delete this comment?')) {
       try {
-        const response: AxiosResponse = await deleteComment(profileId); // Remove the deleted profile from the state 
+        const response: AxiosResponse = await deleteComment(commentId); // Remove the deleted profile from the state 
         const { redirectUrl } = response.data;
-
         if (redirectUrl) {
           // Use react-router-dom's useNavigate to redirect
           navigate(redirectUrl);
@@ -166,12 +186,32 @@ const Posts: React.FC<PostsProps> = ({ posts }) => {
     }
   });
 
+  const postCreateLikeForComment = async (commentId: any) => {
+    try {
+      await addLikeForComment(commentId);
+    } catch (error) {
+      console.error('Error creating like on comment:', error);
+    }
+  };
+
+  const { isLoading: isCreatingLikeForComment, mutate: postLikeForComment } = useMutation(postCreateLikeForComment, {
+    onSuccess: () => {
+      queryClient.invalidateQueries('posts');
+      console.log('Like request completed');
+    }
+  });
+
   const handleAddComment = async (postId: string) => {
     if (commentText.trim()) {
       try {
         await addComment(postId, commentText);
         // queryClient.invalidateQueries('posts');
         setCommentText('');
+        // hide form after publishing comment
+        setIsCommentFormVisible(prev => ({
+          ...prev,
+          [postId]: !prev[postId]
+        }));
       } catch (error) {
         console.error('Error adding comment:', error);
       }
@@ -183,12 +223,48 @@ const Posts: React.FC<PostsProps> = ({ posts }) => {
       try {
         console.log('editPostText: ', editPostText);
         await editPost(postId, editPostText);
-        
+
         setEditPostText('');
         // hide form after publishing edit
         setIsEditPostFormVisible(prev => ({
           ...prev,
           [postId]: !prev[postId]
+        }));
+      } catch (error) {
+        console.error('Error adding comment:', error);
+      }
+    }
+  };
+
+  const handlePublishEditedComment = async (commentId: string) => {
+    if (editCommentText.trim()) {
+      try {
+        console.log('editCommentText: ', editCommentText);
+        await editComment(commentId, editCommentText);
+
+        setEditCommentText('');
+        // hide form after publishing edit
+        setIsEditCommentFormVisible(prev => ({
+          ...prev,
+          [commentId]: !prev[commentId]
+        }));
+      } catch (error) {
+        console.error('Error adding comment:', error);
+      }
+    }
+  };
+
+  const handlePublishCommentOnComment = async (commentId: string) => {
+    if (commentOnCommentText.trim()) {
+      try {
+        console.log('commentOnCommentText: ', commentOnCommentText);
+        await commentOnComment(commentId, commentOnCommentText);
+
+        setCommentOnCommentText('');
+        // hide form after publishing edit
+        setIsCommentOnCommentFormVisible(prev => ({
+          ...prev,
+          [commentId]: !prev[commentId]
         }));
       } catch (error) {
         console.error('Error adding comment:', error);
@@ -241,7 +317,7 @@ const Posts: React.FC<PostsProps> = ({ posts }) => {
                   <div className="d-flex justify-content-end mt-3">
                     <ReadmoreButton onClick={() => handleReadMore(id)} postId={Number(id)} />
                     <div className="m-1">
-                      <LikeButton isDisabled={false} likesCount={likes?.length} onClick={() => postCreateLike(id)} />
+                      <LikeButton isDisabled={false} likesCount={likes?.length} onClick={() => postLike(id)} />
                     </div>
                   </div>
                   <hr />
@@ -260,35 +336,81 @@ const Posts: React.FC<PostsProps> = ({ posts }) => {
                   )}
                   <hr />
                   <div>Comments Section</div>
-                  {readMore[id] && comments && comments.length > 0 && comments.map((comment, index) => (
-                    <div key={index} className="comment d-flex justify-content-between">
-                      <div>
-                        <strong>{comment.authorEmail}</strong>: {comment.content}
-                      </div><div>
-                        {/* <button onClick={() => { handleDeleteComment(comment.id) }}>Delete</button>
-                        <button onClick={() => { handleEditComment(id) }}>Edit</button> */}
-                        {/* I don't why but this dropdown appears in a different part of the card */}
-                        <Dropdown className="">
-                          <Dropdown.Toggle as={Button} variant="link" className="text-muted p-0 bg-black">
-                            <BsThreeDotsVertical />
-                          </Dropdown.Toggle>
-                          <Dropdown.Menu>
-                            <Dropdown.Item href="#" onClick={() => EditPost(id)}>Like</Dropdown.Item>
-                            <Dropdown.Item href="#" onClick={() => { handleEditComment(comment.id) }}>Edit</Dropdown.Item>
-                            <Dropdown.Item href="#" onClick={() => handleToggleCommentForm(comment.id)}>Comment</Dropdown.Item>
-                            <Dropdown.Item href="#" onClick={() => { handleDeleteComment(comment.id) }}>Delete</Dropdown.Item>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                      </div>
+                  {readMore[id] && comments && comments.length > 0 && comments.map((comment) => (
+                    <div key={comment.id} className="comment d-flex justify-content-between">
+                      {isEditCommentFormVisible[comment.id] ? (
+                        <Form>
+                          <Form.Group controlId="editCommentForm">
+                            <Form.Control
+                              type="text"
+                              placeholder="Edit your comment"
+                              value={editCommentText}
+                              onChange={(event) => setEditCommentText(event.target.value)}
+                            />
+                          </Form.Group>
+                          <Button variant="primary" onClick={() => handlePublishEditedComment(comment.id)} className="mt-2">Publish</Button>
+                        </Form>
+                      ) : (
+                        <>
+                          <div>
+                            <strong>{comment.authorEmail}</strong>: {comment.content} 
+                          </div>
+                          <div>
+                            <small className="text-muted">{moment(comment.createdAt).fromNow()}</small>
+                          </div>          
+                          {comment.comments && comment.comments.length > 0 && comment.comments.map((subComment) => (
+                            <div key={subComment.id} className="sub-comment ms-4">
+                              <div>
+                                <strong>{subComment.authorEmail}</strong>: {subComment.content}
+                              </div>
+                              <div>
+                                <small className="text-muted">{moment(subComment.createdAt).fromNow()}</small>
+                              </div>
+                              <LikeButton isDisabled={false} likesCount={(subComment.likes || []).length} onClick={() => postLikeForComment(subComment.id)} />
+                            </div>
+                          ))}
+                          {isCommentOnCommentFormVisible[comment.id] ? (
+                        <Form>
+                          <Form.Group controlId="editCommentForm">
+                            <Form.Control
+                              type="text"
+                              placeholder="Edit your comment"
+                              value={commentOnCommentText}
+                              onChange={(event) => setCommentOnCommentText(event.target.value)}
+                            />
+                          </Form.Group>
+                          <Button variant="primary" onClick={() => handlePublishCommentOnComment(comment.id)} className="mt-2">Publish</Button>
+                        </Form>
+                      ) : (
+                        <>
+                          </>
+                          )}
+                          </>
+                          )}
+                          <div className="comment d-flex justify-content-between">
+                          <Dropdown>
+                            <Dropdown.Toggle as={Button} variant="link" className="text-muted p-0">
+                              <BsThreeDotsVertical />
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item href="#">Like</Dropdown.Item>
+                              <Dropdown.Item href="#" onClick={() => handleToggleEditCommentForm(comment.id, comment.content)}>Edit</Dropdown.Item>
+                              <Dropdown.Item href="#" onClick={() => handleToggleCommentOnCommentForm(comment.id, comment.content)}>Comment</Dropdown.Item>
+                              <Dropdown.Item href="#" onClick={() => handleDeleteComment(comment.id)}>Delete</Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                          <LikeButton isDisabled={false} likesCount={(comment.likes || []).length} onClick={() => postLikeForComment(comment.id)} />
+                          </div>
                     </div>
                   ))}
                 </Card.Body>
               </Card>
             </Col>
           </Row>
-        ))}
-      </Container>
-    </div>
+        ))
+        }
+      </Container >
+    </div >
   );
 };
 
