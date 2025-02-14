@@ -1,0 +1,21 @@
+# version: '3.7'
+
+services:
+  postgres:
+    image: postgres:17-bullseye
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prisma
+    
+    ports:
+      - "6543:5432"
+    
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
+    
+  
+
+# volumes:
+#   postgres_data:

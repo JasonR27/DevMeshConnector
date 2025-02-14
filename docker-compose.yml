@@ -1,0 +1,55 @@
+services:
+ frontend:
+    build:
+      # image: frontend
+      context: ./dmc
+      dockerfile: Dockerfile
+      target: frontend
+    command: serve -s /app/dist -l 3008
+    ports:
+      # - 80:80
+        - 3006:3008
+      #   - 3007:3000
+    networks:
+      - app-network
+    container_name: frontend
+ nginx:
+    build:
+      # image: frontend
+      context: ./nginx
+      dockerfile: Dockerfile
+      target: nginx
+    ports:
+        - 3008:80
+    networks:
+      - app-network
+ api:
+   build:
+     context: ./backend/api
+     dockerfile: Dockerfile
+     target: api
+   command: serve -s /app/dist -l 8080
+   ports:
+     - 8080:8080
+   depends_on:
+    - postgres
+   networks:
+     - app-network  
+
+ postgres:
+    image: postgres:17-bullseye
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=prisma
+    
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+   
+    
