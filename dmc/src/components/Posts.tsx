@@ -1,27 +1,39 @@
-
-// another version
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Badge, Dropdown, Form } from 'react-bootstrap';
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  MenuProps, Box, Container, Card,
+  CardActions, CardContent, CardHeader, Button,
+  Badge, Menu, MenuItem, TextField, IconButton, Typography
+} from '@mui/material';
+// import { MoreVert } from '@mui/icons-material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import moment from 'moment';
 import { truncate } from '../utils/functions';
 import { ReadmoreButton } from './ReadMoreButton';
 import LikeButton from './LikeButton';
 import ProfileAvatar from './ProfileAvatar';
-import '../styles/Posts.css';
-import { useNavigate } from 'react-router-dom';
-// import { addComment, deletePost, deleteComment, editPost, editComment, commentOnComment } from '../services/api';
+// import '../styles/Posts.css';
 import { AxiosResponse } from 'axios';
-import  CommentsSection  from './CommentsSection';
+import CommentsSection from './CommentsSection';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useMutationsContext } from '../services/MutationsContext';
+import { useMutationsContext } from '../context/MutationsContext';
+
+// import * as React from 'react';
+import { styled, alpha } from '@mui/material/styles';
+// import Button from '@mui/material/Button';
+// import Menu, { MenuProps } from '@mui/material/Menu';
+// import MenuItem from '@mui/material/MenuItem';
+import EditIcon from '@mui/icons-material/Edit';
+import Divider from '@mui/material/Divider';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const queryClient = new QueryClient();
-
 const Posts: React.FC<IPost[]> = ({ posts }) => {
-  const [commentText, setCommentText] = useState('');
+
+  const [commentText, setCommentText] = useState('default');
   const [editedPostText, setEditedPostText] = useState('');
   const [editedCommentText, setEditedCommentText] = useState('');
   const [commentOnCommentText, setCommentOnCommentText] = useState('');
@@ -29,7 +41,6 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
   const [isEditPostFormVisible, setIsEditPostFormVisible] = useState<{ [key: string]: boolean }>({});
   const [isEditCommentFormVisible, setIsEditCommentFormVisible] = useState<{ [key: string]: boolean }>({});
   const [isCommentOnCommentFormVisible, setIsCommentOnCommentFormVisible] = useState<{ [key: string]: boolean }>({});
-  // const queryClient = useQueryClient();
   const [readMore, setReadMore] = useState<{ [key: string]: boolean }>(() => {
     const initialState: { [key: string]: boolean } = {};
     posts.forEach(post => {
@@ -37,19 +48,36 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
     });
     return initialState;
   });
+  const [menuPostId, setMenuPostId] = useState<null | string>(null);
 
   const mutations = useMutationsContext();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, postId: number) => {
+    setAnchorEl(event.currentTarget);
+    setMenuPostId(postId);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setMenuPostId(null);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleAddLike = (id: string) => {
     mutations.createMutations.createLike.mutate(id);
   }
 
-  // const handleAddLikeForComment = (id: string) => {
-  //   mutations.createMutations.createLikeForComment.mutate(id);
-  // }
-
   const handleCommentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCommentText(event.target.value);
+    console.log(commentText);
   };
 
   const handleEditPostChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +103,7 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
   const handleDelete = async (postId: any) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
-        mutations.DeleteMutations.deletePost.mutate(postId);
+        mutations.deleteMutations.deletePost.mutate(postId);
       } catch (error) {
         console.error('Error deleting profile:', error);
         // Handle error
@@ -83,79 +111,28 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
     }
   };
 
-  // const EditPost = async (postId: any) => {
-  //   // if (window.confirm('Are you sure you want to delete this post?')) {
-  //   try {
-  //     mutations.UpdateMutations.updatePost.mutate(postId, editedPostText)
-      
-  //   } catch (error) {
-  //     console.error('Error creating profile:', error);
-  //     // Handle error
-  //   }
-  //   // }
-  // };
-
-  const handleToggleEditPostForm = (postId: string) => {
+  const handleToggleEditPostForm = (postId: string, content: string) => {
+    setEditedPostText(content);
     setIsEditPostFormVisible(prev => ({
       ...prev,
       [postId]: !prev[postId]
-    }));    
+    }));
   };
 
-  // const handleToggleEditCommentForm = (postId: string, content: string) => {
-  //   setIsEditCommentFormVisible(prev => ({
-  //     ...prev,
-  //     [postId]: !prev[postId]
-  //   }));
-  //   setEditedCommentText(content);
-  // };
-
-  // const handleToggleCommentOnCommentForm = (postId: string, content: string) => {
-  //   setIsCommentOnCommentFormVisible(prev => ({
-  //     ...prev,
-  //     [postId]: !prev[postId]
-  //   }));
-  //   setCommentOnCommentText(content);
-  // };
-
-  // const handleDeleteComment = async (commentId: string) => {
-  //   if (window.confirm('Are you sure you want to delete this comment?')) {
-  //     try {
-  //       // const response: AxiosResponse = await deleteComment(commentId); // Remove the deleted profile from the state 
-  //       mutations.DeleteMutations.deleteComment.mutate(commentId);
-        
-  //     } catch (error) {
-  //       console.error('Error creating profile:', error);
-  //       // Handle error
-  //     }
-  //   }
-  // };
-
-  // const EditComment = async (profileId: any) => {
-  //   // if (window.confirm('Are you sure you want to delete this post?')) {
-  //   try {
-  //     const response: AxiosResponse = await deletePost(profileId); // Remove the deleted profile from the state 
-  //     const { redirectUrl } = response.data;
-
-  //     if (redirectUrl) {
-  //       // Use react-router-dom's useNavigate to redirect
-  //       navigate(redirectUrl);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error creating profile:', error);
-  //     // Handle error
-  //   }
-  //   // }
-  // };
-
   const handleAddComment = async (postId: string) => {
+    console.log('commentText: ', commentText);
     if (commentText.trim()) {
+      console.log('cmttxt.trim = true')
+      console.log('commentText: ', commentText);
+
       try {
-        // await addComment(postId, commentText);
-        // queryClient.invalidateQueries('posts');
-        mutations.CreateMutations.createComment.mutate(postId, commentText);
-        setCommentText('');
-        // hide form after publishing comment
+        const newComment = { postId: postId, content: commentText }
+        console.log('commentText: ', commentText);
+        console.log('newComment.content: ', newComment.content);
+        mutations.createMutations.createComment.mutate(newComment);
+        console.log('commentText: ', commentText);
+        console.log('newComment.content: ', newComment.content);
+        // setCommentText('');
         setIsCommentFormVisible(prev => ({
           ...prev,
           [postId]: !prev[postId]
@@ -170,10 +147,8 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
     if (editedPostText.trim()) {
       try {
         console.log('editedPostText: ', editedPostText);
-        mutations.UpdateMutations.updatePost.mutate(postId, editedPostText);
-
+        mutations.updateMutations.updatePost.mutate(postId, editedPostText);
         setEditedPostText('');
-        // hide form after publishing edit
         setIsEditPostFormVisible(prev => ({
           ...prev,
           [postId]: !prev[postId]
@@ -184,130 +159,90 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
     }
   };
 
-  // const handlePublishEditedComment = async (commentId: string) => {
-  //   if (editedCommentText.trim()) {
-  //     try {
-  //       console.log('editedCommentText: ', editedCommentText);
-  //       // await editComment(commentId, editedCommentText);
-  //       mutations.UpdateMutations.updateComment.mutate(commentId, editedCommentText);
-
-  //       setEditedCommentText('');
-  //       // hide form after publishing edit
-  //       setIsEditCommentFormVisible(prev => ({
-  //         ...prev,
-  //         [commentId]: !prev[commentId]
-  //       }));
-  //     } catch (error) {
-  //       console.error('Error adding comment:', error);
-  //     }
-  //   }
-  // };
-
-  // const handlePublishCommentOnComment = async (commentId: string) => {
-  //   if (commentOnCommentText.trim()) {
-  //     try {
-  //       console.log('commentOnCommentText: ', commentOnCommentText);
-  //       // await commentOnComment(commentId, commentOnCommentText);
-  //       mutations.CreateMutations.createCommentOnComment.mutate(commentId, commentOnCommentText);
-
-  //       setCommentOnCommentText('');
-  //       // hide form after publishing edit
-  //       setIsCommentOnCommentFormVisible(prev => ({
-  //         ...prev,
-  //         [commentId]: !prev[commentId]
-  //       }));
-  //     } catch (error) {
-  //       console.error('Error adding comment:', error);
-  //     }
-  //   }
-  // };
-
   return (
     <div className="py-5">
-      <Container>
+      <Container style={{ position: 'relative' }}>
         {posts.slice().reverse().map(({ id, createdAt, title, content, profile, likes, comments }, i) => (
-          <Row key={i} className="justify-content-center py-3">
-            <Col md={8}>
-              <Card className="shadow-sm">
-                <Card.Header className="card-header d-flex justify-content-between">
-                  <Dropdown className="dropdown-container">
-                    <Dropdown.Toggle as={Button} variant="link" className="text-muted p-0">
-                      <BsThreeDotsVertical />
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      <Dropdown.Item href="#" onClick={() => handleToggleEditPostForm(id)}>Edit</Dropdown.Item>
-                      <Dropdown.Item href="#" onClick={() => handleToggleCommentForm(id)}>Comment</Dropdown.Item>
-                      <Dropdown.Item href="#" onClick={() => handleDelete(id)}>Delete</Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </Card.Header>
-                <Card.Body>
-                  {isEditPostFormVisible[id] ? <><Form>
-                    <Form.Group controlId="commentForm">
-                      <Form.Control
-                        type="text"
-                        placeholder={"Edit your post"}
-                        value={editedPostText}
-                        onChange={handleEditPostChange}
-                      />
-                    </Form.Group>
-                    <Button variant="primary" onClick={() => handlePublishEditedPost(id)} className="mt-2">Publish</Button>
-                  </Form></> : <>
-                    <Card.Title>{title}</Card.Title>
-                    <Card.Text>{content}</Card.Text>
-                  </>}
-                  <hr />
-                  <div className="d-flex align-items-center">
-                    <ProfileAvatar url={profile?.picture?.avatarUrl} avatarName={truncate(profile.authorEmail)} />
-                    <div className="ms-3">
-                      <h6 className="mb-0">{profile.authorEmail}</h6>
-                      <small className="text-muted">{moment(createdAt).format('Do MMMM YYYY')}</small>
-                    </div>
-                  </div>
-                  <div className="d-flex justify-content-end mt-3">
+
+          <Box key={i} width={{ xs: '100%', sm: '50%', md: '33%' }} p={1}>
+            <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column' }}>
+              <CardHeader
+
+                action={
+                  <>
+                    <IconButton
+                      aria-label="settings"
+                      onClick={(event) => handleMenuOpen(event, id)}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={Boolean(anchorEl) && menuPostId === id}
+                      onClose={handleMenuClose}
+                    >
+                      <MenuItem onClick={() => handleToggleEditPostForm(id, content)}>Edit</MenuItem>
+                      <MenuItem onClick={() => handleToggleCommentForm(id)}>Comment</MenuItem>
+                      <MenuItem onClick={() => handleDelete(id)}>Delete</MenuItem>
+                    </Menu>
+                  </>
+                }
+                title={title}
+              />
+
+
+              {isEditPostFormVisible[id] ? (
+                <form>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Edit your post"
+                    value={editedPostText}
+                    onChange={handleEditPostChange}
+                  />
+                  <Button variant="contained" onClick={() => handlePublishEditedPost(id)} className="mt-2">Publish</Button>
+                </form>
+              ) : (
+                <>
+                  <CardContent>
+                    <Typography variant="body2" color="textSecondary">
+                      {content}
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ justifyContent: 'flex-end' }}>
                     <ReadmoreButton onClick={() => handleReadMore(id)} postId={Number(id)} />
-                    <div className="m-1">
-                      <LikeButton isDisabled={false} likesCount={likes?.length} onClick={() => handleAddLike(id)} />
-                    </div>
-                  </div>
-                  <hr />
-                  {isCommentFormVisible[id] && (
-                    <Form>
-                      <Form.Group controlId="commentForm">
-                        <Form.Control
-                          type="text"
-                          placeholder="Add a comment..."
-                          value={commentText}
-                          onChange={handleCommentChange}
-                        />
-                      </Form.Group>
-                      <Button variant="primary" onClick={() => handleAddComment(id)} className="mt-2">Post Comment</Button>
-                    </Form>
-                  )}
-                  <hr />
-                  <div>Comments Section</div>
-                  {/* {readMore[id] && comments && comments.length > 0 && comments.map((comment) => ( */}
-                  {readMore[id] && comments && comments.length > 0 ? (
-                        <>
-                        first comment section
-                        <CommentsSection 
-                        comments={comments} 
-                        />
-                        end of first comment section
-                        </>
-                      ) : (
-                        <>
-                      no comments here
-                      {/* s */}
-                    </>
-                          )}
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        ))
-        }
-      </Container >
+                    <LikeButton isDisabled={false} likesCount={likes?.length} onClick={() => handleAddLike(id)} />
+                  </CardActions>
+                </>
+              )}
+
+              {isCommentFormVisible[id] && (
+                <form>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Add a comment..."
+                    value={commentText}
+                    onChange={handleCommentChange}
+                  />
+                  <Button variant="contained" onClick={() => handleAddComment(id)} className="mt-2">Post Comment</Button>
+                </form>
+              )}
+              <div>Comments Section</div>
+              {readMore[id] && comments && comments.length > 0 ? (
+                <>
+                  {/* {comments} */}
+                  <CommentsSection comments={comments} />
+                </>
+              ) : (
+                <p>No comments here</p>
+              )}
+
+
+            </Card>
+          </Box>
+        ))}
+      </Container>
     </div >
   );
 };

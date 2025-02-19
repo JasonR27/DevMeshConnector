@@ -46,12 +46,17 @@
 //       avatarUrl: string;
 //     };
 //   };
-  
+
 // }
 
 // interface PostsProps {
 //   posts: Post[];
 // }
+
+interface SettingsProps {
+   userName: string;
+   theme: string;
+}
 
 interface IPost {
   id: uuid;
@@ -62,6 +67,7 @@ interface IPost {
   updatedAt?: string;
   accToken?: string;
   profileId?: number;
+  profileName?: string;
   profile?: IProfile;
   likes?: ILike[];
   comments?: CommentProps[];
@@ -91,41 +97,43 @@ interface AuthContextType {
   login: (user: IPossibleUser) => Promise<AxiosResponse<IUser>>;
 }
 
+interface IComment {
+  
+  id?: string;
+
+  postId?: string;
+
+  commentId?: string;
+
+  userId?: string;
+
+  createdAt?: Date;
+
+  updatedAt?: Date;
+
+  comments?: CommentProps[];
+
+  profileName?: string;
+
+  content?: string;
+
+  img?: string;
+
+  audio?: string;
+
+  file?: string;
+
+  commentHierarchy?: CommentProps;
+
+  user?: string;
+
+  likes?: ILike[];
+
+}
+
 interface CommentProps {
 
-  comment?: {
-
-    id?: string;
-
-    postId?: string;
-
-    commentId?: string;
-
-    userId?: string;
-
-    createdAt?: Date;
-
-    updatedAt?: Date;
-
-    comments?: CommentProps[];
-
-    profileName?: string;
-
-    content?: string;
-
-    img?: string;
-
-    audio?: string;
-
-    file?: string;
-
-    commentHierarchy?: CommentProps;
-
-    user?: string;
-
-    likes?: ILike[];
-
-  };
+  comment?: IComment;
 
   commentId?: string;
 
@@ -135,6 +143,8 @@ interface CommentProps {
   postLikeForComment?: (commentId: string) => void;
 
 }
+
+
 
 
 

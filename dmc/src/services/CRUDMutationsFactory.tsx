@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from './api';
 
 export const CreateMutationsFactory = () => {
+  console.log('entered create mutations factory')
   const queryClient = useQueryClient(); // Use the query client only within this function scope
 
   return {
@@ -47,10 +48,20 @@ export const CreateMutationsFactory = () => {
       },
     }),
     createComment: useMutation({
-      mutationFn: (postId: string, content: string) => api.addComment(postId, content),
-      onMutate: () => console.log("mutate"),
+      mutationFn: (newComment: IComment) => {
+        console.log('postId: ', newComment.postId);
+        console.log('content: ', newComment.content);
+        api.createComment(newComment);
+      },
+      onMutate: () => {
+        console.log("mutate 2")
+        // console.log(content);
+      },
       onError: () => console.log("error"),
-      onSuccess: () => console.log("success"),
+      onSuccess: () => {
+        // console.log('content: ', content)
+        console.log("success 2")
+      },
       onSettled: async (_, error) => {
         if (error) {
           console.log(error);
@@ -60,7 +71,7 @@ export const CreateMutationsFactory = () => {
       },
     }),
     createCommentOnComment: useMutation({
-      mutationFn: (commentId: string, content: string) => api.addCommentOnComment(commentId, content),
+      mutationFn: (commentId: string, content: string) => api.createCommentOnComment(commentId, content),
       onMutate: () => console.log("mutate"),
       onError: () => console.log("error"),
       onSuccess: () => console.log("success"),
@@ -102,6 +113,7 @@ export const CreateMutationsFactory = () => {
 };
 
 export const DeleteMutationsFactory = () => {
+  console.log("entered delete mutations factory")
   const queryClient = useQueryClient(); // Use the query client only within this function scope
 
   return {
@@ -119,7 +131,10 @@ export const DeleteMutationsFactory = () => {
     //   },
     // }),
     deleteProfile: useMutation({
-      mutationFn: (profileId: string) => api.deleteProfile(profileId),
+      mutationFn: (profileId: string) => {
+        console.log('profileId: ', profileId);
+        api.deleteProfile(profileId)
+      },
       onMutate: () => console.log("mutate"),
       onError: () => console.log("error"),
       onSuccess: () => console.log("success"),
@@ -177,19 +192,19 @@ export const UpdateMutationsFactory = () => {
     //     }
     //   },
     // }),
-    // updateProfile: useMutation({
-    //   mutationFn: (profileId: string) => api.editProfile(profileId),
-    //   onMutate: () => console.log("mutate"),
-    //   onError: () => console.log("error"),
-    //   onSuccess: () => console.log("success"),
-    //   onSettled: async (_, error) => {
-    //     if (error) {
-    //       console.log(error);
-    //     } else {
-    //       await queryClient.invalidateQueries({ queryKey: ["update_profile"] });
-    //     }
-    //   },
-    // }),
+    updateProfile: useMutation({
+      mutationFn: (profileId: string) => api.editProfile(profileId),
+      onMutate: () => console.log("mutate"),
+      onError: () => console.log("error"),
+      onSuccess: () => console.log("success"),
+      onSettled: async (_, error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          await queryClient.invalidateQueries({ queryKey: ["update_profile"] });
+        }
+      },
+    }),
     updatePost: useMutation({
       mutationFn: (postId: string, content: string) => api.editPost(postId, content),
       onMutate: () => console.log("mutate"),
@@ -220,6 +235,7 @@ export const UpdateMutationsFactory = () => {
 };
 
 export const VerifySensitiveDataFactory = () => {
+  console.log('entered vsd factory')
   const queryClient = useQueryClient(); // Use the query client only within this function scope
 
   return {

@@ -16,7 +16,8 @@
 			"extensions": [
 				"ms-azuretools.vscode-docker",
 				"prisma.prisma",
-				"ms-ossdata.vscode-postgresql"
+				"ms-ossdata.vscode-postgresql",
+				"github.vscode-actions"
 			]
 		}
 	}

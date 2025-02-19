@@ -8,21 +8,13 @@ import {
   Button
 } from '@mui/material';
 import { useState, SetStateAction } from 'react';
-// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CustomToast from '../CustomToast';
-import { useMutationsContext } from '../../services/MutationsContext';
-// import { useHistory, useLocation } from 'react-router-dom';
+import { useMutationsContext } from '../../context/MutationsContext';
 import { useNavigate } from 'react-router-dom';
 
-
-// const queryClient = new QueryClient();
-
 export const Signin = () => {
-
-  // const history = useHistory();
-  // const location = useLocation();
   const navigate = useNavigate();
-  // Hook for signup state management
+  // Hooks for signup state management
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -36,7 +28,7 @@ export const Signin = () => {
   const [toastMessage, setToastMessage] = useState<ToastMessage | null>(null);
   const [newUser, setNewUser] = useState<IUser>(null);
 
-  const mutations = useMutationsContext();
+  const mutations = useMutationsContext(); 
 
   const handleRegister = async () => {
     const user = { email, password, username, name };
@@ -51,7 +43,8 @@ export const Signin = () => {
   };
 
   const handleLogin = async () => {
-    const user = { email, password, username };
+    console.log('entered handle login')
+    const user = { email, password };
     try {
       await mutations.verifySensitiveDataMutations.logInUser.mutate(user);
       setToastMessage({
@@ -60,9 +53,7 @@ export const Signin = () => {
         variant: 'success',
       });
       setShowToast(true);
-      // history.push('/myprofiles');
-      navigate('/myprofiles');
-      // window.location.href = '/myprofiles';
+      navigate('/myprofiles');      
     } catch (error) {
       console.error('Login failed', error);
     }
@@ -80,15 +71,24 @@ export const Signin = () => {
 
   return (
     // <QueryClientProvider client={queryClient}>
-      <Container maxWidth="sm" className='py-5' style={{
+      <Container style={{
         position: 'relative',
-        top: 0,
-        left: 0,
         zIndex: 13,
       }}>
         <Box py={5}>
           <Box display="flex" justifyContent="center">
-            <Box width={1} border={1} borderColor="primary.main" bgcolor="lightgray">
+            {/* <Box width={1} border={1} borderColor="primary.main"> */}
+            <Box
+                  flex={1}
+                  sx={{
+                    maxWidth: '600px',
+                    minWidth: '300px', 
+                    margin: 'auto', 
+                    padding: 4,
+                    borderRadius: 2,
+                    boxShadow: 5,
+                  }}
+                >
               <Box textAlign="center" mb={4}>
                 <Typography variant="h4">
                   {!authButtonState ? 'Register a new account' : 'Sign in to your account'}

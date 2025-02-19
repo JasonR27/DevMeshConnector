@@ -3,7 +3,7 @@ import { getMainProfile } from "../services/api";
 // import { useQuery } from "@tanstack/react-query";
 import Profiles from "../components/Profiles";
 import { Spinner, Alert, Container } from "react-bootstrap";
-import { AuthContext, useAuth } from '../components/Auth/Auth'
+import { AuthContext, useAuth } from '../context/Auth'
 import { getMainProfileQuery } from "../services/queries";
 
 

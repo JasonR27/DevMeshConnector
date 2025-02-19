@@ -1,21 +1,25 @@
 import React from "react";
-import { Container, Button, Row, Col } from "react-bootstrap";
+import { Container, Box, Button, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import AddIcon from "@mui/icons-material/Add";
 
 const PostActions: React.FC = () => {
   return (
-    <Container fluid className="bg-dark py-2">
-      <Row className="align-items-center justify-content-between">
-        <Col>
-          <Link to="/post/new">
-            <Button variant="primary" size="sm" className="d-flex align-items-center">
-              <FaPlus className="mr-2" />
+    <Container maxWidth="lg" sx={{ py: 2 }}>
+      <Grid container alignItems="center" justifyContent="space-between">
+        <Grid item>
+          <Link to="/post/new" style={{ textDecoration: 'none' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              startIcon={<AddIcon />}
+            >
               Add Post
             </Button>
           </Link>
-        </Col>
-      </Row>
+        </Grid>
+      </Grid>
     </Container>
   );
 };

@@ -4,7 +4,7 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 // import { truncate } from '../utils/functions';
 import ProfileAvatar from './ProfileAvatar';
 // import '../styles/Profiles.css'; // Import the CSS file
-import { AuthContext, useAuth } from './Auth/Auth'
+import { AuthContext, useAuth } from '../context/Auth'
 import { useContext } from 'react';
 import { deleteProfile, SelectAsCurrent, SelectAsMain } from '../services/api';
 

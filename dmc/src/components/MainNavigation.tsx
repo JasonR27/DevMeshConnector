@@ -1,48 +1,56 @@
-import React from 'react';
-import { AxiosResponse } from 'axios';
-import { useEffect, useState, useContext, Dispatch, SetStateAction } from 'react';
-import { useQuery } from 'react-query';
-import { redirect, useNavigate } from 'react-router-dom';
-// import eventBus from '../eventBus';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { AuthContext, useAuth } from './Auth/Auth'
-import { verifySession } from '../services/api';
-import { postLogOut } from '../services/api';
+import React, { useState, useContext } from 'react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { AuthContext, useAuth } from '../context/Auth';
+import { verifySession, postLogOut } from '../services/api';
+import { useThemeContext } from '../context/ThemeContext';
+import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import NightlightIcon from '@mui/icons-material/Nightlight';
+import { styled } from '@mui/system'; 
 
+const StyledLink = styled(RouterLink)(({ theme }) => ({
+  textDecoration: 'none',
+  color: theme.palette.mode === 'dark' ? theme.palette.grey[300] : 'white',
+  '&:hover': {
+    color: theme.palette.primary.light,
+  },
+}));
 
+const MenuStyledLink = styled(RouterLink)(({ theme }) => ({
+  textDecoration: 'none',
+  color: theme.palette.text.primary,
+  '&:hover': {
+    color: theme.palette.primary.main,
+  },
+}));
 
 const MainNavigation = () => {
-  const [avatar_url, setAvatarUrl] = useState<any>();
-  const [profile, setProfile] = useState<IProfile>()
-  // const { isOpen, onOpen, onClose } = useDisclosure();
+  const { darkMode, toggleDarkMode } = useThemeContext();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
   const navigate = useNavigate();
-
   const { user } = useContext(AuthContext);
 
-  console.log('useAuth(): ', useAuth())
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  console.log('user: ', user)
-
-  console.log('user email: ', user?.email)
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const isUserLoggedIn = async () => {
     try {
-      const isValid = await verifySession();  // await the async function
-      console.log('isValid:', isValid);
-      if (isValid) {  
-        setIsLoggedIn(true);          
-        console.log('User is logged in');
-        if (isValid === true) {
-          setIsLoggedIn(true);          
-        }
+      const isValid = await verifySession();
+      if (isValid) {
+        setIsLoggedIn(true);
         return true;
       } else {
-        if (isValid === false) {
-          setIsLoggedIn(false);          
-        }
-        console.log('No user token found');
+        setIsLoggedIn(false);
         return false;
       }
     } catch (error) {
@@ -54,106 +62,258 @@ const MainNavigation = () => {
   isUserLoggedIn();
 
   const signOut = async () => {
-    // Clear the JWT token from local storage
-    postLogOut();    
-
-    // Optionally, clear all local storage data
+    await postLogOut();
     localStorage.clear();
-
-    // Redirect to the sign-in or home page
     window.location.href = '/login';
-    setAvatarUrl('')
-    // redirect('/login')
-    // navigate("/login");
-  }
+  };
 
   const handleClickSignIn = () => {
     navigate('/login');
-    // redirect('/login')
-    if (user) {
-      console.log('user.id', user.id)
-    }
   };
 
-  if (user) {
-    console.log('user.id', user.id)
-  }
-
   return (
-    <>
-    <div className="navContainer">
-      <nav className="navbar navbar-expand-lg fullNav">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">DevMesh 🚀</a>
-          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-              <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="/">Home</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" href="/profiles">Profiles</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" href="/posts">Posts</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" href="/myprofiles">My Profiles</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" href="/profiles/currentprofile/myposts">Profile Posts</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link active" href="https://www.geeksforgeeks.org/">Events</a>
-              </li>
-              <form className="d-flex ps-5" role="search">
-                <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                <button className="btn btn-outline-success" type="submit">Search</button>
-              </form>
-            </ul>
-          </div>
-        </div>
-        
-        <ul className="navbar-nav">
-        <li className="nav-item dropdown ps-5" >
-                <a className="text-light mb-4 nav-link dropdown-toggle ps-5" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  More
-                </a>
-                <ul className="dropdown-menu">
-                <li><a className="dropdown-item" href="/user/page">User Page</a></li>
-                  <li><a className="dropdown-item" href="https://www.linkedin.com">Jobs</a></li>
-                  <li><a className="dropdown-item" href="https://stackup.dev/">Hackatons</a></li>
-                  <li><a className="dropdown-item" href="https://www.geeksforgeeks.org/">Events</a></li>
-                  <div>
-                    {isLoggedIn ? (
-                      <button className="btn btn-danger m-1 p-2 pl-5 pr-9" onClick={signOut}>Sign Out Button</button>
-                    ) : (
-                      <button className="btn btn-primary m-1 p-2 pl-5 pr-9" onClick={handleClickSignIn}>Sign In</button>
+    <AppBar position="static" sx={{
+        position: 'relative',
+        zIndex: 13,
+      }}>
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          DevMesh 🚀
+        </Typography>
 
-                    )}
-                  </div>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li><a className="dropdown-item" href="https://youtu.be/dQw4w9WgXcQ?t=43">Contact JasonR27</a></li>
-                </ul>
-              </li>
-          <li className="nav-item">
-            <div>
-              {
-                isLoggedIn ? (
-                  <div className='text-success'>Welcome, {user?.name}</div>
-                ) : (
-                  <button className="btn btn-primary m-1 p-2 pl-5 pr-9" onClick={handleClickSignIn}>Sign In</button>
-                )}
-            </div>
-          </li>
-        </ul>
-        
-      </nav>
-      </div>
-    </>
+        {!isMobile && (
+          <>
+            <StyledLink to="/">
+              <Button color="inherit">Home</Button>
+            </StyledLink>
+            <StyledLink to="/profiles">
+              <Button color="inherit">Profiles</Button>
+            </StyledLink>
+            <StyledLink to="/posts">
+              <Button color="inherit">Posts</Button>
+            </StyledLink>
+            <StyledLink to="/myprofiles">
+              <Button color="inherit">My Profiles</Button>
+            </StyledLink>
+            <StyledLink to="/profiles/currentprofile/myposts">
+              <Button color="inherit">Profile Posts</Button>
+            </StyledLink>
+            <StyledLink to="/events">
+              <Button color="inherit">Events</Button>
+            </StyledLink>
+          </>
+        )}
+        <IconButton color="inherit" onClick={handleMenuClick}>
+          <MenuIcon />
+        </IconButton>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          {isMobile && [
+              <MenuStyledLink to="/">
+                <MenuItem onClick={handleMenuClose}>Home</MenuItem>
+              </MenuStyledLink>,
+              <MenuStyledLink to="/profiles">
+                <MenuItem onClick={handleMenuClose}>Profiles</MenuItem>
+              </MenuStyledLink>,
+              <MenuStyledLink to="/posts">
+                <MenuItem onClick={handleMenuClose}>Posts</MenuItem>
+              </MenuStyledLink>,
+              <MenuStyledLink to="/myprofiles">
+                <MenuItem onClick={handleMenuClose}>My Profiles</MenuItem>
+              </MenuStyledLink>,
+              <MenuStyledLink to="/profiles/currentprofile/myposts">
+                <MenuItem onClick={handleMenuClose}>Profile Posts</MenuItem>
+              </MenuStyledLink>,
+              <MenuStyledLink to="/events">
+                <MenuItem onClick={handleMenuClose}>Events</MenuItem>
+              </MenuStyledLink>]
+          }
+          <MenuStyledLink to="/user/page">
+            <MenuItem onClick={handleMenuClose}>User Page</MenuItem>
+          </MenuStyledLink>
+          <MenuItem onClick={handleMenuClose} href="https://www.linkedin.com">Jobs</MenuItem>
+          <MenuItem onClick={handleMenuClose} href="https://stackup.dev/">Hackathons</MenuItem>
+          <MenuItem onClick={handleMenuClose} href="https://www.geeksforgeeks.org/">Events</MenuItem>
+          {isLoggedIn ? (
+            <Button color="secondary" onClick={signOut}>Sign Out</Button>
+          ) : (
+            <Button color="primary" onClick={handleClickSignIn}>Sign In</Button>
+          )}
+          <MenuItem onClick={handleMenuClose} href="https://youtu.be/dQw4w9WgXcQ?t=43">Contact JasonR27</MenuItem>
+        </Menu>
+        {isLoggedIn && (
+          <Typography variant="subtitle1" component="div" sx={{ marginLeft: 2 }}>
+            Welcome, {user?.name}
+          </Typography>
+        )}
+        <Button color="inherit" onClick={toggleDarkMode}>
+          {darkMode ? <LightModeIcon /> : <NightlightIcon />}
+        </Button>
+      </Toolbar>
+    </AppBar>
   );
 };
 
 export default MainNavigation;
+
+
+// import React, { useState, useContext } from 'react';
+// import { useNavigate, Link as RouterLink } from 'react-router-dom';
+// import { AuthContext, useAuth } from './Auth/Auth';
+// import { verifySession, postLogOut } from '../services/api';
+// import { useThemeContext } from './Theming/ThemeContext';
+// import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, useMediaQuery, useTheme } from '@mui/material';
+// import MenuIcon from '@mui/icons-material/Menu';
+// import LightModeIcon from '@mui/icons-material/LightMode';
+// import NightlightIcon from '@mui/icons-material/Nightlight';
+// import { styled } from '@mui/system';
+
+// const StyledLink = styled(RouterLink)(({ theme }) => ({
+//   textDecoration: 'none',
+//   color: theme.palette.mode === 'dark' ? theme.palette.grey[300] : 'white',
+//   '&:hover': {
+//     color: theme.palette.primary.light,
+//   },
+// }));
+
+// const MenuStyledLink = styled(RouterLink)(({ theme }) => ({
+//   textDecoration: 'none',
+//   color: theme.palette.text.primary,
+//   '&:hover': {
+//     color: theme.palette.primary.main,
+//   },
+// }));
+
+// const MainNavigation = () => {
+//   const { darkMode, toggleDarkMode } = useThemeContext();
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+//   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+//   const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
+//   const navigate = useNavigate();
+//   const { user } = useContext(AuthContext);
+
+//   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+//     setAnchorEl(event.currentTarget);
+//   };
+
+//   const handleMenuClose = () => {
+//     setAnchorEl(null);
+//   };
+
+//   const isUserLoggedIn = async () => {
+//     try {
+//       const isValid = await verifySession();
+//       if (isValid) {
+//         setIsLoggedIn(true);
+//         return true;
+//       } else {
+//         setIsLoggedIn(false);
+//         return false;
+//       }
+//     } catch (error) {
+//       console.error('Error verifying token:', error);
+//       return false;
+//     }
+//   };
+
+//   isUserLoggedIn();
+
+//   const signOut = async () => {
+//     await postLogOut();
+//     localStorage.clear();
+//     window.location.href = '/login';
+//   };
+
+//   const handleClickSignIn = () => {
+//     navigate('/login');
+//   };
+
+//   return (
+//     <AppBar position="static">
+//       <Toolbar>
+//         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+//           DevMesh 🚀
+//         </Typography>
+
+//         {!isMobile && (
+//           <>
+//             <StyledLink to="/">
+//               <Button color="inherit">Home</Button>
+//             </StyledLink>
+//             <StyledLink to="/profiles">
+//               <Button color="inherit">Profiles</Button>
+//             </StyledLink>
+//             <StyledLink to="/posts">
+//               <Button color="inherit">Posts</Button>
+//             </StyledLink>
+//             <StyledLink to="/myprofiles">
+//               <Button color="inherit">My Profiles</Button>
+//             </StyledLink>
+//             <StyledLink to="/profiles/currentprofile/myposts">
+//               <Button color="inherit">Profile Posts</Button>
+//             </StyledLink>
+//             <StyledLink to="/events">
+//               <Button color="inherit">Events</Button>
+//             </StyledLink>
+//           </>
+//         )}
+//         <IconButton color="inherit" onClick={handleMenuClick}>
+//           <MenuIcon />
+//         </IconButton>
+//         <Menu
+//           anchorEl={anchorEl}
+//           open={Boolean(anchorEl))}
+//           onClose={handleMenuClose}
+//         >
+//           {isMobile && [
+//             <MenuStyledLink key="home" to="/">
+//               <MenuItem onClick={handleMenuClose}>Home</MenuItem>
+//             </MenuStyledLink>,
+//             <MenuStyledLink key="profiles" to="/profiles">
+//               <MenuItem onClick={handleMenuClose}>Profiles</MenuItem>
+//             </MenuStyledLink>,
+//             <MenuStyledLink key="posts" to="/posts">
+//               <MenuItem onClick={handleMenuClose}>Posts</MenuItem>
+//             </MenuStyledLink>,
+//             <MenuStyledLink key="myprofiles" to="/myprofiles">
+//               <MenuItem onClick={handleMenuClose}>My Profiles</MenuItem>
+//             </MenuStyledLink>,
+//             <MenuStyledLink key="profilePosts" to="/profiles/currentprofile/myposts">
+//               <MenuItem onClick={handleMenuClose}>Profile Posts</MenuItem>
+//             </MenuStyledLink>,
+//             <MenuStyledLink key="events" to="/events">
+//               <MenuItem onClick={handleMenuClose}>Events</MenuItem>
+//             </MenuStyledLink>
+//           ]}
+//           <MenuStyledLink to="/user/page">
+//             <MenuItem onClick={handleMenuClose}>User Page</MenuItem>
+//           </MenuStyledLink>
+//           <MenuItem onClick={handleMenuClose} href="https://www.linkedin.com">Jobs</MenuItem>
+//           <MenuItem onClick={handleMenuClose} href="https://stackup.dev/">Hackathons</MenuItem>
+//           <MenuItem onClick={handleMenuClose} href="https://www.geeksforgeeks.org/">Events</MenuItem>
+//           {isLoggedIn ? (
+//             <Button color="secondary" onClick={signOut}>Sign Out</Button>
+//           ) : (
+//             <Button color="primary" onClick={handleClickSignIn}>Sign In</Button>
+//           )}
+//           <MenuItem onClick={handleMenuClose} href="https://youtu.be/dQw4w9WgXcQ?t=43">Contact JasonR27</MenuItem>
+//         </Menu>
+//         {isLoggedIn && (
+//           <Typography variant="subtitle1" component="div" sx={{ marginLeft: 2 }}>
+//             Welcome, {user?.name}
+//           </Typography>
+//         )}
+//         <Button color="inherit" onClick={toggleDarkMode}>
+//           {darkMode ? <LightModeIcon /> : <NightlightIcon />}
+//         </Button>
+//       </Toolbar>
+//     </AppBar>
+//   );
+// };
+
+// export default MainNavigation;

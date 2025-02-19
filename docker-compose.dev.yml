@@ -38,16 +38,17 @@ services:
    volumes:
      - ./backend/api:/app
      - api_node_modules:/app/node_modules
+    #  - api_prisma_migrations:/app/prisma/migrations
    ports:
-    #  - 8080:8080
-    - 8081:3030
+     - 8080:8080
+     - 8081:3030
    container_name: api
    command: ["npm", "run", "dev"] 
    depends_on:
     - postgres
    networks:
      - app-network  
-  #  entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
+   entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
    
  postgres:
     image: postgres:17-bullseye
@@ -55,12 +56,15 @@ services:
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=prisma
-    
+      - POSTGRES_PASSWORD=prisma    
     ports:
-      - "5432:5432"
+      - "6543:5432"
+    container_name: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    
 
 networks:
   app-network:
@@ -68,3 +72,5 @@ networks:
 volumes:
   frontend_node_modules:
   api_node_modules:
+  postgres_data:
+  # api_prisma_migrations:

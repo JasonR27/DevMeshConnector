@@ -1,5 +1,3 @@
-// import { fetchProfilePosts } from '../services/api';
-// import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useState } from "react";
 import Posts from '../components/Posts';
 import { Spinner, Alert } from 'react-bootstrap';

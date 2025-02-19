@@ -26,4 +26,4 @@ export const useMutationsContext = () => {
         throw new Error(Error.name);
     }
     return context;
-};
+}; 

@@ -1,10 +1,10 @@
 import { useContext, useState, useEffect, createContext, ReactNode } from 'react';
 // import { supabaseClient } from '../../config/supabase-client';
-import { getUserInfo } from '../../services/api';
+import { getUserInfo } from '../services/api';
 import { AxiosResponse } from 'axios';
 // import { useQuery } from '@tanstack/react-query';
-import CustomToast from '../CustomToast';
-import { logInUser as apiLogin } from '../../services/api'; // Import the login function
+import CustomToast from '../components/CustomToast';
+import { logInUser as apiLogin } from '../services/api'; // Import the login function
 
 // Create the AuthContext with the appropriate type
 export const AuthContext = createContext<Partial<AuthContextType> | undefined>(undefined);
@@ -98,4 +98,4 @@ export const useAuth = () => {
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
-};
+}; 

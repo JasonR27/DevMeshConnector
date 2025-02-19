@@ -4,12 +4,10 @@ import ProfilesActions from './ProfilesActions';
 const ProfilesLayout = () => {
   return (
     <>
-      <ProfilesActions style={{
-        position: 'relative',
-        top: 0,
-        left: 0,
-        zIndex: 13,
-      }}/>  
+      <ProfilesActions sx={{
+        py: 5,
+        position: 'relative'
+      }} />
       <Outlet />
     </>
   );

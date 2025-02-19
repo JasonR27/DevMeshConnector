@@ -1,0 +1,34 @@
+name: CI/CD Linting Workflow
+
+on:
+  push:
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '.github/workflows/main.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install ESLint
+        run: npm install eslint
+
+      - name: Run ESLint
+        run: npx eslint .
+
+      - name: Push changes
+        if: ${{ success() }}
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

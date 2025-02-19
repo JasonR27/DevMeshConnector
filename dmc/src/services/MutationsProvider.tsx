@@ -2,31 +2,21 @@
 
 // import React, { createContext, useEffect } from 'react';
 import React, { useEffect } from 'react';
-import { CreateMutationsFactory, VerifySensitiveDataFactory } from './CRUDMutationsFactory';
-import { MutationsContext, useMutationsContext } from './MutationsContext';
+import * as factories from './CRUDMutationsFactory';
+import { MutationsContext, useMutationsContext } from '../context/MutationsContext';
 
 export const MutationsProvider: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
 
-  const createMutations = CreateMutationsFactory();
-  const verifySensitiveDataMutations = VerifySensitiveDataFactory();
-
-  useEffect(() => {
-    // Ensure that the mutations are available in the context
-    return () => {
-    //   createMutations.registerUser.mutate;
-    //   createMutations.createPost.mutate;
-    //   verifySensitiveDataMutations.logInUser.mutate;
-    };
-  }, []);
-
-//   const useMutations = () => ({
-//     ...createMutations,
-//     ...verifySensitiveDataMutations,
-//   });
+  const createMutations = factories.CreateMutationsFactory();
+  const verifySensitiveDataMutations = factories.VerifySensitiveDataFactory();
+  const deleteMutations = factories.DeleteMutationsFactory();
+  const updateMutations = factories.UpdateMutationsFactory();
 
   const useMutations = () => ({
     createMutations,
     verifySensitiveDataMutations,
+    deleteMutations,
+    updateMutations,
   });
 
   return (

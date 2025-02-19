@@ -2,27 +2,18 @@ import React, { useState } from 'react';
 import { Button, Dropdown, Form, Container, Spinner, Alert } from 'react-bootstrap';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import LikeButton from './LikeButton';
-import { addLikeForComment, deleteComment, editComment, addCommentOnComment, getComment } from '../services/api';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import SeeComments from './SeeComments';
 import CommentsSection from './CommentsSection';
-// import { useQuery } from '@tanstack/react-query';
-import { AxiosResponse } from 'axios';
-import { useMutationsContext } from '../services/MutationsContext';
+import { useMutationsContext } from '../context/MutationsContext';
 import { getCommentQuery } from '../services/queries';
-
 
 const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
 
-    console.log('comment?.id: ', comment?.id);
-    console.log('commentId: ', commentId);
-
-    const { data: commentQuery, error, isError, isPending } = getCommentQuery();
+    const { data: commentQuery, error, isError, isPending } = getCommentQuery(commentId);
 
     const mutations = useMutationsContext();
-
     const [editCommentText, setEditCommentText] = useState('');
     const [isEditCommentFormVisible, setIsEditCommentFormVisible] = useState<{ [key: string]: boolean }>({});
     const [isCommentOnCommentFormVisible, setIsCommentOnCommentFormVisible] = useState<{ [key: string]: boolean }>({});
@@ -67,12 +58,6 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
         if (window.confirm('Are you sure you want to delete this comment?')) {
             try {
                 mutations.DeleteMutations.deleteComment.mutate(commentId);
-                // const response: AxiosResponse = await deleteComment(commentId); // Remove the deleted profile from the state 
-                // const { redirectUrl } = response.data;
-                // if (redirectUrl) {
-                //     // Use react-router-dom's useNavigate to redirect
-                //     navigate(redirectUrl);
-                // }
             } catch (error) {
                 console.error('Error deleting comment:', error);
                 // Handle error
@@ -83,12 +68,8 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
     const handlePublishCommentOnComment = async (commentId: string) => {
         if (commentOnCommentText.trim()) {
             try {
-                console.log('commentOnCommentText: ', commentOnCommentText);
-                // await commentOnComment(commentId, commentOnCommentText);
                 mutations.CreateMutations.createCommentOnComment.mutate(commentId, commentOnCommentText)
-
                 setCommentOnCommentText('');
-                // hide form after publishing edit
                 setIsCommentOnCommentFormVisible(prev => ({
                     ...prev,
                     [commentId]: !prev[commentId]
@@ -104,10 +85,7 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
             try {
                 console.log('editCommentText: ', editCommentText);
                 mutations.UpdateMutations.updateComment.mutate(commentId, editCommentText);
-                // await editComment(commentId, editCommentText);
-
                 setEditCommentText('');
-                // hide form after publishing edit
                 setIsEditCommentFormVisible(prev => ({
                     ...prev,
                     [commentId]: !prev[commentId]
@@ -120,28 +98,28 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
 
     if (isPending) {
         return (
-          <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </Container>
-        );
-      }
-    
-      if (isError) {
-        return (
-          <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-            <Alert variant="danger">
-              Error! {(error as Error).message}
-            </Alert>
-          </Container>
+            <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </Container>
         );
     }
 
-
-
+    if (isError) {
+        return (
+            <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+                <Alert variant="danger">
+                    Error! {(error as Error).message}
+                </Alert>
+            </Container>
+        );
+    }
     comment = commentQuery?.commentData?.comment;
-
+    console.log('comment.content: ', comment.content)
+    console.log('commentQuery: ', commentQuery)
+    console.log('commentQuery cmtdt: ', commentQuery.commentData)
+    console.log('commentQuery cmtdt cmt: ', commentQuery.commentData.comment)
     return (
         <div className="comment d-flex m-2 justify-content-between">
             {comment?.id && isEditCommentFormVisible[comment?.id] ? (
@@ -159,12 +137,13 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
             ) : (
                 comment ? (
                     <>
+                    hello comment
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     <div>
                                         <div>
-                                            <strong>{comment.profileName}</strong>: {comment.content}
+                                            <strong>{comment.userName}</strong>: {comment.content}
                                         </div>
                                         <div>
                                             <small className="text-muted">{moment(comment.createdAt).fromNow()}</small>

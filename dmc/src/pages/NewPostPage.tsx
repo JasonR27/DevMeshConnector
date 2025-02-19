@@ -1,63 +1,87 @@
-// import React from 'react';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabaseClient } from '../config/supabase-client';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { AxiosResponse } from 'axios';
-import { createPost } from '../services/api';
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-
+import { TextField, Button, Container, Box, Typography } from '@mui/material';
+import { useMutationsContext } from '../context/MutationsContext';
+import { getCurrentProfileQuery } from '../services/queries';
 
 function NewPostPage() {
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [state, setState] = useState<'initial' | 'submitting' | 'success'>('initial');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const {data: profileData, OnError, error, isPending } = getCurrentProfileQuery();
+  const mutations = useMutationsContext();
+
+  
+
+  const handleSubmit = async () => {
+    if (OnError) {
+      console.log('error.message: ', error.message);
+    }
+    if (isPending) {
+      console.log('profile data loading...')
+    }
+    console.log('profileData: ', profileData);
+    const newPost = { title: postTitle, content: postContent, profileName: profileData[0].username }
+    console.log('newPost.content: ', newPost.content);
+    console.log('newPost.profileName: ',newPost.profileName);
+    try {
+      await mutations.createMutations.createPost.mutate(newPost);
+      navigate('/profiles/currentprofile/myposts')
+    } catch (error: any) {
+      console.log('error.name', error.name)
+      console.log('error.message', error.message)
+    }
+  }
+  
 
   return (
-    <Container className="mt-5">
-      <Row className="justify-content-center">
-        <Col md={6}>
-          <div className="p-4 bg-white shadow rounded">
-            <h2 className="text-center mb-4">What do you have in mind?</h2>
-            <Form onSubmit={async (e: FormEvent) => {
-              e.preventDefault();
-              // ... your form submission logic
-            }}>
-              <Form.Group controlId="postTitle">
-                <Form.Control
-                  type="text"
-                  placeholder="Your title here"
-                  value={postTitle}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPostTitle(e.target.value)}
-                  disabled={state !== 'initial' && state !== 'success'}
-                  required
-                />
-              </Form.Group>
-              <Form.Group controlId="postContent" className="mt-3">
-                <Form.Control
-                  type="text"
-                  placeholder="Your content here"
-                  value={postContent}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setPostContent(e.target.value)}
-                  disabled={state !== 'initial' && state !== 'success'}
-                  required
-                />
-              </Form.Group>
-              <Button
-                variant={state === 'success' ? 'success' : 'primary'}
-                type={state === 'success' ? 'button' : 'submit'}
-                // onClick={postData}
-                className="mt-4 w-100"
-                disabled={state === 'submitting'}
-              >
-                {state === 'success' ? <i className="bi bi-check mr-2"></i> : 'Submit'}
-              </Button>
-            </Form>
-          </div>
-        </Col>
-      </Row>
+    <Container maxWidth="sm" style={{ marginTop: '5rem', position: 'relative', top: 0, left: 0 }}>
+      <Box boxShadow={3} p={4} bgcolor="white" borderRadius={2}>
+        <Typography variant="h4" align="center" gutterBottom>
+          What do you have in mind, huh?
+        </Typography>
+        <form onSubmit={async (e: FormEvent) => {
+          e.preventDefault();
+          handleSubmit();
+        }}>
+          <TextField
+            id="postTitle"
+            label="Your title here"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={postTitle}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setPostTitle(e.target.value)}
+            disabled={state !== 'initial' && state !== 'success'}
+            required
+          />
+          <TextField
+            id="postContent"
+            label="Your content here"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+            value={postContent}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setPostContent(e.target.value)}
+            disabled={state !== 'initial' && state !== 'success'}
+            required
+          />
+          <Button
+            variant="contained"
+            color={state === 'success' ? 'success' : 'primary'}
+            type={state === 'success' ? 'button' : 'submit'}
+            className="mt-4 w-100"
+            disabled={state === 'submitting'}
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            {state === 'success' ? '✔️ Success' : 'Submit'}
+          </Button>
+        </form>
+      </Box>
     </Container>
   );
 }
