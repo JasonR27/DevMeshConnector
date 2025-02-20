@@ -9,7 +9,7 @@ import UsersLayout from './components/UsersLayout';
 import NewPostPage from './pages/NewPostPage';
 import PostDetailPage from './pages/PostDetailPage';
 import PostLayout from './components/PostLayout';
-import PostPage from './pages/PostPage';
+import PostsPage from './pages/PostsPage';
 import WelcomePage from './pages/WelcomePage';
 import ProfilesPage from './pages/ProfilesPage';
 import UsersPage from './pages/UsersPage';
@@ -48,7 +48,7 @@ export const App = () => {
             </Route>
             <Route path='*' element={<NotFound />} />
             <Route path="/posts" element={<PostLayout />}>
-              <Route index element={<PostPage />} />
+              <Route index element={<PostsPage />} />
             </Route>
             <Route path="/profiles/currentprofile/myposts" element={<PostLayout />}>
               <Route index element={<ProfilePostsPage />} />

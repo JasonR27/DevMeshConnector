@@ -1,34 +1,3 @@
-// import React from 'react';
-// import Comment from './Comment';
-
-
-// interface CommentsSectionProps {
-//     comments: CommentProps[];
-//     onEdit?: (postId: string, content: string) => void;
-//     onDelete?: (id: string) => Promise<void>;
-//     onComment?: (postId: string, content: string) => void;
-//     postLikeForComment?: (commentId: string) => void;
-// }
-
-// const CommentsSection: React.FC<CommentsSectionProps> = ({ comments }) => {
-//     return (
-//         <div>
-//             {comments.map(comment => (
-//             <div key={comments.indexOf(comment)}>
-//                 <Comment key={comment.comment?.id} comment={comment} />
-//                 {comment.comment?.comments && (
-//                 <div style={{ marginLeft: '20px' }}>
-//                     <CommentsSection comments={comment.comment.comments} />
-//                 </div>
-//                 )}
-//             </div>
-//             ))}
-//         </div>
-//     );
-// };
-
-// export default CommentsSection;
-
 import React, { useState } from 'react';
 import Comment from './Comment';
 import SeeComments from './SeeComments';
@@ -53,7 +22,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ comments }) => {
 
 return (
     <div>
-        css {comments.length}
+        {/* css {comments.length} */}
         {comments.map(comment => (
             <div key={comment.id} style={{ marginBottom: '20px', borderLeft: '2px solid #ccc', paddingLeft: '10px' }}>
                 <Comment
@@ -71,7 +40,7 @@ return (
                 )} */}
             </div>
         ))}
-        cse {comments.length}
+        {/* cse {comments.length} */}
     </div>
 );
 };

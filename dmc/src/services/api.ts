@@ -105,9 +105,15 @@ export async function getUsers(): Promise<IUser[]> {
   return data;
 }
 
-export async function fetchPosts() {
-  const { data } = await axiosInstance.get(postsUrl);
-  // const { data } = await axios.get("/api/v1/posts");
+export async function getProfiles(): Promise<IProfile[]> {
+  const response = await axios.get<IProfile[]>(profilesUrl);
+  const data: IProfile[] = response.data;
+  return data;
+}
+
+export async function getPosts() {
+  const response = await axiosInstance.get(postsUrl);
+  const data: IPost[] = response.data;
   return data;
 }
 
@@ -121,7 +127,7 @@ export async function getComment(commentId: string) {
 
 export async function getProfilePosts() {
   const { data } = await axiosInstance.get(`${postsUrl}/profile/current`);
-  // const { data } = await axios.get("/api/v1/posts");
+  console.log('data: ', data)
   return data;
 }
 
@@ -140,11 +146,7 @@ export const getUserByEmail = async (userEmail: string): Promise<AxiosResponse> 
   }
 };
 
-export async function getProfiles(): Promise<IProfile[]> {
-  const response = await axios.get<IProfile[]>(profilesUrl);
-  const data: IProfile[] = response.data;
-  return data;
-}
+
 
 // export async function getProfiles(): Promise<IProfile[]> {
 //   const response = await axios.get<IProfile[]>(profilesUrl);
@@ -301,10 +303,12 @@ export const createComment = async (newComment: IComment) => {
   return response.data;
 };
 
-export const createCommentOnComment = async (commentId: string, content: string) => {
+export const createCommentOnComment = async (newComment: IComment) => {
   try {
-    console.log('content: ', content);
-    const response = await axiosInstance.post(`${commentsUrl}/create/commentoncomment`, { content, commentId });
+    console.log('api comment on comment: ', newComment);
+    console.log('api comment on comment commentId: ', newComment.commentId);
+    console.log('api comment on comment content: ', newComment.content);
+    const response = await axiosInstance.post(`${commentsUrl}/create/commentoncomment`, newComment);
     return response.data;
   } catch (error) {
     console.error('Error deleting profile:', error);

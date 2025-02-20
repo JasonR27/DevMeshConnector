@@ -14,6 +14,13 @@ export function getAllProfilesQuery() {
   });
 }
 
+export function getAllPostsQuery() {
+  return useQuery({
+    queryKey: ["posts"],
+    queryFn: api.getPosts,
+  });
+}
+
 export function getProfilesByUserQuery() {
   return useQuery({
     queryKey: ["user_profiles"],

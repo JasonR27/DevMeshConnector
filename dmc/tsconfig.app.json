@@ -33,6 +33,6 @@
       "./*.js",
       "src/**/*.ts",
       "test/**/*.ts",
-      "./prisma/seed.ts",
+      "./prisma/seed.ts", "eslint.config.mjs",
     ]
 }

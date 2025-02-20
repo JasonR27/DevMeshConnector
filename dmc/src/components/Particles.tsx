@@ -7,36 +7,49 @@ import type { Engine } from "@tsparticles/engine";
 
 
 const Particle: React.FC = () => {
-    const { theme, darkMode } = useThemeContext(); // Access the current theme from context
+    const { theme, mode, themeParticleColor } = useThemeContext(); // Access the current theme from context
+    console.log('themeParticleColor: ', themeParticleColor)
     const [init, setInit] = useState(false);
     const [particleColor, setParticleColor] = useState("#008b8b")
 
-    initParticlesEngine(async (engine) => {
-        await loadSlim(engine);
-    }).then(() => {
-        setInit(true);
-        setParticleColor("#008b8b")
-    });
+    
 
     useEffect(() => {
         console.log('from useffect')
         // const reset = 
-        async () => {
-            if (initParticlesEngine.current) {
-                await initParticlesEngine.current.destroy(); // Destroy the current instance
-                // await initParticles(particlesInit.current); // Reinitialize
-                initParticlesEngine(async (engine) => {
-                    await loadSlim(engine);
-                }).then(() => {
-                    setInit(true);
-                    setParticleColor("#FF0000")
-                });
-            }
-        }
-    }, [theme])
+        initParticlesEngine(async (engine) => {
+            await loadSlim(engine);
+        }).then(() => {
+            setInit(true);
+    
+            setParticleColor("#008b8b")
+            if (particleColor === "#008b8b" ) {
+                setParticleColor('#005ce6');
+              } else {
+                setParticleColor("#008b8b");
+              }
+        });
 
-    //   const particlesLoaded = (container: Container | undefined): Promise<void> => {
-    //   };
+        // async () => {
+        //     if (initParticlesEngine.current) {
+        //         await initParticlesEngine.current.destroy(); // Destroy the current instance
+        //         // await initParticles(particlesInit.current); // Reinitialize
+        //         initParticlesEngine(async (engine) => {
+        //             await loadSlim(engine);
+        //         }).then(() => {
+        //             setInit(true);
+        //             // setParticleColor("#FF0000")
+        //             // if (particleColor === 'red' ) {
+        //             //     setParticleColor('blue');
+        //             //   } else {
+        //             //     setParticleColor('red');
+        //             //   }
+        //         });
+        //     }
+        // }
+    }, [mode])
+
+
     return (
         <>
             {init && (
@@ -72,22 +85,16 @@ const Particle: React.FC = () => {
                         },
                         particles: {
                             color: {
-                                // value: "#bae6fd",
-                                // value: "#008b8b",
                                 value: particleColor,
                                 // value: theme === "light" ? "#008b8b" : "#0000ff", // Dynamic background based on theme
+                                // value: themeParticleColor,
                             },
                             // size: 5,
                             width: 7,
                             links: {
                                 // color: theme === "light" ? "#008b8b" : "#0000ff", // Dynamic background based on theme
-                                color: particleColor,
-                                // color: "#e0f2fe",
-                                // color: "#008b8b",
-                                // distance: 150,
-                                // enable: true,
-                                // opacity: 0.5,
-                                // width: 1,
+                                // color: themeParticleColor,
+                                color: particleColor,                                
                                 distance: 150,
                                 enable: true,
                                 opacity: 0.8,

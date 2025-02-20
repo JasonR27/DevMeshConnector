@@ -1,6 +1,8 @@
+
+
 import React, { useState } from 'react';
-import { Button, Dropdown, Form, Container, Spinner, Alert } from 'react-bootstrap';
-import { BsThreeDotsVertical } from 'react-icons/bs';
+import { Button, IconButton, Menu, MenuItem, TextField, Container, CircularProgress, Alert, Box, Typography } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import LikeButton from './LikeButton';
 import moment from 'moment';
 import { useNavigate } from 'react-router-dom';
@@ -10,15 +12,14 @@ import { useMutationsContext } from '../context/MutationsContext';
 import { getCommentQuery } from '../services/queries';
 
 const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
-
     const { data: commentQuery, error, isError, isPending } = getCommentQuery(commentId);
-
     const mutations = useMutationsContext();
     const [editCommentText, setEditCommentText] = useState('');
     const [isEditCommentFormVisible, setIsEditCommentFormVisible] = useState<{ [key: string]: boolean }>({});
     const [isCommentOnCommentFormVisible, setIsCommentOnCommentFormVisible] = useState<{ [key: string]: boolean }>({});
     const [commentOnCommentText, setCommentOnCommentText] = useState('');
     const [isSeeCommentsVisible, setIsSeeCommentsVisible] = useState<{ [key: string]: boolean }>({});
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const navigate = useNavigate();
 
@@ -66,9 +67,12 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
     };
 
     const handlePublishCommentOnComment = async (commentId: string) => {
+        console.log('commentId: ', commentId);
+        console.log('commentOnCommentText: ', commentOnCommentText);
+        const newComment = { commentId: commentId, content: commentOnCommentText }
         if (commentOnCommentText.trim()) {
             try {
-                mutations.CreateMutations.createCommentOnComment.mutate(commentId, commentOnCommentText)
+                mutations.createMutations.createCommentOnComment.mutate(newComment);
                 setCommentOnCommentText('');
                 setIsCommentOnCommentFormVisible(prev => ({
                     ...prev,
@@ -96,12 +100,18 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
         }
     };
 
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
     if (isPending) {
         return (
             <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-                <Spinner animation="border" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </Spinner>
+                <CircularProgress />
             </Container>
         );
     }
@@ -109,105 +119,102 @@ const Comment: React.FC<CommentProps> = ({ comment, commentId }) => {
     if (isError) {
         return (
             <Container className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
-                <Alert variant="danger">
+                <Alert severity="error">
                     Error! {(error as Error).message}
                 </Alert>
             </Container>
         );
     }
     comment = commentQuery?.commentData?.comment;
-    console.log('comment.content: ', comment.content)
-    console.log('commentQuery: ', commentQuery)
-    console.log('commentQuery cmtdt: ', commentQuery.commentData)
-    console.log('commentQuery cmtdt cmt: ', commentQuery.commentData.comment)
+    console.log('comment.content: ', comment.content);
+    console.log('commentQuery: ', commentQuery);
+    console.log('commentQuery cmtdt: ', commentQuery.commentData);
+    console.log('commentQuery cmtdt cmt: ', commentQuery.commentData.comment);
     return (
-        <div className="comment d-flex m-2 justify-content-between">
+        <Box className="comment d-flex m-2 justify-content-between">
             {comment?.id && isEditCommentFormVisible[comment?.id] ? (
-                <Form>
-                    <Form.Group controlId="editCommentForm">
-                        <Form.Control
-                            type="text"
-                            placeholder="Edit your comment"
-                            value={editCommentText}
-                            onChange={(event) => setEditCommentText(event.target.value)}
-                        />
-                    </Form.Group>
-                    <Button variant="primary" onClick={() => handlePublishEditedComment(comment.id)} className="mt-2">Publish</Button>
-                </Form>
+                <Box component="form">
+                    <TextField
+                        id="editCommentForm"
+                        label="Edit your comment"
+                        variant="outlined"
+                        value={editCommentText}
+                        onChange={(event) => setEditCommentText(event.target.value)}
+                        fullWidth
+                    />
+                    <Button variant="contained" color="primary" onClick={() => handlePublishEditedComment(comment.id)} className="mt-2">Publish</Button>
+                </Box>
             ) : (
                 comment ? (
-                    <>
-                    hello comment
-                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                <div style={{ display: 'flex', gap: '10px' }}>
-                                    <div>
+                    <Box display="flex" flexDirection="column">
+                        <Box display="flex" flexDirection="column">
+                            <Box sx={{ display: 'flex', flexDirection: 'column' }} gap={1}>
+                                <Box>
+                                    <Box sx={{ display: 'flex', flexDirection: 'row' }} gap={1}>
+                                        {/* <div> */}
+                                            <Typography variant="body1">
+                                                <strong>{comment.userName}</strong>: {comment.content}
+                                            </Typography>
+                                        {/* </div> */}
+                                        {/* <Box> */}
                                         <div>
-                                            <strong>{comment.userName}</strong>: {comment.content}
+                                            <IconButton aria-controls="simple-menu" aria-haspopup="true" onClick={handleMenuOpen}>
+                                                <MoreVertIcon />
+                                            </IconButton>
+                                            <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                                                <MenuItem onClick={() => createLikeForComment(comment.id)}>Like</MenuItem>
+                                                <MenuItem onClick={() => handleToggleEditCommentForm(comment.id)}>Edit</MenuItem>
+                                                <MenuItem onClick={() => handleToggleCommentOnCommentForm(comment.id)}>Comment</MenuItem>
+                                                <MenuItem onClick={() => handleDeleteComment(comment.id)}>Delete</MenuItem>
+                                            </Menu>
                                         </div>
-                                        <div>
-                                            <small className="text-muted">{moment(comment.createdAt).fromNow()}</small>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <LikeButton isDisabled={false} likesCount={comment.likes?.length} onClick={() => createLikeForComment(comment.id)} />
-                                            <SeeComments isDisabled={false} commentsCount={comment.comments?.length} onClick={() => handleToggleSeeComments(comment.id)} />
-                                        </div>
-                                    </div>
-
-                                    <Dropdown>
-                                        <Dropdown.Toggle as={Button} variant="link" className="text-muted p-0">
-                                            <BsThreeDotsVertical />
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            <Dropdown.Item onClick={() => createLikeForComment(comment.id)} >Like</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handleToggleEditCommentForm(comment.id)}>Edit</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handleToggleCommentOnCommentForm(comment.id)}>Comment</Dropdown.Item>
-                                            <Dropdown.Item onClick={() => handleDeleteComment(comment.id)}>Delete</Dropdown.Item>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-
-                                </div>
-                                <div>
-
-                                    {comment.id && isSeeCommentsVisible[comment.id] && comment.comments && (
-                                        <div style={{ marginLeft: '20px', marginTop: '10px' }}>
-                                            <CommentsSection
-                                                comments={comment.comments}
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div>
-                                {comment.id && isCommentOnCommentFormVisible[comment.id] ? (
-                                    <Form className='mt-3'>
-                                        <Form.Group controlId="commentOnCommentForm">
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Write your comment"
-                                                value={commentOnCommentText}
-                                                onChange={(event) => setCommentOnCommentText(event.target.value)}
-                                            />
-                                        </Form.Group>
-                                        <Button variant="primary" onClick={() => handlePublishCommentOnComment(comment.id)} className="mt-2">Publish</Button>
-                                    </Form>
-                                ) : (
-                                    <>
-                                        {/* commnt on comment form not visible */}
-                                    </>
+                                        {/* </Box> */}
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="caption" color="textSecondary">
+                                            {moment(comment.createdAt).fromNow()}
+                                        </Typography>
+                                    </Box>
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <LikeButton isDisabled={false} likesCount={comment.likes?.length} onClick={() => createLikeForComment(comment.id)} />
+                                        <SeeComments isDisabled={false} commentsCount={comment.comments?.length} onClick={() => handleToggleSeeComments(comment.id)} />
+                                    </Box>
+                                </Box>
+                            </Box>
+                            <Box>
+                                {comment.id && isSeeCommentsVisible[comment.id] && comment.comments && (
+                                    <Box ml={2} mt={1}>
+                                        <CommentsSection
+                                            comments={comment.comments}
+                                        />
+                                    </Box>
                                 )}
-                            </div>
-                        </div>
+                            </Box>
+                        </Box>
 
-                    </>
+                        <Box>
+                            {comment.id && isCommentOnCommentFormVisible[comment.id] ? (
+                                <Box component="form" mt={3}>
+                                    <TextField
+                                        id="commentOnCommentForm"
+                                        label="Write your comment"
+                                        variant="outlined"
+                                        value={commentOnCommentText}
+                                        onChange={(event) => setCommentOnCommentText(event.target.value)}
+                                        fullWidth
+                                    />
+                                    <Button variant="contained" color="primary" onClick={() => handlePublishCommentOnComment(comment.id)} className="mt-2">Publish</Button>
+                                </Box>
+                            ) : (
+                                <></>
+                            )}
+                        </Box>
+                    </Box>
                 ) : (
-                    <>
-                        {/* no comment for this comment comment comp */}
-                    </>
+                    <></>
                 )
             )}
-        </div>
+        </Box>
     );
 };
 

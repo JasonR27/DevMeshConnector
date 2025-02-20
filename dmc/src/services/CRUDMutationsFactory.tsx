@@ -71,7 +71,11 @@ export const CreateMutationsFactory = () => {
       },
     }),
     createCommentOnComment: useMutation({
-      mutationFn: (commentId: string, content: string) => api.createCommentOnComment(commentId, content),
+      mutationFn: (newComment: IComment) => {
+        console.log('commentId: ', newComment.commentId);
+        console.log('content: ', newComment.content);
+        api.createCommentOnComment(newComment);
+      },
       onMutate: () => console.log("mutate"),
       onError: () => console.log("error"),
       onSuccess: () => console.log("success"),

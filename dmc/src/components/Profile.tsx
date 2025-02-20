@@ -34,14 +34,12 @@ const Profile = () => {
   const [isEditingLanguage, setIsEditingLanguage] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isPublishingProfile, setIsPublishingProfile] = useState<boolean>(false);
-  // const [isUpdatingProfile, setIsUpdatingProfile] = useState<boolean>(false);
   const [profileId, setProfileId] = useState<string>();
   const [authorEmail, setAuthorEmail] = useState<string>();
   const [profile, setProfile] = useState<IProfile>();
   const [newParams, setNewParams] = useState<any[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [mainOptions, setMainOptions] = useState<boolean>(false);
-  // const [isCreatingProfile, setIsCreatingProfile] = useState<boolean>(false);
 
   const { user } = useAuth();
   const mutations = useMutationsContext();

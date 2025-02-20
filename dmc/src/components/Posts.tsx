@@ -13,24 +13,25 @@ import { ReadmoreButton } from './ReadMoreButton';
 import LikeButton from './LikeButton';
 import ProfileAvatar from './ProfileAvatar';
 // import '../styles/Posts.css';
-import { AxiosResponse } from 'axios';
+// import { AxiosResponse } from 'axios';
 import CommentsSection from './CommentsSection';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useMutationsContext } from '../context/MutationsContext';
+import SeeComments from './SeeComments';
 
-// import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-// import Button from '@mui/material/Button';
-// import Menu, { MenuProps } from '@mui/material/Menu';
-// import MenuItem from '@mui/material/MenuItem';
-import EditIcon from '@mui/icons-material/Edit';
-import Divider from '@mui/material/Divider';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+// // import * as React from 'react';
+// import { styled, alpha } from '@mui/material/styles';
+// // import Button from '@mui/material/Button';
+// // import Menu, { MenuProps } from '@mui/material/Menu';
+// // import MenuItem from '@mui/material/MenuItem';
+// import EditIcon from '@mui/icons-material/Edit';
+// import Divider from '@mui/material/Divider';
+// import ArchiveIcon from '@mui/icons-material/Archive';
+// import FileCopyIcon from '@mui/icons-material/FileCopy';
+// import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+// import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
-const queryClient = new QueryClient();
+// const queryClient = new QueryClient();
 const Posts: React.FC<IPost[]> = ({ posts }) => {
 
   const [commentText, setCommentText] = useState('default');
@@ -48,12 +49,24 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
     });
     return initialState;
   });
+  const [isSeeCommentsVisible, setIsSeeCommentsVisible] = useState<{ [key: string]: boolean }>({});
+
   const [menuPostId, setMenuPostId] = useState<null | string>(null);
 
   const mutations = useMutationsContext();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
+  const handleToggleSeeComments = (commentId?: string) => {
+    if (commentId) {
+      setIsSeeCommentsVisible(prev => ({
+        ...prev,
+        [commentId]: !prev[commentId]
+      }));  
+    };
+  }
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -67,9 +80,9 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
     setAnchorEl(null);
     setMenuPostId(null);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
 
   const handleAddLike = (id: string) => {
     mutations.createMutations.createLike.mutate(id);
@@ -86,13 +99,6 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
 
   const handleToggleCommentForm = (postId: string) => {
     setIsCommentFormVisible(prev => ({
-      ...prev,
-      [postId]: !prev[postId]
-    }));
-  };
-
-  const handleReadMore = (postId: string) => {
-    setReadMore(prev => ({
       ...prev,
       [postId]: !prev[postId]
     }));
@@ -164,10 +170,10 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
       <Container style={{ position: 'relative' }}>
         {posts.slice().reverse().map(({ id, createdAt, title, content, profile, likes, comments }, i) => (
 
-          <Box key={i} width={{ xs: '100%', sm: '50%', md: '33%' }} p={1}>
+          // <Box key={i} width={{ xs: '100%', sm: '50%', md: '33%' }} p={1}>
+          <Box key={i} p={1}>
             <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column' }}>
               <CardHeader
-
                 action={
                   <>
                     <IconButton
@@ -186,7 +192,7 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
                       <MenuItem onClick={() => handleDelete(id)}>Delete</MenuItem>
                     </Menu>
                   </>
-                }
+                } 
                 title={title}
               />
 
@@ -210,7 +216,8 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
                     </Typography>
                   </CardContent>
                   <CardActions sx={{ justifyContent: 'flex-end' }}>
-                    <ReadmoreButton onClick={() => handleReadMore(id)} postId={Number(id)} />
+                    {/* <ReadmoreButton onClick={() => handleReadMore(id)} postId={Number(id)} /> */}
+                    <SeeComments isDisabled={false} commentsCount={comments?.length} onClick={() => handleToggleSeeComments(id)} />
                     <LikeButton isDisabled={false} likesCount={likes?.length} onClick={() => handleAddLike(id)} />
                   </CardActions>
                 </>
@@ -229,7 +236,7 @@ const Posts: React.FC<IPost[]> = ({ posts }) => {
                 </form>
               )}
               <div>Comments Section</div>
-              {readMore[id] && comments && comments.length > 0 ? (
+              {isSeeCommentsVisible[id] && comments && comments.length > 0 ? (
                 <>
                   {/* {comments} */}
                   <CommentsSection comments={comments} />
