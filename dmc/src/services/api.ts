@@ -8,30 +8,22 @@ const homeUrl = window.location.origin;
 
 const BASE_URL = `${homeUrl}/backend`;
 
-const axiosInstance = axios.create({
+export const axiosPublic = axios.create({
+  // No credentials are sent
+  baseURL: BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
+
+export const axiosInstance = axios.create({
   baseURL: BASE_URL,
   withCredentials: true, // Include credentials (cookies) in requests
   headers: {
     'Content-Type': 'application/json',
   }
 });
-
-export default axiosInstance;
-
-// console.log("REACT_APP_TESTBACKEND: ", import.meta.env.VITE_TESTBACKEND)
-// console.log("VITE_BACKEND_URL: ", import.meta.env.VITE_BACKEND_URL)
-
-// const baseUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2`;
-// const profilesUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/profiles`;
-// const postsUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/posts`;
-// const commentsUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/comments`;
-// const pictureUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/pictures`;
-// const likeUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/likes`;
-// const usersUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/users`;
-// const authUrl: string = `${import.meta.env.VITE_BACKEND_URL}/api/v2/auth`;
-
-// console.log("REACT_APP_TESTBACKEND: ", import.meta.env.VITE_TESTBACKEND)
-// console.log("VITE_BACKEND_URL: ", import.meta.env.VITE_BACKEND_URL)
 
 const baseUrl: string = `${BASE_URL}/api/v2`;
 const profilesUrl: string = `${BASE_URL}/api/v2/profiles`;
@@ -47,18 +39,28 @@ export const logInUser = async (user: IPossibleUser): Promise<AxiosResponse> => 
   const password = user.password;
 
   try {
-    // First, make the login request to get the token
     const response: AxiosResponse<ApiDataType> = await axiosInstance.post(
-      // `${authUrl}/login/`,
       `${authUrl}/login/`,
       { email, password },
-      // { headers: {'Content-Type': 'application/json',}, withCredentials: true } // Include credentials if needed
     );
     return response;
   } catch (error: any) {
     throw new AxiosError(error);
   }
 };
+
+export const refreshToken = async (): Promise<void> => {
+  try {
+    // const response: AxiosResponse<ApiDataType> = 
+    await axiosInstance.post(
+      `${authUrl}/refreshtoken`
+    )
+    
+  } catch (error: any) {
+    console.log('Error refreshing session',error.message)
+  }
+
+}
 
 // export const verifySession = async () => {
 //   const response = await axiosInstance.get(`${authUrl}/verifytoken/`);

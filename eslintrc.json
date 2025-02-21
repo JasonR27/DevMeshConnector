@@ -1,0 +1,13 @@
+{
+  "env": {
+    "es8": true,
+    "node": true,
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    // your rules here
+  },
+    "esversion": 8
+}

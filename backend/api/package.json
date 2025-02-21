@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@eslint/js": "~9.17",
-    "@prisma/client": "^6.4.0",
+    "@prisma/client": "^6.4.1",
     "@types/bcrypt": "^5.0.2",
     "@types/dotenv": "^6.1.1",
     "@types/eslint__js": "~8.42",
@@ -23,7 +23,7 @@
     "globals": "~15.14",
     "nodemon": "^3.1.9",
     "prettier": "~3.4",
-    "prisma": "^6.4.0",
+    "prisma": "^6.4.1",
     "ts-api-utils": "~2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",

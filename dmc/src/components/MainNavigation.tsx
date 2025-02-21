@@ -7,7 +7,7 @@ import { AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, useMed
 import MenuIcon from '@mui/icons-material/Menu';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import NightlightIcon from '@mui/icons-material/Nightlight';
-import { styled } from '@mui/system'; 
+import { styled } from '@mui/system';
 
 const StyledLink = styled(RouterLink)(({ theme }) => ({
   textDecoration: 'none',
@@ -72,10 +72,9 @@ const MainNavigation = () => {
   };
 
   return (
-    <AppBar position="static" sx={{
-        position: 'relative',
-        zIndex: 13,
-      }}>
+    <AppBar position="static"
+      sx={{ position: 'relative', }}
+    >
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           DevMesh 🚀
@@ -112,24 +111,24 @@ const MainNavigation = () => {
           onClose={handleMenuClose}
         >
           {isMobile && [
-              <MenuStyledLink to="/">
-                <MenuItem onClick={handleMenuClose}>Home</MenuItem>
-              </MenuStyledLink>,
-              <MenuStyledLink to="/profiles">
-                <MenuItem onClick={handleMenuClose}>Profiles</MenuItem>
-              </MenuStyledLink>,
-              <MenuStyledLink to="/posts">
-                <MenuItem onClick={handleMenuClose}>Posts</MenuItem>
-              </MenuStyledLink>,
-              <MenuStyledLink to="/myprofiles">
-                <MenuItem onClick={handleMenuClose}>My Profiles</MenuItem>
-              </MenuStyledLink>,
-              <MenuStyledLink to="/profiles/currentprofile/myposts">
-                <MenuItem onClick={handleMenuClose}>Profile Posts</MenuItem>
-              </MenuStyledLink>,
-              <MenuStyledLink to="/events">
-                <MenuItem onClick={handleMenuClose}>Events</MenuItem>
-              </MenuStyledLink>]
+            <MenuStyledLink to="/">
+              <MenuItem onClick={handleMenuClose}>Home</MenuItem>
+            </MenuStyledLink>,
+            <MenuStyledLink to="/profiles">
+              <MenuItem onClick={handleMenuClose}>Profiles</MenuItem>
+            </MenuStyledLink>,
+            <MenuStyledLink to="/posts">
+              <MenuItem onClick={handleMenuClose}>Posts</MenuItem>
+            </MenuStyledLink>,
+            <MenuStyledLink to="/myprofiles">
+              <MenuItem onClick={handleMenuClose}>My Profiles</MenuItem>
+            </MenuStyledLink>,
+            <MenuStyledLink to="/profiles/currentprofile/myposts">
+              <MenuItem onClick={handleMenuClose}>Profile Posts</MenuItem>
+            </MenuStyledLink>,
+            <MenuStyledLink to="/events">
+              <MenuItem onClick={handleMenuClose}>Events</MenuItem>
+            </MenuStyledLink>]
           }
           <MenuStyledLink to="/user/page">
             <MenuItem onClick={handleMenuClose}>User Page</MenuItem>

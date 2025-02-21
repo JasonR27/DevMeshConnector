@@ -13,6 +13,7 @@ import like from './likes';
 import signup from './signup';
 import verifytoken from './verifytoken';
 import comments from './comments';
+import refreshtoken from './refreshtoken';
 
 const app = express();
 
@@ -73,6 +74,6 @@ app.use('/profiles', profile);
 app.use('/pictures', picture);
 app.use('/likes', like);
 app.use('/comments', comments);
-app.use('/auth', signup, login, verifytoken);
+app.use('/auth', signup, login, verifytoken, refreshtoken);
 
 export default app;

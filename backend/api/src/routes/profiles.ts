@@ -378,7 +378,7 @@ router.put('/update/current/:id', auth, async (req, res): Promise<any> => {
         where: { id: userId },
         data: { currentProfileId: id },
         
-      });
+      }); 
       // const settingsCookie = req.cookies.settings;
 
       // let settings = settingsCookie ? JSON.parse(settingsCookie) : {};

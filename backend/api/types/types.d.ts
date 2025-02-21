@@ -1,6 +1,11 @@
 import * as express from 'express';
 // Request interface extension
 
+interface SettingsProps {
+  userName?: string;
+  theme?: string;
+}
+
 interface MessageResponse {
   message: string;
 }

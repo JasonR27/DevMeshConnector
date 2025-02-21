@@ -10,7 +10,8 @@ const Particle: React.FC = () => {
     const { theme, mode, themeParticleColor } = useThemeContext(); // Access the current theme from context
     console.log('themeParticleColor: ', themeParticleColor)
     const [init, setInit] = useState(false);
-    const [particleColor, setParticleColor] = useState("#008b8b")
+    // const [particleColor, setParticleColor] = useState("#008b8b")
+    const [particleColor, setParticleColor] = useState("#005ce6")
 
     
 
@@ -22,11 +23,17 @@ const Particle: React.FC = () => {
         }).then(() => {
             setInit(true);
     
+            // setParticleColor("#008b8b")
+            // if (particleColor === "#008b8b" ) {
+            //     setParticleColor('#005ce6');
+            //   } else {
+            //     setParticleColor("#008b8b");
+            //   }
             setParticleColor("#008b8b")
-            if (particleColor === "#008b8b" ) {
-                setParticleColor('#005ce6');
-              } else {
+            if (mode) {
                 setParticleColor("#008b8b");
+              } else {                
+                setParticleColor('#005ce6');
               }
         });
 

@@ -1,4 +1,4 @@
-import React, { StrictMode } from 'react';
+import React, { useEffect, StrictMode } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CssBaseline, Container } from '@mui/material';
 import NotFound from './components/NotFound';
@@ -20,10 +20,25 @@ import Signin from './components/Auth/Signin';
 import Profile from './components/Profile';
 import ProfilePostsPage from './pages/ProfilePostsPage';
 import ProfilePageOwnerView from './pages/ProfilePageOwnerView';
-import './styles/App.css'
+// import './styles/App.css'
+import { useMutationsContext } from './context/MutationsContext';
+import { useThemeContext } from './context/ThemeContext';
 
 
 export const App = () => {
+  const mutations = useMutationsContext();
+  const mode = useThemeContext();
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // Your code to run every 45 minutes
+      console.log('This runs every 45 minutes');
+      mutations.verifySensitiveData.refreshToken.mutate();
+    }, 45 * 60 * 1000); // 45 minutes in milliseconds
+
+    return () => clearInterval(intervalId); // Clean up the interval on component unmount
+  }, [mode]);
+
   return (
     <StrictMode>
       <CssBaseline />

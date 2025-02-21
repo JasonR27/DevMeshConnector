@@ -33,8 +33,8 @@ async function main():Promise<void> {
       userName: 'JeisonRoblero',
       passwordHash: '$2b$12$UEsk.9Pqvq3xH1znnhMc.OeQv3JKclGwuC/5hdo2VhLH1w.o72oyO',
       role: 'user',
-      currentProfileId: '450208d0-865d-4acd-a3e8-a2d1ecbd095f',
-      mainProfileId: '450208d0-865d-4acd-a3e8-a2d1ecbd095f',
+      // currentProfileId: '450208d0-865d-4acd-a3e8-a2d1ecbd095f',
+      // mainProfileId: '450208d0-865d-4acd-a3e8-a2d1ecbd095f',
     },
   });
 
@@ -98,6 +98,19 @@ async function main():Promise<void> {
       programmingLanguages: ['JavaScript', 'TypeScript'],
     },
   });
+
+  // adding foreign key relationship for main and currentprofile on user 3
+  await prisma.users.update(
+    {
+      where: {
+        id: user3.id,
+      },
+      data: {
+        currentProfileId:  profile3.id,
+        mainProfileId: profile4.id,
+      }
+    }
+  )
 
   // Create posts
   const post1 = await prisma.posts.create({

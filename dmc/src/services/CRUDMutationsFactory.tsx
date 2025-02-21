@@ -256,5 +256,18 @@ export const VerifySensitiveDataFactory = () => {
         }
       },
     }),
+    refreshToken: useMutation({
+      mutationFn: () => api.refreshToken(),
+      onMutate: () => console.log("mutate"),
+      onError: () => console.log("error"),
+      onSuccess: () => console.log("success"),
+      onSettled: async (_, error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          await queryClient.invalidateQueries({ queryKey: ["refresh_token"] });
+        }
+      },
+    })
   };
 };

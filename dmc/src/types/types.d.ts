@@ -54,9 +54,9 @@
 // }
 
 interface SettingsProps {
-   userName: string;
-   theme: string;
-}
+   userName?: string;
+   theme?: string;
+} 
 
 interface IPost {
   id: uuid;

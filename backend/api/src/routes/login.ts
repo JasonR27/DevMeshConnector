@@ -38,6 +38,7 @@ router.post('/login', async (req, res): Promise<any> => {
   console.log('Entered login endpoint');
   const { email, password } = req.body;
   // console.log('email: ', email);
+  const currentDate = new Date().toISOString();
 
 
   try {
@@ -47,7 +48,7 @@ router.post('/login', async (req, res): Promise<any> => {
       // Ensure the user ID is unique
       // const generatedSecret = generateSecret();
       // console.log('process.env.SUPABASE_JWT_SECRET: ', process.env.SUPABASE_JWT_SECRET);
-      const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id, email: user.email, loginDate: currentDate }, SECRET_KEY, { expiresIn: '1h' });
 
       if (token) {
         console.log('Generated token for user ID:', user.id);
@@ -66,15 +67,14 @@ router.post('/login', async (req, res): Promise<any> => {
 
       let settings: SettingsProps = {
         userName: userName,
-        theme: 'dark',
+        theme: 'dark', 
       }
 
-      res.cookie('settings', settings, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 3600 * 10000,
-      }); 
+      const theme = 'dark'
+
+      res.cookie('settings', JSON.stringify({ userName: userName, theme: 'dark' }));
+
+      res.cookie('theme', theme)
 
       res.cookie('token', token, {
         httpOnly: true,
