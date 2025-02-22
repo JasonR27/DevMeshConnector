@@ -21,8 +21,7 @@ const Particle: React.FC = () => {
         initParticlesEngine(async (engine) => {
             await loadSlim(engine);
         }).then(() => {
-            setInit(true);
-    
+            setInit(true);    
             // setParticleColor("#008b8b")
             // if (particleColor === "#008b8b" ) {
             //     setParticleColor('#005ce6');

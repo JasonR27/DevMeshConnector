@@ -1,4 +1,4 @@
-import React, { useEffect, StrictMode } from 'react';
+import React, { useEffect, useState, StrictMode } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { CssBaseline, Container } from '@mui/material';
 import NotFound from './components/NotFound';
@@ -28,16 +28,18 @@ import { useThemeContext } from './context/ThemeContext';
 export const App = () => {
   const mutations = useMutationsContext();
   const mode = useThemeContext();
+  const [refreshInterval, setRefreshInterval] = useState<boolean>(true);
+  let interval: boolean = false;
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      // Your code to run every 45 minutes
-      console.log('This runs every 45 minutes');
-      mutations.verifySensitiveData.refreshToken.mutate();
-    }, 45 * 60 * 1000); // 45 minutes in milliseconds
+  const intervalId = setInterval(() => {
+    // Your code to run every 50 minutes
+    console.log('token refresh interval function')
+    mutations.verifySensitiveDataMutations.refreshToken.mutate();
+    interval = !interval;    
+    setRefreshInterval(!refreshInterval);
+  }, 50 * 60 * 1000); // 50 minutes in milliseconds 50 * 60 * 1000
 
-    return () => clearInterval(intervalId); // Clean up the interval on component unmount
-  }, [mode]);
+  console.log('App.tsx log')
 
   return (
     <StrictMode>

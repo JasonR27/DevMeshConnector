@@ -260,7 +260,7 @@ export const VerifySensitiveDataFactory = () => {
       mutationFn: () => api.refreshToken(),
       onMutate: () => console.log("mutate"),
       onError: () => console.log("error"),
-      onSuccess: () => console.log("success"),
+      onSuccess: () => console.log("success"), 
       onSettled: async (_, error) => {
         if (error) {
           console.log(error);
